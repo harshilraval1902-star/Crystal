@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+model Admin {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique(map: "Admin_email_key")
+  password     String
+  name         String
+  role         String        @default(dbgenerated("(admin)"))
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  activityLogs  ActivityLog[]
+  refreshTokens RefreshToken[]
+
+  @@map("admin")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique(map: "RefreshToken_token_key")
+  adminId   Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade, map: "RefreshToken_adminId_fkey")
+
+  @@index([adminId], map: "RefreshToken_adminId_fkey")
+  @@map("refreshtoken")
+}
+
+// ─── Products ─────────────────────────────────────────────────────────────────
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String
+  slug           String   @unique(map: "Product_slug_key")
+  brand          String?
+  model          String?
+  category       String?
+  price          String
+  discountPrice  String?
+  description    String?  @db.Text
+  features       String?  @db.Text
+  specifications String?  @db.Text
+  warranty       String?
+  stockStatus    String   @default(dbgenerated("(in_stock)"))
+  stock          Int?
+  featured       Boolean  @default(false)
+  mainImageUrl   String?  @db.Text
+  thumbnail      String?  @db.Text
+  image          String?  @db.Text
+  images         String?  @db.Text
+  variants       String?  @db.Text
+  tags           String?  @db.Text
+  badge          String?
+  seoTitle       String?
+  seoDescription String?
+  isActive       Boolean  @default(true)
+  isDeleted      Boolean  @default(false)
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  reviews        Review[]
+
+  @@map("product")
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+model Review {
+  id           Int      @id @default(autoincrement())
+  productId    Int
+  customerName String
+  rating       Int
+  reviewText   String   @db.Text
+  status       String   @default(dbgenerated("(pending)"))
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "Review_productId_fkey")
+
+  @@index([productId], map: "Review_productId_fkey")
+  @@map("review")
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+model Testimonial {
+  id           Int      @id @default(autoincrement())
+  customerName String
+  review       String   @db.Text
+  rating       Int      @default(5)
+  location     String?
+  designation  String?
+  photoUrl     String?
+  isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("testimonial")
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+model GalleryImage {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageUrl  String   @db.Text
+  category  String   @default(dbgenerated("(General)"))
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("galleryimage")
+}
+
+// ─── AMC Plans ────────────────────────────────────────────────────────────────
+model AmcPlan {
+  id                Int      @id @default(autoincrement())
+  name              String
+  price             String
+  durationMonths    Int      @default(12)
+  description       String?  @db.Text
+  serviceVisits     Int      @default(2)
+  sparePartsCovered Boolean  @default(false)
+  prioritySupport   Boolean  @default(false)
+  badge             String?
+  isActive          Boolean  @default(true)
+  isDeleted         Boolean  @default(false)
+  displayOrder      Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("amcplan")
+}
+
+// ─── Site Services ────────────────────────────────────────────────────────────
+model SiteService {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String   @db.Text
+  href         String
+  cta          String
+  icon         String?
+  accent       String?
+  isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("siteservice")
+}
+
+// ─── FAQs ─────────────────────────────────────────────────────────────────────
+model Faq {
+  id           Int      @id @default(autoincrement())
+  question     String
+  answer       String   @db.Text
+  category     String   @default(dbgenerated("(General)"))
+  isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("faq")
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique(map: "Setting_key_key")
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("setting")
+}
+
+// ─── Service Requests ─────────────────────────────────────────────────────────
+model ServiceRequest {
+  id           Int      @id @default(autoincrement())
+  customerName String
+  phone        String
+  email        String?
+  address      String?
+  serviceType  String?
+  message      String?  @db.Text
+  status       String   @default(dbgenerated("(new)"))
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("servicerequest")
+}
+
+// ─── Inquiries ────────────────────────────────────────────────────────────────
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String?
+  subject   String?
+  message   String?  @db.Text
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("inquiry")
+}
+
+// ─── Activity Logs ────────────────────────────────────────────────────────────
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int?
+  action    String
+  entity    String
+  entityId  Int?
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+  admin     Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull, map: "ActivityLog_adminId_fkey")
+
+  @@index([adminId], map: "ActivityLog_adminId_fkey")
+  @@map("activitylog")
+}

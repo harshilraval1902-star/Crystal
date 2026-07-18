@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GalleryService, type GalleryImage } from "@/services/gallery.service";
 import PageHeader from "@/components/admin/PageHeader";
 import SectionCard from "@/components/admin/SectionCard";
+import apiClient from "@/lib/api";
 
 export default function Gallery() {
   const qc = useQueryClient();
@@ -10,6 +11,7 @@ export default function Gallery() {
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [category, setCategory] = useState("General");
   const [error, setError] = useState("");
 
@@ -19,16 +21,35 @@ export default function Gallery() {
   });
 
   const addImage = useMutation({
-    mutationFn: () => {
-      const src = imagePreview || imageUrl.trim();
-      if (!title.trim() || !src) throw new Error("Title and image are required.");
-      if (!imagePreview) {
-        try { new URL(src); } catch { throw new Error("Enter a valid image URL."); }
+    mutationFn: async () => {
+      if (!title.trim()) throw new Error("Title is required.");
+
+      let finalImageUrl = imageUrl.trim();
+
+      // If a file was selected, upload it first
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const response = await apiClient.post<{ url: string }>("/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        finalImageUrl = response.data.url;
       }
-      return GalleryService.create({ title: title.trim(), imageUrl: src, category: category.trim() || "General", isActive: true });
+
+      if (!finalImageUrl) throw new Error("An image file or URL is required.");
+      if (!selectedFile && finalImageUrl) {
+        try { new URL(finalImageUrl); } catch { throw new Error("Enter a valid image URL."); }
+      }
+
+      return GalleryService.create({
+        title: title.trim(),
+        imageUrl: finalImageUrl,
+        category: category.trim() || "General",
+        isActive: true,
+      });
     },
     onSuccess: () => {
-      setTitle(""); setImageUrl(""); setImagePreview(""); setCategory("General"); setError("");
+      setTitle(""); setImageUrl(""); setImagePreview(""); setSelectedFile(null); setCategory("General"); setError("");
       if (fileRef.current) fileRef.current.value = "";
       qc.invalidateQueries({ queryKey: ["admin-gallery"] });
     },
@@ -48,8 +69,11 @@ export default function Gallery() {
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFile(file);
+    setImageUrl("");
+    // Show local preview only
     const reader = new FileReader();
-    reader.onload = (ev) => { setImagePreview(ev.target?.result as string); setImageUrl(""); };
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -120,7 +144,7 @@ export default function Gallery() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-900">Or paste image URL</label>
-              <input value={imageUrl} onChange={(e) => { setImageUrl(e.target.value); setImagePreview(""); }} placeholder="https://image-url"
+              <input value={imageUrl} onChange={(e) => { setImageUrl(e.target.value); setImagePreview(""); setSelectedFile(null); if (fileRef.current) fileRef.current.value = ""; }} placeholder="https://image-url"
                 className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" />
             </div>
             {(imagePreview || imageUrl) && (
@@ -133,7 +157,7 @@ export default function Gallery() {
             </div>
             <button type="submit" disabled={addImage.isPending}
               className="w-full rounded-3xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60">
-              {addImage.isPending ? "Adding…" : "Add image"}
+              {addImage.isPending ? "Uploading…" : "Add image"}
             </button>
           </form>
         </SectionCard>

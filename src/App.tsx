@@ -13,7 +13,7 @@ import NotFound from "@/pages/NotFound";
 import AdminLogin from "@/admin/Login";
 import AdminLayout from "@/admin/Layout";
 import { ToastProvider } from "@/components/admin/ToastProvider";
-
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +47,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
         <WouterRouter>
-          <AppRoutes />
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </WouterRouter>
       </ToastProvider>
     </QueryClientProvider>

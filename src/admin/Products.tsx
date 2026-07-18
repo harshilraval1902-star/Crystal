@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProductService, type Product } from "@/services/product.service";
 import PageHeader from "@/components/admin/PageHeader";
@@ -12,6 +12,7 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useToast } from "@/components/admin/ToastProvider";
 import { useAdminSearch } from "@/components/admin/AdminSearchContext";
+import apiClient from "@/lib/api";
 
 const CATEGORIES = ["RO Purifier", "UV Purifier", "UF Purifier", "Gravity Filter", "Commercial RO", "Accessories"];
 const CATEGORY_FILTERS = ["all", ...CATEGORIES];
@@ -135,12 +136,13 @@ export default function Products() {
     window.scrollTo({ top: document.getElementById("product-form")?.offsetTop ?? 0, behavior: "smooth" });
   };
 
-  const buildPayload = () => {
+  const buildPayload = (uploadedImageUrl?: string) => {
     const normalizedSlug = slug.trim() || slugify(name);
     const parsedStock = stock ? Math.max(0, Number(stock)) : undefined;
     const imageList = images
       ? images.split("\n").map((item) => item.trim()).filter(Boolean)
       : undefined;
+    const finalImage = uploadedImageUrl || imageUrl || undefined;
 
     return {
       name,
@@ -161,9 +163,9 @@ export default function Products() {
       tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : undefined,
       seoTitle: seoTitle || undefined,
       seoDescription: seoDescription || undefined,
-      mainImageUrl: imagePreview || imageUrl || undefined,
-      image: imagePreview || imageUrl || undefined,
-      images: imageList ?? (imagePreview || imageUrl ? [imagePreview || imageUrl] : undefined),
+      mainImageUrl: finalImage,
+      image: finalImage,
+      images: imageList ?? (finalImage ? [finalImage] : undefined),
       isActive,
       featured,
       displayOrder: 0,
@@ -171,11 +173,26 @@ export default function Products() {
   };
 
   const saveProduct = useMutation({
-    mutationFn: () =>
-      editId !== null
-        ? ProductService.update(editId, buildPayload())
-        : ProductService.create(buildPayload()),
+    mutationFn: async () => {
+      let uploadedImageUrl: string | undefined;
+
+      // Upload file first if one was selected
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const response = await apiClient.post<{ url: string }>("/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        uploadedImageUrl = response.data.url;
+      }
+
+      const payload = buildPayload(uploadedImageUrl);
+      return editId !== null
+        ? ProductService.update(editId, payload)
+        : ProductService.create(payload);
+    },
     onSuccess: () => {
+      setSelectedFile(null);
       resetForm();
       qc.invalidateQueries({ queryKey: ["admin-products"] });
       notify({ title: editId ? "Product updated" : "Product created", description: "Your changes have been saved.", variant: "success" });
@@ -210,11 +227,16 @@ export default function Products() {
     return errors;
   };
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFile(file);
+    setImageUrl("");
+    // Show local preview only — actual upload happens on form submit
     const reader = new FileReader();
-    reader.onload = (ev) => { setImagePreview(ev.target?.result as string); setImageUrl(""); };
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -333,7 +355,7 @@ export default function Products() {
                             className="rounded-2xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">
                             {product.isActive ? "Disable" : "Enable"}
                           </button>
-                          <button type="button" onClick={() => deleteProduct.mutate(product.id)}
+                          <button type="button" onClick={() => setDeleteProductId(product.id)}
                             className="rounded-2xl bg-rose-100 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-200">
                             Delete
                           </button>
