@@ -1,8 +1,8 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Info, X } from "lucide-react";
+import { CheckCircle2, Info, XCircle, AlertTriangle } from "lucide-react";
 
-type ToastVariant = "success" | "info" | "danger";
+type ToastVariant = "success" | "info" | "warning" | "error";
 
 interface ToastItem {
   id: string;
@@ -30,7 +30,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const timers = toasts.map((toast) =>
       window.setTimeout(() => {
         setToasts((current) => current.filter((item) => item.id !== toast.id));
-      }, 4200),
+      }, 5000),
     );
 
     return () => timers.forEach((timer) => window.clearTimeout(timer));
@@ -38,31 +38,53 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({ notify }), [notify]);
 
+  const getVariantStyles = (variant: ToastVariant = 'info') => {
+    switch (variant) {
+      case 'success':
+        return { border: 'border-l-accent-500', icon: <CheckCircle2 className="h-5 w-5 text-accent-500" /> };
+      case 'error':
+        return { border: 'border-l-danger-500', icon: <XCircle className="h-5 w-5 text-danger-500" /> };
+      case 'warning':
+        return { border: 'border-l-warning-500', icon: <AlertTriangle className="h-5 w-5 text-warning-500" /> };
+      case 'info':
+      default:
+        return { border: 'border-l-primary-500', icon: <Info className="h-5 w-5 text-primary-500" /> };
+    }
+  };
+
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-3">
+      <div className="pointer-events-none fixed bottom-5 right-5 z-50 flex w-[400px] flex-col gap-3">
         <AnimatePresence>
-          {toasts.map((toast) => (
-            <motion.div
-              key={toast.id}
-              initial={{ opacity: 0, y: 12, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-              className="pointer-events-auto rounded-[1.5rem] border border-slate-200 bg-white px-4 py-4 shadow-lg"
-            >
-              <div className="flex items-start gap-3">
-                <span className="mt-1 text-slate-400">
-                  {toast.variant === "danger" ? <X className="h-5 w-5 text-rose-500" /> : <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-950">{toast.title}</p>
-                  {toast.description && <p className="mt-1 text-sm text-slate-600">{toast.description}</p>}
+          {toasts.map((toast) => {
+            const { border, icon } = getVariantStyles(toast.variant);
+            return (
+              <motion.div
+                key={toast.id}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 100 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`pointer-events-auto overflow-hidden rounded-xl bg-white shadow-md ${border} border-l-[3px] border-y border-r border-y-gray-100 border-r-gray-100 relative`}
+              >
+                <div className="flex items-start gap-3 p-4">
+                  <span className="mt-0.5 shrink-0">{icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-gray-900">{toast.title}</p>
+                    {toast.description && <p className="mt-1 text-sm text-gray-500">{toast.description}</p>}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+                {/* Progress bar animation */}
+                <motion.div 
+                  initial={{ width: "100%" }}
+                  animate={{ width: "0%" }}
+                  transition={{ duration: 5, ease: "linear" }}
+                  className="absolute bottom-0 left-0 h-[2px] bg-gray-200"
+                />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
     </ToastContext.Provider>

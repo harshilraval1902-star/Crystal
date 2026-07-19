@@ -40,6 +40,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     data: { token: refreshToken, adminId: admin.id, expiresAt },
   });
 
+  // Update lastLogin
+  await prisma.admin.update({
+    where: { id: admin.id },
+    data: { lastLogin: new Date() },
+  });
+
   // Log activity
   await prisma.activityLog.create({
     data: { adminId: admin.id, action: "LOGIN", entity: "Admin", entityId: admin.id },

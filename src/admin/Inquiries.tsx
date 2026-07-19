@@ -1,92 +1,207 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Search, Eye, Filter, Trash2, Mail, Phone, Calendar } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { InquiryService, type Inquiry } from "@/services/inquiry.service";
-import PageHeader from "@/components/admin/PageHeader";
-import SectionCard from "@/components/admin/SectionCard";
-import { useAdminSearch } from "@/components/admin/AdminSearchContext";
+import { Button } from "@/components/admin/ui/Button";
+import { Drawer } from "@/components/admin/ui/Drawer";
+import { DataTable, Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/admin/ui/DataTable";
+import { SkeletonText } from "@/components/admin/ui/Skeleton";
+import { EmptyState } from "@/components/admin/ui/EmptyState";
+import { useToast } from "@/components/admin/ToastProvider";
 
 export default function Inquiries() {
-  const { search, setSearch } = useAdminSearch();
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
+  const { notify } = useToast();
 
-  const { data, isLoading, error } = useQuery<Inquiry[]>({
-    queryKey: ["admin-inquiries", search],
-    queryFn: async () => (await InquiryService.getAll()).filter((inquiry) =>
-      !search || `${inquiry.name} ${inquiry.phone} ${inquiry.email ?? ""}`.toLowerCase().includes(search.toLowerCase()),
-    ),
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const [viewInquiry, setViewInquiry] = useState<Inquiry | null>(null);
+
+  const { data: allInquiries = [], isLoading, error } = useQuery<Inquiry[]>({
+    queryKey: ["admin-inquiries"],
+    queryFn: () => InquiryService.getAll(),
   });
+
+  const filteredItems = allInquiries.filter(inq => 
+    !search || `${inq.name} ${inq.phone} ${inq.email || ""} ${inq.subject || ""}`.toLowerCase().includes(search.toLowerCase())
+  ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  
+  const pageCount = Math.max(1, Math.ceil(filteredItems.length / pageSize));
+  const paginatedItems = filteredItems.slice((page - 1) * pageSize, page * pageSize);
 
   const deleteInquiry = useMutation({
     mutationFn: (id: number) => InquiryService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-inquiries"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-inquiries"] });
+      notify({ title: "Deleted", description: "The inquiry has been removed.", variant: "success" });
+      setViewInquiry(null);
+    },
   });
 
+  if (error) return <div className="p-8 text-danger-600">Failed to load inquiries.</div>;
+
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Inquiries"
-        subtitle="Review incoming customer questions and delete resolved leads."
-      />
-
-      <SectionCard
-        title="Inbound inquiries"
-        description="Centralize incoming customer inquiries and resolve them from one workspace."
-      >
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500">Customer leads</p>
-            <h2 className="mt-2 text-xl font-semibold text-slate-950">Inbound inquiries</h2>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-3xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
-            <span>{data?.length ?? 0}</span>
-            <span className="text-slate-400">messages</span>
-          </div>
+    <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Inbound Inquiries</h1>
+          <p className="text-sm text-gray-500">Read and manage messages from your website contact form.</p>
         </div>
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900">Search is managed from the top toolbar.</div>
-      </SectionCard>
+      </div>
 
-      <SectionCard title="Inquiry list" description="Browse and remove resolved inquiries quickly.">
-        <h2 className="text-xl font-semibold text-slate-950">Inquiry list</h2>
-        {isLoading ? (
-          <div className="mt-6 text-slate-500">Loading inquiries…</div>
-        ) : error ? (
-          <div className="mt-6 rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Unable to load inquiries.</div>
-        ) : (
-          <div className="mt-6 space-y-4">
-            {data?.map((inquiry) => (
-              <div key={inquiry.id} className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-950">{inquiry.name}</p>
-                    <p className="text-sm text-slate-500">{inquiry.email ?? inquiry.phone}</p>
-                    <p className="text-xs text-slate-400">{new Date(inquiry.createdAt).toLocaleString()}</p>
+      <DataTable 
+        searchPlaceholder="Search by customer name, email, phone, or subject..."
+        onSearch={setSearch}
+        pagination={{
+          currentPage: page,
+          totalPages: pageCount,
+          onPageChange: setPage
+        }}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px]">ID</TableHead>
+              <TableHead className="w-[200px]">Customer</TableHead>
+              <TableHead>Subject</TableHead>
+              <TableHead className="w-[180px]">Date</TableHead>
+              <TableHead className="text-right w-[120px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="h-32 text-center">
+                  <SkeletonText lines={3} className="max-w-md mx-auto" />
+                </TableCell>
+              </TableRow>
+            ) : paginatedItems.length > 0 ? (
+              paginatedItems.map(item => (
+                <TableRow key={item.id} className="cursor-pointer hover:bg-gray-50/50" onClick={() => setViewInquiry(item)}>
+                  <TableCell>
+                    <span className="font-mono text-sm text-gray-500">#{item.id}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium text-gray-900 truncate max-w-[180px]">{item.name}</div>
+                    <div className="text-xs text-gray-500 truncate max-w-[180px]">{item.email || item.phone}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm font-medium text-gray-900 truncate max-w-md">{item.subject || "No subject"}</div>
+                    <div className="text-xs text-gray-500 truncate max-w-md mt-0.5">{item.message}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600 flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                      {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setViewInquiry(item); }} title="Read">
+                        <Eye className="h-4 w-4 text-gray-500" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Delete this inquiry?')) deleteInquiry.mutate(item.id);
+                      }} title="Delete">
+                        <Trash2 className="h-4 w-4 text-danger-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="h-48">
+                  <EmptyState 
+                    title="No inquiries found" 
+                    description={search ? "Try adjusting your search criteria." : "You have no unread messages."}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </DataTable>
+
+      {/* Detail Drawer */}
+      <Drawer
+        isOpen={!!viewInquiry}
+        onClose={() => setViewInquiry(null)}
+        title={`Inquiry #${viewInquiry?.id}`}
+        size="md"
+        footer={
+          <div className="w-full flex justify-between items-center">
+            <Button variant="secondary" className="text-danger-600 hover:text-danger-700 hover:bg-danger-50 border-transparent shadow-none" onClick={() => {
+              if (confirm('Delete this inquiry?')) deleteInquiry.mutate(viewInquiry!.id);
+            }}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Message
+            </Button>
+            <Button variant="secondary" onClick={() => setViewInquiry(null)}>Close</Button>
+          </div>
+        }
+      >
+        {viewInquiry && (
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">{viewInquiry.subject || "No subject provided"}</h2>
+              <p className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">{viewInquiry.message || "No message content."}</p>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact Information</label>
+              <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 rounded-lg">
+                      <span className="text-gray-500 font-medium">N</span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Name</p>
+                      <p className="text-sm font-medium text-gray-900">{viewInquiry.name}</p>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => deleteInquiry.mutate(inquiry.id)}
-                    className="rounded-2xl bg-rose-100 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-200"
-                  >
-                    Delete
-                  </button>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Subject</p>
-                    <p className="mt-1 text-sm text-slate-600">{inquiry.subject ?? "No subject"}</p>
+                
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                      <Phone className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Phone</p>
+                      <p className="text-sm font-medium text-gray-900">{viewInquiry.phone}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Message</p>
-                    <p className="mt-1 text-sm text-slate-600">{inquiry.message ?? "No message"}</p>
+                  <a href={`tel:${viewInquiry.phone}`} className="text-xs font-semibold text-primary-600 hover:text-primary-700">Call</a>
+                </div>
+
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                      <Mail className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-sm font-medium text-gray-900">{viewInquiry.email || "Not provided"}</p>
+                    </div>
                   </div>
+                  {viewInquiry.email && (
+                    <a href={`mailto:${viewInquiry.email}`} className="text-xs font-semibold text-primary-600 hover:text-primary-700">Reply</a>
+                  )}
                 </div>
               </div>
-            ))}
-            {data?.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">No inquiries match your search.</div>
-            ) : null}
+            </div>
+
+            <div className="text-xs text-gray-400 text-center">
+              Received on {new Date(viewInquiry.createdAt).toLocaleString()}
+            </div>
           </div>
         )}
-      </SectionCard>
+      </Drawer>
     </div>
   );
 }

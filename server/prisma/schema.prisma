@@ -13,8 +13,10 @@ model Admin {
   email        String        @unique(map: "Admin_email_key")
   password     String
   name         String
-  role         String        @default(dbgenerated("(admin)"))
+  role         String        @default("Editor")
+  status       String        @default("active")
   isActive     Boolean       @default(true)
+  lastLogin    DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   activityLogs  ActivityLog[]

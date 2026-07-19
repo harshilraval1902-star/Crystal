@@ -1,134 +1,292 @@
-import { useMemo } from "react";
-import { Activity, LayoutDashboard, ShoppingBag, Layers, MessageCircle, Plus, Star } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { useLocation } from "wouter";
+import { Activity, ShoppingBag, Layers, MessageCircle, Plus, Droplets, Download, FileText, FileSpreadsheet, FileIcon, DollarSign } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { format, parseISO } from "date-fns";
+
 import { DashboardService } from "@/services/dashboard.service";
-import PageHeader from "@/components/admin/PageHeader";
-import SectionCard from "@/components/admin/SectionCard";
-import StatCard from "@/components/admin/StatCard";
-
-interface DashboardResponse {
-  stats: {
-    totalProducts: number;
-    totalServiceRequests: number;
-    totalAmcPlans: number;
-    totalInquiries: number;
-    totalTestimonials: number;
-  };
-  statusBreakdown: Array<{ status: string; count: number }>;
-  monthlyRequests: Array<{ month: string; count: string }>;
-  recentServiceRequests: Array<{ id: number; customerName: string; phone: string; status: string; createdAt: string }>;
-  recentInquiries: Array<{ id: number; name: string; email: string | null; subject: string | null; createdAt: string }>;
-}
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-}
+import { useToast } from "@/components/admin/ToastProvider";
+import { KpiCard } from "@/components/admin/dashboard/KpiCard";
+import { AnalyticsChart } from "@/components/admin/dashboard/AnalyticsChart";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/admin/ui/Card";
+import { Badge } from "@/components/admin/ui/Badge";
+import { Button } from "@/components/admin/ui/Button";
+import { SkeletonText, Skeleton } from "@/components/admin/ui/Skeleton";
+import { exportToCSV, exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 export default function Dashboard() {
-  const { data, isLoading, error } = useQuery<DashboardResponse>({
+  const [, setLocation] = useLocation();
+  const { notify } = useToast();
+  const [exporting, setExporting] = useState(false);
+
+  // Use the SAME queryKey + queryFn as TopBar/AdminSearchContext so the cache is shared correctly.
+  // All transformations happen in useMemo below, not inside the queryFn.
+  const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["admin-dashboard"],
-    queryFn: async () => {
-      const { products, amcPlans, serviceRequests, inquiries, testimonials } = await DashboardService.getAll();
-      const statusBreakdown = Object.entries(serviceRequests.reduce<Record<string, number>>((result, request) => ({ ...result, [request.status]: (result[request.status] ?? 0) + 1 }), {})).map(([status, count]) => ({ status, count }));
-      return {
-        stats: { totalProducts: products.length, totalServiceRequests: serviceRequests.length, totalAmcPlans: amcPlans.length, totalInquiries: inquiries.length, totalTestimonials: testimonials.length },
-        statusBreakdown,
-        monthlyRequests: [],
-        recentServiceRequests: serviceRequests.slice(0, 5).map((request) => ({ ...request, email: request.email ?? null })),
-        recentInquiries: inquiries.slice(0, 5).map((inquiry) => ({ ...inquiry, email: inquiry.email ?? null, subject: inquiry.subject ?? null })),
-      };
-    },
-    staleTime: 0,
+    queryFn: async () => DashboardService.getAll(),
+    staleTime: 5000,
   });
 
-  const stats = data?.stats;
-  const statusItems = data?.statusBreakdown ?? [];
-  const monthly = data?.monthlyRequests ?? [];
+  const formatStr = (value: string) => {
+    try { return format(parseISO(value), "MMM d, yyyy h:mm a"); }
+    catch { return value ?? ""; }
+  };
+
+  // Derived data computed from raw API response
+  const derived = useMemo(() => {
+    if (!rawData) return null;
+
+    const { products = [], amcPlans = [], serviceRequests = [], inquiries = [], testimonials = [] } = rawData as any;
+
+    // Monthly chart data
+    const monthMap: Record<string, { requests: number; inquiries: number }> = {};
+    const addCount = (dateStr: string, type: "requests" | "inquiries") => {
+      if (!dateStr) return;
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return;
+      const key = d.toLocaleString("default", { month: "short" });
+      if (!monthMap[key]) monthMap[key] = { requests: 0, inquiries: 0 };
+      monthMap[key][type]++;
+    };
+    serviceRequests.forEach((r: any) => addCount(r.createdAt, "requests"));
+    inquiries.forEach((i: any) => addCount(i.createdAt, "inquiries"));
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyRequests = months.filter((m) => monthMap[m]).map((m) => ({ name: m, ...monthMap[m] }));
+
+    // Activity feed
+    const allActivities: any[] = [];
+    products.forEach((p: any) => allActivities.push({ id: `p-${p.id}`, type: "Product Added", title: p.name, subtitle: `Category: ${p.category ?? "—"}`, date: p.createdAt, icon: ShoppingBag }));
+    serviceRequests.forEach((s: any) => allActivities.push({ id: `s-${s.id}`, type: "Service Request", title: s.customerName, subtitle: `Status: ${s.status}`, date: s.createdAt, icon: Activity }));
+    inquiries.forEach((i: any) => allActivities.push({ id: `i-${i.id}`, type: "Inquiry Received", title: i.name, subtitle: i.subject || "No subject", date: i.createdAt, icon: MessageCircle }));
+    allActivities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return {
+      stats: {
+        totalProducts: products.length,
+        totalServiceRequests: serviceRequests.length,
+        totalAmcPlans: amcPlans.length,
+        totalInquiries: inquiries.length,
+        totalTestimonials: testimonials.length,
+      },
+      monthlyRequests: monthlyRequests.length > 0 ? monthlyRequests : [{ name: "No Data", requests: 0, inquiries: 0 }],
+      recentServiceRequests: [...serviceRequests].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),
+      recentInquiries: [...inquiries].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),
+      activityFeed: allActivities.slice(0, 10),
+      exportData: { products, serviceRequests, inquiries, amcPlans },
+    };
+  }, [rawData]);
+
+  const handleExport = (fmt: "CSV" | "Excel" | "PDF") => {
+    if (!derived) return;
+    setExporting(true);
+    try {
+      const exportSet = derived.exportData.serviceRequests.map((r: any) => ({
+        ID: r.id,
+        Customer: r.customerName,
+        Phone: r.phone,
+        Email: r.email,
+        Status: r.status,
+        Created: formatStr(r.createdAt),
+      }));
+
+      if (fmt === "CSV") exportToCSV(exportSet, "Service_Requests_Export");
+      if (fmt === "Excel") exportToExcel(exportSet, "Service_Requests_Export");
+      if (fmt === "PDF") {
+        exportToPDF(exportSet, "Service_Requests_Export", [
+          { header: "ID", dataKey: "ID" },
+          { header: "Customer", dataKey: "Customer" },
+          { header: "Phone", dataKey: "Phone" },
+          { header: "Status", dataKey: "Status" },
+          { header: "Date", dataKey: "Created" },
+        ]);
+      }
+      notify({ title: "Export Successful", description: `Downloaded as ${fmt}.`, variant: "success" });
+    } catch (e: any) {
+      const msg = e?.message || "Could not generate file.";
+      if (msg.includes("No data")) {
+        notify({ title: "Nothing to Export", description: "There are no service requests to download yet.", variant: "error" });
+      } else {
+        notify({ title: "Export Failed", description: msg, variant: "error" });
+      }
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const stats = derived?.stats;
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-danger-200 bg-danger-50 p-8 text-danger-700 shadow-sm">
+        Error loading dashboard data. Please try again.
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Crystal Water Admin"
-        subtitle="Live operational metrics for products, plans, inquiries, and service requests."
-        breadcrumbs={[{ label: "Dashboard" }]}
-        actions={
-          <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700">
-            <Plus className="h-4 w-4" />
-            New report
-          </button>
-        }
-      />
-
-      {isLoading ? (
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-          <p className="text-slate-500">Loading dashboard data...</p>
+    <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Overview</h1>
+          <p className="text-sm text-gray-500">Here's what's happening with your business today.</p>
         </div>
-      ) : error ? (
-        <div className="rounded-[2rem] border border-red-200 bg-red-50 p-8 text-red-700 shadow-sm">
-          Error loading dashboard data.
-        </div>
-      ) : (
-        <>
-          <SectionCard
-            title="Performance overview"
-            description="Track your top product, service, and customer metrics at a glance."
-            actions={
-              <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700">
-                <Plus className="h-4 w-4" />
-                Create report
-              </button>
-            }
-          >
-            <div className="grid gap-6 xl:grid-cols-5">
-              <StatCard label="Total products" value={stats?.totalProducts ?? 0} icon={ShoppingBag} accent="primary" trend="Up 12% in the last 30 days" />
-              <StatCard label="Service requests" value={stats?.totalServiceRequests ?? 0} icon={Activity} accent="warning" trend="Stable this week" />
-              <StatCard label="AMC plans" value={stats?.totalAmcPlans ?? 0} icon={Layers} accent="surface" trend="New package added" />
-              <StatCard label="Inquiries" value={stats?.totalInquiries ?? 0} icon={MessageCircle} accent="success" trend="Higher response rate" />
-              <StatCard label="Testimonials" value={stats?.totalTestimonials ?? 0} icon={Star} accent="primary" trend="Featured reviews rising" />
+        <div className="flex items-center gap-3">
+          <div className="relative group inline-block">
+            <Button variant="secondary">
+              <Download className="h-4 w-4 mr-2" />
+              Download Reports
+            </Button>
+            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-50">
+              <div className="py-1">
+                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+                  <FileText className="h-4 w-4 mr-2 text-gray-500" /> CSV
+                </button>
+                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+                  <FileSpreadsheet className="h-4 w-4 mr-2 text-green-500" /> Excel
+                </button>
+                <button onClick={() => handleExport("PDF")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
+                  <FileIcon className="h-4 w-4 mr-2 text-red-500" /> PDF
+                </button>
+              </div>
             </div>
-          </SectionCard>
-
-          <div className="grid gap-6 xl:grid-cols-[1.4fr_0.8fr]">
-            <SectionCard title="Request status" description="Monitor ticket status and volume in a unified view.">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Request status</p>
-                <span className="text-xs text-slate-400">Overview</span>
-              </div>
-              <div className="mt-6 space-y-3">
-                {statusItems.length ? statusItems.map((item) => (
-                  <div key={item.status} className="flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-3">
-                    <span className="text-sm text-slate-700">{item.status.replace(/_/g, " ")}</span>
-                    <span className="text-sm font-semibold text-slate-900">{item.count}</span>
-                  </div>
-                )) : <p className="text-sm text-slate-500">No request status data available yet.</p>}
-              </div>
-            </SectionCard>
-
-            <SectionCard title="Latest inquiries" description="Recent customer messages requiring attention.">
-              <div className="mt-6 space-y-3">
-                {data?.recentInquiries.length ? data.recentInquiries.map((inquiry) => (
-                  <div key={inquiry.id} className="rounded-3xl bg-slate-50 p-4">
-                    <p className="text-sm font-semibold text-slate-950">{inquiry.name}</p>
-                    <p className="mt-1 text-xs text-slate-500">{inquiry.subject ?? "No subject"}</p>
-                    <p className="mt-2 text-xs text-slate-500">{formatDate(inquiry.createdAt)}</p>
-                  </div>
-                )) : <p className="text-sm text-slate-500">No inquiries yet.</p>}
-              </div>
-            </SectionCard>
           </div>
+          <Button variant="primary" onClick={() => setLocation("/admin/products/new")}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Entry
+          </Button>
+        </div>
+      </div>
 
-          <SectionCard title="Monthly request volume" description="Projected request growth and trend insights.">
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {monthly.length ? monthly.map((item) => (
-                <div key={item.month} className="rounded-3xl bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">{item.month}</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-950">{item.count}</p>
-                </div>
-              )) : <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-500">No monthly data available.</div>}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)
+        ) : (
+          <>
+            <KpiCard title="Revenue (Placeholder)" value={"₹0.00"} icon={<DollarSign className="h-6 w-6" />} trend={{ value: 0, isPositive: true, label: "Coming Soon" }} />
+            <KpiCard title="Service Requests" value={stats?.totalServiceRequests ?? 0} icon={<Activity className="h-6 w-6" />} trend={{ value: 12.5, isPositive: true, label: "vs last month" }} />
+            <KpiCard title="Total Inquiries" value={stats?.totalInquiries ?? 0} icon={<MessageCircle className="h-6 w-6" />} trend={{ value: 4.2, isPositive: true, label: "vs last month" }} />
+            <KpiCard title="Active AMC Plans" value={stats?.totalAmcPlans ?? 0} icon={<Layers className="h-6 w-6" />} trend={{ value: 2.1, isPositive: false, label: "vs last month" }} />
+            <KpiCard title="Products Listed" value={stats?.totalProducts ?? 0} icon={<ShoppingBag className="h-6 w-6" />} />
+          </>
+        )}
+      </div>
+
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-8">
+          {isLoading ? (
+            <Skeleton className="h-[400px] rounded-xl" />
+          ) : (
+            <AnalyticsChart title="Service Requests & Inquiries Volume" data={derived?.monthlyRequests || []} dataKey="requests" color="#2563EB" height={350} />
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>Recent Service Requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="space-y-4 mt-4"><SkeletonText lines={5} /></div>
+                ) : derived?.recentServiceRequests?.length ? (
+                  <div className="mt-4 space-y-4">
+                    {derived.recentServiceRequests.map((req: any) => (
+                      <div key={req.id} className="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                        <div>
+                          <p className="font-medium text-gray-900 text-sm">{req.customerName}</p>
+                          <p className="text-xs text-gray-500">{req.phone}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge variant={req.status === "PENDING" ? "pending" : req.status === "COMPLETED" ? "active" : "default"}>{req.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-sm text-gray-500">No recent service requests.</div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>Latest Inquiries</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="space-y-4 mt-4"><SkeletonText lines={5} /></div>
+                ) : derived?.recentInquiries?.length ? (
+                  <div className="mt-4 space-y-4">
+                    {derived.recentInquiries.map((inq: any) => (
+                      <div key={inq.id} className="flex gap-3 items-center border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-50 text-secondary-600">
+                          <MessageCircle className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">{inq.name}</p>
+                          <p className="text-xs text-gray-500 truncate">{inq.subject || "No subject"}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-sm text-gray-500">No new inquiries.</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          <Card className="bg-gradient-to-br from-primary-600 to-primary-800 text-white border-0 shadow-blue overflow-hidden relative">
+            <div className="absolute right-0 top-0 opacity-10">
+              <Droplets className="h-32 w-32 -mr-6 -mt-6" />
             </div>
-          </SectionCard>
-        </>
-      )}
+            <CardHeader>
+              <CardTitle className="text-white opacity-90">System Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mt-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-primary-100">Database</span>
+                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-accent-400 animate-pulse"></span> Online</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-primary-100">API Uptime</span>
+                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-accent-400"></span> 99.9%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle>Activity Timeline</CardTitle>
+              <CardDescription>Latest system events</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="space-y-4 mt-4"><SkeletonText lines={6} /></div>
+              ) : derived?.activityFeed?.length ? (
+                <div className="mt-4 relative before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-gray-200">
+                  <div className="space-y-6">
+                    {derived.activityFeed.map((activity: any, index: number) => (
+                      <div key={`${activity.id}-${index}`} className="relative flex gap-4">
+                        <div className="absolute left-4 -ml-[5px] mt-1.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-4 ring-white" />
+                        <div className="ml-10 flex-1">
+                          <p className="text-sm font-medium text-gray-900">{activity.type}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{activity.title} &bull; <span className="text-gray-400">{formatStr(activity.date)}</span></p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="py-8 text-center text-sm text-gray-500">No activity.</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,11 +1,24 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Plus, Check, Edit2, Trash2, Shield, Wrench, Star } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AmcService, type AmcPlan as Plan } from "@/services/amc.service";
-import PageHeader from "@/components/admin/PageHeader";
-import SectionCard from "@/components/admin/SectionCard";
-import StatusBadge from "@/components/admin/StatusBadge";
+import { Button } from "@/components/admin/ui/Button";
+import { BlockCard } from "@/components/admin/ui/Card";
+import { Badge } from "@/components/admin/ui/Badge";
+import { Drawer } from "@/components/admin/ui/Drawer";
+import { Input } from "@/components/admin/ui/Input";
+import { SkeletonText, Skeleton } from "@/components/admin/ui/Skeleton";
+import { useToast } from "@/components/admin/ToastProvider";
+import { EmptyState } from "@/components/admin/ui/EmptyState";
 
 export default function AMCPlans() {
+  const qc = useQueryClient();
+  const { notify } = useToast();
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+
+  // Form State
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [durationMonths, setDurationMonths] = useState(12);
@@ -15,15 +28,42 @@ export default function AMCPlans() {
   const [prioritySupport, setPrioritySupport] = useState(false);
   const [badge, setBadge] = useState("");
   const [isActive, setIsActive] = useState(true);
-  const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery<Plan[]>({
+  const { data = [], isLoading, error } = useQuery<Plan[]>({
     queryKey: ["admin-amc-plans"],
     queryFn: () => AmcService.getAll(),
   });
 
-  const createPlan = useMutation<Plan, Error, void>({
-    mutationFn: () => AmcService.create({
+  const resetForm = () => {
+    setEditingPlan(null);
+    setName("");
+    setPrice("");
+    setDurationMonths(12);
+    setDescription("");
+    setServiceVisits(1);
+    setSparePartsCovered(false);
+    setPrioritySupport(false);
+    setBadge("");
+    setIsActive(true);
+  };
+
+  const handleEdit = (plan: Plan) => {
+    setEditingPlan(plan);
+    setName(plan.name);
+    setPrice(plan.price);
+    setDurationMonths(plan.durationMonths);
+    setDescription(plan.description || "");
+    setServiceVisits(plan.serviceVisits);
+    setSparePartsCovered(plan.sparePartsCovered);
+    setPrioritySupport(plan.prioritySupport);
+    setBadge(plan.badge || "");
+    setIsActive(plan.isActive);
+    setIsDrawerOpen(true);
+  };
+
+  const savePlan = useMutation({
+    mutationFn: () => {
+      const payload = {
         name,
         price,
         durationMonths,
@@ -33,187 +73,242 @@ export default function AMCPlans() {
         prioritySupport,
         badge: badge || undefined,
         isActive,
-        displayOrder: data?.length ?? 0,
-      }),
-    onSuccess: () => {
-      setName("");
-      setPrice("");
-      setDurationMonths(12);
-      setDescription("");
-      setServiceVisits(1);
-      setSparePartsCovered(false);
-      setPrioritySupport(false);
-      setBadge("");
-      setIsActive(true);
-      queryClient.invalidateQueries({ queryKey: ["admin-amc-plans"] });
-    },
-  });
+        displayOrder: editingPlan ? editingPlan.displayOrder : data.length,
+      };
 
-  const togglePlan = useMutation({
-    mutationFn: ({ id, active }: { id: number; active: boolean }) => AmcService.update(id, { isActive: !active }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-amc-plans"] }),
+      if (editingPlan) {
+        return AmcService.update(editingPlan.id, payload);
+      }
+      return AmcService.create(payload);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-amc-plans"] });
+      notify({ title: "Success", description: `Plan ${editingPlan ? 'updated' : 'created'} successfully.`, variant: "success" });
+      setIsDrawerOpen(false);
+      resetForm();
+    },
   });
 
   const deletePlan = useMutation({
     mutationFn: (id: number) => AmcService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-amc-plans"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-amc-plans"] });
+      notify({ title: "Plan deleted", description: "The AMC plan has been removed.", variant: "success" });
+    },
   });
 
+  const toggleActive = useMutation({
+    mutationFn: (plan: Plan) => AmcService.update(plan.id, { isActive: !plan.isActive }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-amc-plans"] }),
+  });
+
+  if (error) return <div className="p-8 text-danger-600">Failed to load AMC plans.</div>;
+
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="AMC Plans"
-        subtitle="Review and manage AMC plan offerings, pricing, and priority service settings."
-      />
-
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <SectionCard
-          title="AMC plans"
-          description="Manage maintenance plans, pricing tiers, and availability from one panel."
-        >
-          {isLoading ? (
-            <div className="mt-6 text-slate-500">Loading plans…</div>
-          ) : error ? (
-            <div className="mt-6 rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Unable to load maintenance plans.</div>
-          ) : (
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full min-w-[680px] divide-y divide-slate-200 text-left text-sm">
-                <thead>
-                  <tr>
-                    <th className="py-3 font-medium text-slate-500">Name</th>
-                    <th className="py-3 font-medium text-slate-500">Price</th>
-                    <th className="py-3 font-medium text-slate-500">Duration</th>
-                    <th className="py-3 font-medium text-slate-500">Status</th>
-                    <th className="py-3 font-medium text-slate-500">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {data?.map((plan) => (
-                    <tr key={plan.id}>
-                      <td className="py-4 pr-6">
-                        <div className="font-semibold text-slate-900">{plan.name}</div>
-                        <div className="text-xs text-slate-500">{plan.badge ?? "Standard"}</div>
-                      </td>
-                      <td className="py-4 pr-6 text-slate-700">₹{plan.price}</td>
-                      <td className="py-4 pr-6 text-slate-700">{plan.durationMonths} months</td>
-                      <td className="py-4 pr-6 text-slate-700">{plan.isActive ? "Active" : "Inactive"}</td>
-                      <td className="py-4 pr-6 space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => togglePlan.mutate({ id: plan.id, active: plan.isActive })}
-                          className="rounded-2xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
-                        >
-                          {plan.isActive ? "Disable" : "Enable"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deletePlan.mutate(plan.id)}
-                          className="rounded-2xl bg-rose-100 px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-200"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {data?.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-6 text-center text-sm text-slate-500">No AMC plans found.</td>
-                    </tr>
-                  ) : null}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </SectionCard>
-
-        <SectionCard
-          title="Create new plan"
-          description="Add or update AMC plans with service details and subscription options."
-        >
-          <form onSubmit={(event) => {
-            event.preventDefault();
-            createPlan.mutate();
-          }} className="mt-6 space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-900">Name</label>
-              <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-                className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-900">Price</label>
-              <input
-                value={price}
-                onChange={(event) => setPrice(event.target.value)}
-                required
-                className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-900">Duration (months)</label>
-              <input
-                type="number"
-                min={1}
-                value={durationMonths}
-                onChange={(event) => setDurationMonths(Number(event.target.value))}
-                className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-900">Description</label>
-              <textarea
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-900">Service visits</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={serviceVisits}
-                  onChange={(event) => setServiceVisits(Number(event.target.value))}
-                  className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-900">Badge</label>
-                <input
-                  value={badge}
-                  onChange={(event) => setBadge(event.target.value)}
-                  className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
-                />
-              </div>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <label className="flex items-center gap-3 text-sm font-medium text-slate-900">
-                <input type="checkbox" checked={sparePartsCovered} onChange={(event) => setSparePartsCovered(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-emerald-600" />
-                Spare parts covered
-              </label>
-              <label className="flex items-center gap-3 text-sm font-medium text-slate-900">
-                <input type="checkbox" checked={prioritySupport} onChange={(event) => setPrioritySupport(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-emerald-600" />
-                Priority support
-              </label>
-            </div>
-            <label className="flex items-center gap-3 text-sm font-medium text-slate-900">
-              <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-emerald-600" />
-              Active
-            </label>
-            <button
-              type="submit"
-              disabled={createPlan.isPending}
-              className="inline-flex w-full items-center justify-center rounded-3xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
-            >
-              {createPlan.isPending ? "Saving…" : "Create plan"}
-            </button>
-          </form>
-        </SectionCard>
+    <div className="space-y-6 animate-in fade-in duration-500 pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">AMC Plans</h1>
+          <p className="text-sm text-gray-500">Manage Annual Maintenance Contracts and pricing tiers.</p>
+        </div>
+        <Button variant="primary" onClick={() => { resetForm(); setIsDrawerOpen(true); }}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Plan
+        </Button>
       </div>
+
+      {isLoading ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-[400px] rounded-2xl" />
+          <Skeleton className="h-[400px] rounded-2xl" />
+          <Skeleton className="h-[400px] rounded-2xl" />
+        </div>
+      ) : data.length > 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+          {data.map((plan) => (
+            <div 
+              key={plan.id} 
+              className={`relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-200 hover:shadow-lg ${
+                plan.badge ? 'border-primary-500 shadow-blue' : 'border-gray-200 bg-white'
+              } ${!plan.isActive && 'opacity-60 grayscale-[0.5]'}`}
+            >
+              {/* Badge Ribbon */}
+              {plan.badge && (
+                <div className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-lg">
+                  {plan.badge}
+                </div>
+              )}
+
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-3 rounded-xl ${plan.badge ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600'}`}>
+                    <Shield className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                    <p className="text-sm text-gray-500">{plan.durationMonths} Months Coverage</p>
+                  </div>
+                </div>
+
+                <div className="mb-6 flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-gray-900">₹{plan.price}</span>
+                  <span className="text-sm font-medium text-gray-500">/ plan</span>
+                </div>
+
+                {plan.description && (
+                  <p className="text-sm text-gray-600 mb-6 line-clamp-2">{plan.description}</p>
+                )}
+
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-accent-500 shrink-0" />
+                    <span className="text-sm text-gray-700">{plan.serviceVisits} Scheduled Service Visits</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    {plan.sparePartsCovered ? (
+                      <Check className="h-5 w-5 text-accent-500 shrink-0" />
+                    ) : (
+                      <Wrench className="h-5 w-5 text-gray-400 shrink-0" />
+                    )}
+                    <span className={`text-sm ${plan.sparePartsCovered ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {plan.sparePartsCovered ? 'Free Spare Parts Coverage' : 'Spare Parts at Additional Cost'}
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    {plan.prioritySupport ? (
+                      <Check className="h-5 w-5 text-accent-500 shrink-0" />
+                    ) : (
+                      <Star className="h-5 w-5 text-gray-400 shrink-0" />
+                    )}
+                    <span className={`text-sm ${plan.prioritySupport ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {plan.prioritySupport ? '24/7 Priority Support' : 'Standard Business Hours Support'}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-auto border-t border-gray-100 bg-gray-50 p-4 flex gap-2">
+                <Button 
+                  variant="secondary" 
+                  className="flex-1"
+                  onClick={() => toggleActive.mutate(plan)}
+                >
+                  {plan.isActive ? 'Deactivate' : 'Activate'}
+                </Button>
+                <Button variant="secondary" size="icon" onClick={() => handleEdit(plan)}>
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  size="icon" 
+                  className="text-danger-600 hover:text-danger-700 hover:bg-danger-50"
+                  onClick={() => {
+                    if (confirm("Delete this AMC plan?")) {
+                      deletePlan.mutate(plan.id);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <BlockCard>
+          <EmptyState 
+            title="No AMC plans" 
+            description="Create your first Annual Maintenance Contract plan to offer to customers."
+            actionLabel="Create Plan"
+            onAction={() => { resetForm(); setIsDrawerOpen(true); }}
+          />
+        </BlockCard>
+      )}
+
+      {/* Editor Drawer */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        title={editingPlan ? "Edit AMC Plan" : "Create New Plan"}
+        size="md"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setIsDrawerOpen(false)}>Cancel</Button>
+            <Button 
+              variant="primary" 
+              onClick={() => savePlan.mutate()}
+              disabled={savePlan.isPending}
+            >
+              {savePlan.isPending ? "Saving..." : editingPlan ? "Update Plan" : "Create Plan"}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Plan Name *</label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Premium Protection" />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Price (₹) *</label>
+              <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Duration (Months) *</label>
+              <Input type="number" value={durationMonths} onChange={(e) => setDurationMonths(Number(e.target.value))} />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+            <textarea 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none min-h-[80px]"
+              placeholder="Brief overview of what this plan includes..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Service Visits</label>
+              <Input type="number" value={serviceVisits} onChange={(e) => setServiceVisits(Number(e.target.value))} />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Badge (Optional)</label>
+              <Input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="e.g. Best Value" />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100 space-y-4">
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={sparePartsCovered} onChange={(e) => setSparePartsCovered(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <div className="text-sm">
+                <p className="font-medium text-gray-900">Spare Parts Covered</p>
+                <p className="text-gray-500">Filters and parts are replaced at no extra cost.</p>
+              </div>
+            </label>
+            
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={prioritySupport} onChange={(e) => setPrioritySupport(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <div className="text-sm">
+                <p className="font-medium text-gray-900">Priority Support</p>
+                <p className="text-gray-500">Customer gets moved to the front of the queue.</p>
+              </div>
+            </label>
+
+            <label className="flex items-center gap-3">
+              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <div className="text-sm">
+                <p className="font-medium text-gray-900">Active</p>
+                <p className="text-gray-500">Plan is visible and available for purchase.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </Drawer>
     </div>
   );
 }

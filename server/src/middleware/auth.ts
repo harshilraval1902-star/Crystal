@@ -32,7 +32,7 @@ export async function authenticate(
   }
 }
 
-export async function requireRole(role: string) {
+export function requireRole(role: string) {
   return (req: AuthRequest, res: Response, next: NextFunction): void => {
     if (req.adminRole !== role) {
       res.status(403).json({ error: "Insufficient permissions." });

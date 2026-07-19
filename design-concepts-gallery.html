@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal Admin — Design Concepts Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0b;
+            color: #ededed;
+            line-height: 1.6;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 40px 60px;
+            background: linear-gradient(135deg, #0a0a0b 0%, #1a1a2e 50%, #0a0a0b 100%);
+            border-bottom: 1px solid #222;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 11, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #222;
+            padding: 16px 40px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            padding: 8px 20px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid #333;
+            color: #aaa;
+        }
+
+        .nav a:hover {
+            border-color: #555;
+            color: #fff;
+            background: #1a1a1a;
+        }
+
+        .nav a.c1 { border-color: #0071E3; color: #0071E3; }
+        .nav a.c1:hover { background: #0071E3; color: #fff; }
+        .nav a.c2 { border-color: #008060; color: #008060; }
+        .nav a.c2:hover { background: #008060; color: #fff; }
+        .nav a.c3 { border-color: #7C5CFC; color: #7C5CFC; }
+        .nav a.c3:hover { background: #7C5CFC; color: #fff; }
+        .nav a.c4 { border-color: #635BFF; color: #635BFF; }
+        .nav a.c4:hover { background: #635BFF; color: #fff; }
+        .nav a.c5 { border-color: #FF6B35; color: #FF6B35; }
+        .nav a.c5:hover { background: #FF6B35; color: #fff; }
+        .nav a.c6 { border-color: #00B4D8; color: #00B4D8; }
+        .nav a.c6:hover { background: #00B4D8; color: #fff; }
+
+        .concept-section {
+            padding: 80px 40px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .concept-section:nth-child(even) {
+            background: #0e0e0f;
+        }
+
+        .concept-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .concept-number {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .c1-color { color: #0071E3; }
+        .c2-color { color: #008060; }
+        .c3-color { color: #7C5CFC; }
+        .c4-color { color: #635BFF; }
+        .c5-color { color: #FF6B35; }
+        .c6-color { color: #00B4D8; }
+
+        .concept-header h2 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .concept-header .subtitle {
+            font-size: 16px;
+            color: #777;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #333;
+            color: #999;
+        }
+
+        .mockup-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .mockup-item {
+            background: #141415;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .mockup-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .mockup-label {
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mockup-label .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .mockup-item img {
+            width: 100%;
+            display: block;
+            cursor: zoom-in;
+        }
+
+        .mockup-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .mockup-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(10px);
+            cursor: zoom-out;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 95%;
+            max-height: 95vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+        }
+
+        .lightbox .close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #222;
+            color: #fff;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 60px 40px;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Crystal Admin — Design Concepts</h1>
+        <p>6 unique UI directions for your RO Water Purifier admin panel. Click any image to zoom in. Choose your favorite concept.</p>
+    </div>
+
+    <nav class="nav">
+        <a href="#concept1" class="c1">① Apple + Vercel</a>
+        <a href="#concept2" class="c2">② Shopify</a>
+        <a href="#concept3" class="c3">③ Linear</a>
+        <a href="#concept4" class="c4">④ Stripe</a>
+        <a href="#concept5" class="c5">⑤ Notion + Framer</a>
+        <a href="#concept6" class="c6">⑥ Enterprise CRM</a>
+    </nav>
+
+    <!-- CONCEPT 1 -->
+    <section class="concept-section" id="concept1">
+        <div class="concept-header">
+            <div class="concept-number c1-color">Concept 01</div>
+            <h2>Apple + Vercel</h2>
+            <div class="subtitle">Ultra minimal • Premium typography • Glass navbar • Serene blue</div>
+            <div class="tags">
+                <span class="tag">Ultra Minimal</span>
+                <span class="tag">Large Whitespace</span>
+                <span class="tag">Soft Shadows</span>
+                <span class="tag">Glass Morphism</span>
+                <span class="tag">Calm Blue #0071E3</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#0071E3"></span> Login Page</div>
+                <img src="design-concepts/concept1_login_1784467084737.png" alt="Concept 1 Login" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#0071E3"></span> Dashboard</div>
+                <img src="design-concepts/concept1_dashboard_1784466909499.png" alt="Concept 1 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#0071E3"></span> Product Editor</div>
+                <img src="design-concepts/concept1_product_editor_1784467003275.png" alt="Concept 1 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT 2 -->
+    <section class="concept-section" id="concept2">
+        <div class="concept-header">
+            <div class="concept-number c2-color">Concept 02</div>
+            <h2>Shopify Inspired</h2>
+            <div class="subtitle">Enterprise • Powerful tables • Multi-step wizard • Business green</div>
+            <div class="tags">
+                <span class="tag">Enterprise</span>
+                <span class="tag">Product Management</span>
+                <span class="tag">Professional Forms</span>
+                <span class="tag">Multi-step Editor</span>
+                <span class="tag">Green #008060</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#008060"></span> Dashboard</div>
+                <img src="design-concepts/concept2_dashboard_1784466921902.png" alt="Concept 2 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#008060"></span> Product Editor</div>
+                <img src="design-concepts/concept2_product_editor_1784467015164.png" alt="Concept 2 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT 3 -->
+    <section class="concept-section" id="concept3">
+        <div class="concept-header">
+            <div class="concept-number c3-color">Concept 03</div>
+            <h2>Linear</h2>
+            <div class="subtitle">Dark elegant • Fast workflow • Command palette • Violet accents</div>
+            <div class="tags">
+                <span class="tag">Dark Theme</span>
+                <span class="tag">Compact Layout</span>
+                <span class="tag">Command Palette</span>
+                <span class="tag">Keyboard-first</span>
+                <span class="tag">Violet #7C5CFC</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#7C5CFC"></span> Dashboard</div>
+                <img src="design-concepts/concept3_dashboard_1784466935587.png" alt="Concept 3 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#7C5CFC"></span> Product Editor</div>
+                <img src="design-concepts/concept3_product_editor_1784467027253.png" alt="Concept 3 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT 4 -->
+    <section class="concept-section" id="concept4">
+        <div class="concept-header">
+            <div class="concept-number c4-color">Concept 04</div>
+            <h2>Stripe Dashboard</h2>
+            <div class="subtitle">Premium cards • Beautiful charts • Elegant spacing • Indigo refined</div>
+            <div class="tags">
+                <span class="tag">Premium Cards</span>
+                <span class="tag">Data-first</span>
+                <span class="tag">Soft Gradients</span>
+                <span class="tag">Top Navigation</span>
+                <span class="tag">Indigo #635BFF</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#635BFF"></span> Dashboard</div>
+                <img src="design-concepts/concept4_dashboard_1784466946279.png" alt="Concept 4 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#635BFF"></span> Product Editor</div>
+                <img src="design-concepts/concept4_product_editor_1784467037394.png" alt="Concept 4 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT 5 -->
+    <section class="concept-section" id="concept5">
+        <div class="concept-header">
+            <div class="concept-number c5-color">Concept 05</div>
+            <h2>Notion + Framer CMS</h2>
+            <div class="subtitle">Extremely clean • Modular blocks • Editorial feel • Warm coral</div>
+            <div class="tags">
+                <span class="tag">Content-first</span>
+                <span class="tag">Modular Cards</span>
+                <span class="tag">Drag & Drop Blocks</span>
+                <span class="tag">Warm Typography</span>
+                <span class="tag">Coral #FF6B35</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#FF6B35"></span> Dashboard</div>
+                <img src="design-concepts/concept5_dashboard_1784466956590.png" alt="Concept 5 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#FF6B35"></span> Product Editor</div>
+                <img src="design-concepts/concept5_product_editor_1784467046099.png" alt="Concept 5 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT 6 -->
+    <section class="concept-section" id="concept6">
+        <div class="concept-header">
+            <div class="concept-number c6-color">Concept 06</div>
+            <h2>Premium Enterprise CRM</h2>
+            <div class="subtitle">Executive dashboard • Analytics heavy • CRM workflow • Navy + Teal</div>
+            <div class="tags">
+                <span class="tag">Professional</span>
+                <span class="tag">Analytics Heavy</span>
+                <span class="tag">Powerful Tables</span>
+                <span class="tag">CRM Workflow</span>
+                <span class="tag">Teal #00B4D8</span>
+            </div>
+        </div>
+        <div class="mockup-grid">
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#00B4D8"></span> Dashboard</div>
+                <img src="design-concepts/concept6_dashboard_1784466970451.png" alt="Concept 6 Dashboard" onclick="openLightbox(this)">
+            </div>
+            <div class="mockup-item">
+                <div class="mockup-label"><span class="dot" style="background:#00B4D8"></span> Product Editor</div>
+                <img src="design-concepts/concept6_product_editor_1784467056058.png" alt="Concept 6 Product Editor" onclick="openLightbox(this)">
+            </div>
+        </div>
+    </section>
+
+    <div class="footer">
+        <p>Crystal Admin Panel — Design Concepts by Senior Product Designer</p>
+        <p style="margin-top:8px">Choose your favorite concept and reply with the number (1-6)</p>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="close-btn" onclick="closeLightbox()">✕</button>
+        <img id="lightbox-img" src="" alt="Zoomed view">
+    </div>
+
+    <script>
+        function openLightbox(imgEl) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = imgEl.src;
+            lightbox.classList.add('active');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>

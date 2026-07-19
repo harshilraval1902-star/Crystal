@@ -1,5 +1,5 @@
 import { Redirect, Route, Switch } from "wouter";
-import Layout from "@/components/AdminLayout";
+import { AdminLayout as Layout } from "@/components/admin/layout/AdminLayout";
 import NotFound from "./NotFound";
 import Dashboard from "./Dashboard";
 import Products from "./Products";
@@ -7,12 +7,14 @@ import AMCPlans from "./AMCPlans";
 import ServiceRequests from "./ServiceRequests";
 import Inquiries from "./Inquiries";
 import Testimonials from "./Testimonials";
-import Settings from "./Settings";
 import Gallery from "./Gallery";
 import Reviews from "./Reviews";
 import Faqs from "./Faqs";
 import SiteServices from "./SiteServices";
+import Settings from "./Settings";
 import { useAuth } from "@/contexts/AuthContext";
+import NewProductPage from "./NewProductPage";
+import EditProductPage from "./EditProductPage";
 
 export default function AdminLayout() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -39,6 +41,8 @@ export default function AdminLayout() {
         <Route path="/admin" component={Dashboard} />
         <Route path="/admin/dashboard" component={Dashboard} />
         <Route path="/admin/products" component={Products} />
+        <Route path="/admin/products/new" component={NewProductPage} />
+        <Route path="/admin/products/:id/edit" component={EditProductPage} />
         <Route path="/admin/amc" component={AMCPlans} />
         <Route path="/admin/services" component={ServiceRequests} />
         <Route path="/admin/inquiries" component={Inquiries} />

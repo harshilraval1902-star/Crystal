@@ -1,7 +1,9 @@
-import { useEffect, useState, FormEvent } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
-import { Droplets, Loader2 } from "lucide-react";
+import { Droplets, Loader2, ArrowRight } from "lucide-react";
+import { Button } from "@/components/admin/ui/Button";
+import { Input } from "@/components/admin/ui/Input";
 
 export default function Login() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -33,68 +35,74 @@ export default function Login() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-4 py-12">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl">
-          <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-600 text-white">
-            <Loader2 className="h-7 w-7 animate-spin" />
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg rounded-[2rem] border border-slate-200 bg-white p-10 shadow-xl">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-600 text-white shadow-lg">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-[440px] animate-in slide-in-from-bottom-4 duration-500 fade-in">
+        <div className="text-center mb-8">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-lg shadow-primary-500/30">
             <Droplets className="h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-semibold text-slate-950">Enterprise admin access</h1>
-          <p className="mt-3 text-sm text-slate-600">Securely sign in to manage the dashboard, products and website content.</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Admin Portal</h1>
+          <p className="mt-2 text-sm text-gray-500">Sign in to manage your Crystal Water enterprise dashboard.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {error ? (
-            <div className="rounded-[1.5rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-xl shadow-gray-200/50">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="admin@crystalwater.in"
+                required
+                autoFocus
+              />
             </div>
-          ) : null}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-900">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="admin@crystalwater.in"
-              required
-              autoFocus
-            />
-          </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-900">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-[1.75rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-[1.75rem] bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Sign in
-          </button>
-        </form>
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full h-12 text-base"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="h-5 w-5 ml-2" />
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   );

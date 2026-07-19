@@ -20,6 +20,7 @@ import serviceRequestRoutes from "./routes/serviceRequest.routes";
 import inquiryRoutes from "./routes/inquiry.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import uploadRoutes from "./routes/upload.routes";
+import usersRoutes from "./routes/users.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { UPLOAD_DIR } from "./middleware/upload";
 import prisma from "./config/db";
@@ -45,7 +46,11 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (curl, Postman, server-to-server)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes("*") ||
+        allowedOrigins.includes(origin)
+      ) {
         return callback(null, true);
       }
       callback(new Error(`CORS: Origin ${origin} not allowed.`));
@@ -84,6 +89,9 @@ app.use("/uploads", express.static(UPLOAD_DIR));
 
 // ── API Routes ────────────────────────────────────────────
 app.use("/api/admin/auth", authRoutes);
+app.use("/api/admin/reviews", reviewRoutes);
+app.use("/api/admin/products", productRoutes);
+app.use("/api/admin/users", usersRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/amc-plans", amcRoutes);
