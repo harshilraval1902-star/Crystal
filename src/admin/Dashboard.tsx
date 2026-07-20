@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Badge } from "@/components/admin/ui/Badge";
 import { Button } from "@/components/admin/ui/Button";
 import { SkeletonText, Skeleton } from "@/components/admin/ui/Skeleton";
-import { exportToCSV, exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { exportToCSV, exportToExcel, exportToODS } from "@/utils/exportUtils";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -76,30 +76,43 @@ export default function Dashboard() {
     };
   }, [rawData]);
 
-  const handleExport = (fmt: "CSV" | "Excel" | "PDF") => {
+  /** Format raw DB id → BK-000001 */
+  const fmtBookingId = (id: number) => `BK-${String(id).padStart(6, "0")}`;
+
+  /** Map stored status values to human-readable labels */
+  const fmtStatus = (status: string): string => {
+    const map: Record<string, string> = {
+      new: "Pending", contacted: "Contacted", in_progress: "In Progress",
+      assigned: "In Progress", completed: "Completed", cancelled: "Cancelled",
+    };
+    return map[status] ?? status;
+  };
+
+  const handleExport = (fmt: "CSV" | "Excel" | "ODS") => {
     if (!derived) return;
     setExporting(true);
     try {
-      const exportSet = derived.exportData.serviceRequests.map((r: any) => ({
-        ID: r.id,
-        Customer: r.customerName,
-        Phone: r.phone,
-        Email: r.email,
-        Status: r.status,
-        Created: formatStr(r.createdAt),
-      }));
+      const exportSet = derived.exportData.serviceRequests.map((r: any) => {
+        const d = new Date(r.createdAt);
+        const bookingDate = isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        const bookingTime = isNaN(d.getTime()) ? "" : d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+        return {
+          "Booking ID":         fmtBookingId(r.id),
+          "Full Name":          r.customerName ?? "",
+          "Phone Number":       r.phone ?? "",
+          "Address":            r.address ?? "",
+          "Service Type":       r.serviceType ?? "",
+          "Additional Details": r.message ?? "",
+          "Booking Date":       bookingDate,
+          "Booking Time":       bookingTime,
+          "Booking Status":     fmtStatus(r.status),
+        };
+      });
 
-      if (fmt === "CSV") exportToCSV(exportSet, "Service_Requests_Export");
-      if (fmt === "Excel") exportToExcel(exportSet, "Service_Requests_Export");
-      if (fmt === "PDF") {
-        exportToPDF(exportSet, "Service_Requests_Export", [
-          { header: "ID", dataKey: "ID" },
-          { header: "Customer", dataKey: "Customer" },
-          { header: "Phone", dataKey: "Phone" },
-          { header: "Status", dataKey: "Status" },
-          { header: "Date", dataKey: "Created" },
-        ]);
-      }
+      const filename = `Service_Bookings_Export_${new Date().toISOString().slice(0, 10)}`;
+      if (fmt === "CSV")   exportToCSV(exportSet, filename);
+      if (fmt === "Excel") exportToExcel(exportSet, filename);
+      if (fmt === "ODS")   exportToODS(exportSet, filename);
       notify({ title: "Export Successful", description: `Downloaded as ${fmt}.`, variant: "success" });
     } catch (e: any) {
       const msg = e?.message || "Could not generate file.";
@@ -136,16 +149,17 @@ export default function Dashboard() {
               <Download className="h-4 w-4 mr-2" />
               Download Reports
             </Button>
-            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-50">
-              <div className="py-1">
-                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
-                  <FileText className="h-4 w-4 mr-2 text-gray-500" /> CSV
+            <div className="absolute right-0 mt-2 w-52 rounded-lg shadow-xl bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
+              <div className="py-1.5">
+                <p className="px-4 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Service Requests</p>
+                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+                  <FileText className="h-4 w-4 text-gray-500 shrink-0" /> CSV (.csv)
                 </button>
-                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
-                  <FileSpreadsheet className="h-4 w-4 mr-2 text-green-500" /> Excel
+                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+                  <FileSpreadsheet className="h-4 w-4 text-green-500 shrink-0" /> Excel (.xlsx)
                 </button>
-                <button onClick={() => handleExport("PDF")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50">
-                  <FileIcon className="h-4 w-4 mr-2 text-red-500" /> PDF
+                <button onClick={() => handleExport("ODS")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+                  <FileIcon className="h-4 w-4 text-orange-400 shrink-0" /> ODS (.ods)
                 </button>
               </div>
             </div>

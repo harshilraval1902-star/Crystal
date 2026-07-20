@@ -20,14 +20,30 @@ export function exportToCSV(data: any[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
+/** Shared helper — builds an XLSX workbook from an array of plain objects. */
+function buildWorkbook(data: any[]): XLSX.WorkBook {
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  return workbook;
+}
+
 export function exportToExcel(data: any[], filename: string) {
   if (!data || data.length === 0) {
     throw new Error("No data to export.");
   }
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-  XLSX.writeFile(workbook, `${filename}.xlsx`);
+  XLSX.writeFile(buildWorkbook(data), `${filename}.xlsx`);
+}
+
+/** Export as OpenDocument Spreadsheet (.ods).
+ *  Uses the same workbook-building logic as exportToExcel — only the
+ *  file extension differs. XLSX natively writes ODS when the filename
+ *  ends with ".ods". */
+export function exportToODS(data: any[], filename: string) {
+  if (!data || data.length === 0) {
+    throw new Error("No data to export.");
+  }
+  XLSX.writeFile(buildWorkbook(data), `${filename}.ods`);
 }
 
 export function exportToPDF(data: any[], filename: string, columns: { header: string; dataKey: string }[]) {
