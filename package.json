@@ -41,7 +41,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.1",
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "^4.1.14",
     "@types/node": "^25.3.3",
