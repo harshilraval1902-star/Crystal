@@ -251,8 +251,8 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-8">
-          <Card className="bg-gradient-to-br from-primary-600 to-primary-800 text-white border-0 shadow-blue overflow-hidden relative">
-            <div className="absolute right-0 top-0 opacity-10">
+          <Card className="bg-gradient-to-br from-brand-primary to-primary-900 text-white border-0 shadow-lg overflow-hidden relative">
+            <div className="absolute right-0 top-0 opacity-5">
               <Droplets className="h-32 w-32 -mr-6 -mt-6" />
             </div>
             <CardHeader>
@@ -262,11 +262,11 @@ export default function Dashboard() {
               <div className="mt-2 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-primary-100">Database</span>
-                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-accent-400 animate-pulse"></span> Online</span>
+                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-brand-secondary animate-pulse"></span> Online</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-primary-100">API Uptime</span>
-                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-accent-400"></span> 99.9%</span>
+                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-brand-secondary"></span> 99.9%</span>
                 </div>
               </div>
             </CardContent>
@@ -285,7 +285,7 @@ export default function Dashboard() {
                   <div className="space-y-6">
                     {derived.activityFeed.map((activity: any, index: number) => (
                       <div key={`${activity.id}-${index}`} className="relative flex gap-4">
-                        <div className="absolute left-4 -ml-[5px] mt-1.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-4 ring-white" />
+                        <div className="absolute left-4 -ml-[5px] mt-1.5 h-2.5 w-2.5 rounded-full bg-brand-primary ring-4 ring-white" />
                         <div className="ml-10 flex-1">
                           <p className="text-sm font-medium text-gray-900">{activity.type}</p>
                           <p className="text-xs text-gray-500 mt-0.5">{activity.title} &bull; <span className="text-gray-400">{formatStr(activity.date)}</span></p>

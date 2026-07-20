@@ -1,30 +1,45 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { ProductService } from "@/services/product.service";
 import { useDataStore } from "@/hooks/useDataStore";
 import { TestimonialService } from "@/services/testimonial.service";
 import { SiteServiceService } from "@/services/content.service";
 import { SettingsService } from "@/services/settings.service";
 import {
-  Phone, CheckCircle, Star, Droplets, Shield, Wrench,
-  Clock, Award, ArrowRight, ChevronLeft, ChevronRight
+  Phone, CheckCircle2, Star, Droplets, Shield, Wrench,
+  Clock, Award, ArrowRight, ChevronLeft, ChevronRight, Check
 } from "lucide-react";
 
+// Animation Variants
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
 const features = [
-  { icon: <Droplets className="w-6 h-6 text-blue-600" />, title: "100% Pure Water", desc: "Multi-stage RO filtration removes bacteria, viruses, chemicals ensuring safe drinking water." },
-  { icon: <Shield className="w-6 h-6 text-blue-600" />, title: "Genuine Spare Parts", desc: "Only certified and original spare parts for long-lasting purifier performance." },
-  { icon: <Wrench className="w-6 h-6 text-blue-600" />, title: "Expert Technicians", desc: "Skilled technicians for installation, repair, and maintenance of all RO brands." },
-  { icon: <Clock className="w-6 h-6 text-blue-600" />, title: "Same-Day Service", desc: "Prompt after-sales support. Call us anytime for quick service visits." },
+  { icon: <Droplets className="w-6 h-6 text-brand-primary" />, title: "100% Pure Water", desc: "Multi-stage RO filtration removes bacteria, viruses, and chemicals, ensuring safe drinking water." },
+  { icon: <Shield className="w-6 h-6 text-brand-secondary" />, title: "Genuine Parts", desc: "Only certified and original spare parts for long-lasting purifier performance." },
+  { icon: <Wrench className="w-6 h-6 text-brand-accent" />, title: "Expert Technicians", desc: "Skilled technicians for installation, repair, and maintenance of all RO brands." },
+  { icon: <Clock className="w-6 h-6 text-purple-500" />, title: "Same-Day Service", desc: "Prompt after-sales support. Call us anytime for quick service visits." },
 ];
 
 const TAG_COLORS: Record<string, string> = {
-  "Best Seller": "bg-amber-400 text-amber-900",
-  Popular: "bg-blue-400 text-blue-900",
-  Premium: "bg-purple-400 text-purple-900",
-  "New Arrival": "bg-emerald-400 text-emerald-900",
-  New: "bg-emerald-400 text-emerald-900",
-  Sleek: "bg-slate-400 text-slate-900",
+  "Best Seller": "bg-amber-100 text-amber-800 border border-amber-200",
+  Popular: "bg-blue-100 text-blue-800 border border-blue-200",
+  Premium: "bg-purple-100 text-purple-800 border border-purple-200",
+  "New Arrival": "bg-emerald-100 text-emerald-800 border border-emerald-200",
+  New: "bg-emerald-100 text-emerald-800 border border-emerald-200",
+  Sleek: "bg-slate-100 text-slate-800 border border-slate-200",
 };
 
 type Slide = { img: string; name: string; subtitle: string; price: string; tag: string; tagColor: string };
@@ -47,7 +62,7 @@ function ProductSlideshow({ slides }: { slides: Slide[] }) {
 
   useEffect(() => {
     if (!slides.length) return;
-    const timer = setInterval(next, 3500);
+    const timer = setInterval(next, 4000);
     return () => clearInterval(timer);
   }, [next, slides.length]);
 
@@ -56,55 +71,50 @@ function ProductSlideshow({ slides }: { slides: Slide[] }) {
   const slide = slides[current];
 
   return (
-    <div className="relative w-full h-full flex flex-col select-none">
-      <div className="relative flex-1 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800/60 to-slate-900/80 border border-white/10 backdrop-blur-sm">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={current}
-            initial={{ opacity: 0, x: direction * 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -60 }}
-            transition={{ duration: 0.45, ease: "easeInOut" }}
-            className="absolute inset-0 flex flex-col items-center justify-center p-6"
-          >
-            <div className="flex-1 flex items-center justify-center w-full">
-              <img
-                src={slide.img}
-                alt={slide.name}
-                className="max-h-56 max-w-full object-contain drop-shadow-2xl"
-              />
-            </div>
-            <div className="w-full text-center pb-2">
-              <span className={`inline-block text-xs font-bold px-3 py-0.5 rounded-full mb-2 ${slide.tagColor}`}>
-                {slide.tag}
-              </span>
-              <p className="text-white font-bold text-lg leading-tight">{slide.name}</p>
-              <p className="text-blue-300 text-sm">{slide.subtitle}</p>
-              <p className="text-cyan-300 font-extrabold text-xl mt-1">{slide.price}</p>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        <button
-          onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 transition-colors z-10"
+    <div className="relative w-full h-[500px] flex flex-col select-none rounded-[2rem] bg-white border border-gray-100 shadow-2xl shadow-primary-900/5 overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl -ml-20 -mb-20"></div>
+      
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, x: direction * 40, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: direction * -40, scale: 0.95 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 flex flex-col items-center justify-between p-10"
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <button
-          onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 transition-colors z-10"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
+          <div className="flex-1 flex items-center justify-center w-full">
+            <img
+              src={slide.img}
+              alt={slide.name}
+              className="max-h-72 max-w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.1)]"
+            />
+          </div>
+          <div className="w-full text-center mt-6">
+            <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full mb-3 shadow-sm ${slide.tagColor}`}>
+              {slide.tag}
+            </span>
+            <p className="text-gray-900 font-extrabold text-2xl tracking-tight">{slide.name}</p>
+            <p className="text-gray-500 text-sm mt-1">{slide.subtitle}</p>
+            <p className="text-brand-primary font-bold text-xl mt-2">{slide.price}</p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="flex justify-center gap-1.5 mt-3">
+      <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-50 text-gray-700 rounded-full p-2.5 shadow-lg border border-gray-100 transition-all z-10 hover:scale-110 active:scale-95">
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-50 text-gray-700 rounded-full p-2.5 shadow-lg border border-gray-100 transition-all z-10 hover:scale-110 active:scale-95">
+        <ChevronRight className="w-5 h-5" />
+      </button>
+      
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
-            className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-1.5 bg-cyan-400" : "w-1.5 h-1.5 bg-white/30 hover:bg-white/50"}`}
+            className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-1.5 bg-brand-primary" : "w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400"}`}
           />
         ))}
       </div>
@@ -135,7 +145,7 @@ export default function Home() {
         .flatMap((item) => {
           const images = item.images ?? item.variants ?? (item.mainImageUrl ?? item.image ? [item.mainImageUrl ?? item.image!] : []);
           const tag = item.badge ?? "Featured";
-          const tagColor = TAG_COLORS[tag] ?? "bg-blue-400 text-blue-900";
+          const tagColor = TAG_COLORS[tag] ?? "bg-brand-primary text-white";
           return images.map((img, index) => ({
             img,
             name: item.name,
@@ -173,219 +183,196 @@ export default function Home() {
 
   return (
     <>
-      <title>Crystal Natural Water | RO Purifier Sales & Service</title>
-      <meta name="description" content="Crystal Natural Water - Trusted RO Water Purifier Sales, Installation & Service since 2019. Domestic & Commercial RO systems, AMC plans, genuine spare parts." />
+      <Helmet>
+        <title>Crystal Water | Premium RO Purifier Sales & Service</title>
+        <meta name="description" content="Crystal Water - Trusted RO Water Purifier Sales, Installation & Service since 2019. Premium AMC plans, genuine spare parts." />
+      </Helmet>
 
-      <main>
-        <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900 text-white overflow-hidden min-h-[92vh] flex items-center">
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-blue-600 opacity-10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-32 right-0 w-[600px] h-[600px] bg-cyan-500 opacity-10 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-700 opacity-5 rounded-full blur-3xl" />
+      <main className="bg-background selection:bg-brand-primary selection:text-white">
+        {/* HERO SECTION */}
+        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden border-b border-gray-100">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-secondary/5 blur-3xl"></div>
+            <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-brand-primary/5 blur-3xl"></div>
           </div>
-
-          <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-cyan-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 border border-white/15 tracking-wide uppercase">
-                  <Award className="w-3.5 h-3.5" />
-                  Trusted Since 2019
-                </div>
-                <h1 className="text-5xl sm:text-6xl font-extrabold leading-[1.1] mb-6 tracking-tight">
-                  {settings.homeHeroTitle?.split(".")[0] ?? "Pure Water"},<br />
-                  <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
-                    {settings.homeHeroTitle?.split(".")[1]?.trim() || "Healthy Life"}
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-2xl">
+                <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm mb-8 text-sm font-semibold text-brand-primary">
+                  <Award className="w-4 h-4 text-brand-secondary" />
+                  Trusted By {happyCustomers} Families
+                </motion.div>
+                
+                <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.05] mb-6">
+                  {settings.homeHeroTitle?.split(".")[0] ?? "Pure Water."},<br />
+                  <span className="text-gradient">
+                    {settings.homeHeroTitle?.split(".")[1]?.trim() || "Better Health."}
                   </span>
-                </h1>
-                <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
-                  {settings.homeHeroSubtitle ?? "Crystal Natural Water provides expert RO purifier sales, installation, repair, and Annual Maintenance Contracts for homes and businesses across India."}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                  <Link
-                    href="/service-booking"
-                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-slate-900 font-bold px-7 py-3.5 rounded-xl hover:from-amber-300 hover:to-orange-300 transition-all text-base shadow-lg shadow-amber-500/25"
-                  >
-                    Book a Service <ArrowRight className="w-4 h-4" />
+                </motion.h1>
+                
+                <motion.p variants={fadeUp} className="text-lg sm:text-xl text-gray-500 leading-relaxed mb-10 max-w-lg">
+                  {settings.homeHeroSubtitle ?? "Crystal Water provides premium RO purifier sales, installation, repair, and smart AMC plans for homes and businesses."}
+                </motion.p>
+                
+                <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-12">
+                  <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-brand-primary text-white font-semibold px-8 py-4 rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 hover:-translate-y-0.5 active:translate-y-0 text-base">
+                    Book Service <ArrowRight className="w-4 h-4" />
                   </Link>
-                  <a
-                    href={`tel:${contactNumber}`}
-                    className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all text-base"
-                  >
-                    <Phone className="w-4 h-4 text-cyan-300" />
-                    {contactNumber}
-                  </a>
-                </div>
-                <div className="flex flex-wrap gap-5">
-                  {[`${yearsExperience} Years Experience`, `${happyCustomers} Happy Customers`, "All RO Brands", "Same Day Service"].map((item) => (
-                    <div key={item} className="flex items-center gap-1.5 text-sm text-slate-400">
-                      <CheckCircle className="w-4 h-4 text-cyan-400 shrink-0" />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="hidden lg:flex flex-col" style={{ height: "420px" }}>
+                  <Link href="/ro-sales" className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 border border-gray-200 font-semibold px-8 py-4 rounded-xl hover:bg-gray-50 transition-all hover:border-gray-300 text-base">
+                    Explore Products
+                  </Link>
+                </motion.div>
+                
+                <motion.div variants={fadeUp} className="flex flex-wrap gap-6 items-center text-sm font-medium text-gray-500">
+                  <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-brand-accent" /> Same Day Service</div>
+                  <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-brand-accent" /> Genuine Parts</div>
+                  <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-brand-accent" /> {yearsExperience} Years Exp.</div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} className="hidden lg:block relative">
                 <ProductSlideshow slides={slides} />
-              </div>
+              </motion.div>
             </div>
           </div>
-
-          <div className="absolute bottom-0 left-0 right-0">
-            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 60L60 50C120 40 240 20 360 15C480 10 600 20 720 28C840 36 960 42 1080 38C1200 34 1320 20 1380 13L1440 6V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" fill="rgb(248 250 252)" />
-            </svg>
-          </div>
         </section>
 
-        <section className="lg:hidden bg-slate-900 px-4 py-8">
-          <div style={{ height: "380px" }}>
-            <ProductSlideshow slides={slides} />
-          </div>
+        {/* MOBILE SLIDESHOW FALLBACK */}
+        <section className="lg:hidden px-4 py-8 bg-gray-50 border-b border-gray-100">
+          <ProductSlideshow slides={slides} />
         </section>
 
-        <section className="bg-slate-50 border-b border-slate-200 py-4">
+        {/* BENTO BOX FEATURES */}
+        <section className="py-24 bg-white relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap justify-center gap-8">
-              {[
-                { label: happyCustomers, sub: "Happy Customers" },
-                { label: yearsExperience, sub: "Years Experience" },
-                { label: "All", sub: "RO Brands Serviced" },
-                { label: "Same Day", sub: "Service Available" },
-              ].map((s) => (
-                <div key={s.sub} className="text-center">
-                  <div className="text-blue-700 font-extrabold text-xl">{s.label}</div>
-                  <div className="text-slate-500 text-xs">{s.sub}</div>
-                </div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-16 max-w-2xl mx-auto">
+              <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">The Crystal Standard</h2>
+              <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Engineered for purity, designed for peace of mind.</h3>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((f, i) => (
+                <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="group bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:bg-white hover:shadow-xl hover:shadow-primary-900/5 hover:border-gray-200 transition-all duration-300">
+                  <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                    {f.icon}
+                  </div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-3">{f.title}</h4>
+                  <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-16 bg-white">
+        {/* FEATURED PRODUCTS (SaaS Style) */}
+        <section className="py-24 bg-gray-50 border-y border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-blue-600 text-sm font-semibold uppercase tracking-widest mb-2">Why Us</p>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Why Choose Crystal Natural Water?</h2>
-              <p className="text-slate-500 text-lg max-w-2xl mx-auto">Committed to delivering pure, safe drinking water through quality products and prompt support.</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {features.map((f) => (
-                <div key={f.title} className="group bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200 hover:shadow-lg hover:border-blue-200 transition-all duration-300">
-                  <div className="bg-white inline-flex p-3 rounded-xl shadow-sm mb-4 group-hover:shadow-md transition-shadow">{f.icon}</div>
-                  <h3 className="font-bold text-slate-900 text-base mb-2">{f.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-end justify-between mb-10">
-              <div>
-                <p className="text-blue-600 text-sm font-semibold uppercase tracking-widest mb-1">Products</p>
-                <h2 className="text-3xl font-extrabold text-slate-900">Featured Models</h2>
-              </div>
-              <Link href="/ro-sales" className="hidden sm:inline-flex items-center gap-1 text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors">
-                View All <ArrowRight className="w-4 h-4" />
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">Premium Collection</h2>
+                <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">Best-Selling Purifiers</h3>
+              </motion.div>
+              <Link href="/ro-sales" className="inline-flex items-center gap-2 text-brand-primary font-semibold hover:text-brand-secondary transition-colors">
+                View All Collection <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {managedProducts.map((p) => (
-                <Link
-                  key={p.name}
-                  href="/ro-sales"
-                  className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden group"
-                >
-                  <div className="bg-gradient-to-b from-slate-100 to-slate-50 p-4 flex items-center justify-center" style={{ height: "180px" }}>
-                    <img src={p.img} alt={p.name} className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
-                  </div>
-                  <div className="p-4">
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">{p.tag}</span>
-                    <h3 className="font-bold text-slate-900 text-sm mt-2 mb-1 leading-tight">{p.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-blue-700 font-extrabold text-base">{p.price}</span>
-                      <span className="text-xs text-blue-500 font-medium group-hover:translate-x-1 transition-transform inline-block">→</span>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              {managedProducts.map((p, i) => (
+                <motion.div key={p.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }}>
+                  <Link href="/ro-sales" className="block bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-primary-900/5 hover:-translate-y-1 transition-all duration-300 group">
+                    <div className="h-48 bg-gray-50 p-6 flex items-center justify-center relative">
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <img src={p.img} alt={p.name} className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-md relative z-10" />
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="text-center mt-8">
-              <Link href="/ro-sales" className="inline-flex items-center gap-2 bg-blue-600 text-white font-bold px-7 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-500/20">
-                View All Products <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-blue-600 text-sm font-semibold uppercase tracking-widest mb-2">What We Do</p>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Our Services</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {siteServices.map((s) => (
-                <div key={s.title} className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200 hover:shadow-lg transition-shadow flex flex-col">
-                  <h3 className="font-bold text-slate-900 text-xl mb-2">{s.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed flex-1 mb-4">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-1 text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors">
-                    {s.cta} <ArrowRight className="w-4 h-4" />
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[11px] font-bold tracking-wide uppercase text-brand-secondary">{p.tag}</span>
+                      </div>
+                      <h4 className="font-bold text-gray-900 text-lg mb-1 leading-tight group-hover:text-brand-primary transition-colors">{p.name}</h4>
+                      <p className="text-brand-primary font-extrabold text-xl mt-4">{p.price}</p>
+                    </div>
                   </Link>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-16 bg-slate-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-blue-600 text-sm font-semibold uppercase tracking-widest mb-2">Reviews</p>
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-3">What Our Customers Say</h2>
+        {/* SERVICES */}
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16 max-w-2xl mx-auto">
+              <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">Expert Care</h2>
+              <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">Complete Service Solutions</h3>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {siteServices.map((s, i) => (
+                <motion.div key={s.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-gray-200 transition-all flex flex-col h-full group">
+                  <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-brand-primary group-hover:text-white transition-colors text-brand-primary">
+                    <Check className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 text-xl mb-3">{s.title}</h4>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-8 flex-1">{s.desc}</p>
+                  <Link href={s.href} className="inline-flex items-center gap-2 text-brand-primary font-semibold text-sm group-hover:text-brand-secondary transition-colors mt-auto">
+                    {s.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </motion.div>
+              ))}
             </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section className="py-24 bg-brand-primary text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl -mr-[400px] -mt-[400px]"></div>
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16">
+              <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">Wall of Love</h2>
+              <h3 className="text-3xl font-extrabold text-white tracking-tight">Trusted by thousands.</h3>
+            </motion.div>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {managedTestimonials.map((t) => (
-                <div key={t.name} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex gap-1 mb-3">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+              {managedTestimonials.slice(0, 3).map((t, i) => (
+                <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/10 hover:bg-white/15 transition-colors">
+                  <div className="flex gap-1 mb-6">
+                    {Array.from({ length: t.rating }).map((_, j) => (
+                      <Star key={j} className="w-5 h-5 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-4 italic">"{t.review}"</p>
-                  <div className="font-semibold text-slate-900 text-sm">— {t.name}</div>
-                </div>
+                  <p className="text-primary-100 text-base leading-relaxed mb-6 font-medium">"{t.review}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-brand-secondary/20 flex items-center justify-center font-bold text-brand-secondary">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div className="font-bold text-white">{t.name}</div>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 text-white relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-16 right-0 w-96 h-96 bg-cyan-500 opacity-10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-16 left-0 w-96 h-96 bg-blue-400 opacity-10 rounded-full blur-3xl" />
-          </div>
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-4xl font-extrabold mb-3 tracking-tight">Ready for Pure Water?</h2>
-            <p className="text-blue-200 text-lg mb-10 max-w-xl mx-auto">Contact us today for a free consultation or to book a service visit at your doorstep.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/service-booking"
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-orange-400 text-slate-900 font-bold px-9 py-4 rounded-xl hover:from-amber-300 hover:to-orange-300 transition-all text-base shadow-lg shadow-amber-500/25"
-              >
-                Book a Service <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href={`tel:${contactNumber}`}
-                className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-9 py-4 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all text-base"
-              >
-                <Phone className="w-4 h-4 text-cyan-300" />
-                {contactNumber}
-              </a>
-            </div>
+        {/* CTA */}
+        <section className="py-24 bg-white relative">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6">Ready to upgrade your water?</h2>
+              <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">Get in touch with our experts today for a free consultation or to schedule a service visit.</p>
+              
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-brand-primary text-white font-semibold px-8 py-4 rounded-xl hover:bg-primary-800 transition-all shadow-lg shadow-brand-primary/20 hover:-translate-y-0.5 text-lg">
+                  Book a Service
+                </Link>
+                <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 border border-gray-200 font-semibold px-8 py-4 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all text-lg">
+                  <Phone className="w-5 h-5 text-brand-secondary" />
+                  {contactNumber}
+                </a>
+              </div>
+            </motion.div>
           </div>
         </section>
       </main>

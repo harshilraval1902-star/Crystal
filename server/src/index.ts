@@ -46,11 +46,9 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (curl, Postman, server-to-server)
       if (!origin) return callback(null, true);
-      if (
-        allowedOrigins.length === 0 ||
-        allowedOrigins.includes("*") ||
-        allowedOrigins.includes(origin)
-      ) {
+      
+      // Strict matching for production
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
       callback(new Error(`CORS: Origin ${origin} not allowed.`));
