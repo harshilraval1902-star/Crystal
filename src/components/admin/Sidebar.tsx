@@ -75,7 +75,7 @@ export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }: 
             </div>
             {!collapsed && (
               <div>
-                <p className="text-sm font-semibold text-slate-950">Crystal Water</p>
+                <p className="text-sm font-semibold text-slate-950">Crystal Natural Water</p>
                 <p className="text-xs text-slate-500">Enterprise admin</p>
               </div>
             )}

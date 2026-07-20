@@ -9,7 +9,7 @@ import { Phone, CheckCircle2, X, ArrowRight, ShieldCheck, Sparkles, Plus } from 
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
 };
 
 const staggerContainer = {
@@ -104,8 +104,8 @@ export default function AMCPlans() {
   return (
     <>
       <Helmet>
-        <title>AMC Plans | Crystal Water - RO Annual Maintenance</title>
-        <meta name="description" content="Affordable RO Water Purifier Annual Maintenance Contract (AMC) plans by Crystal Water. Regular servicing, filter changes, and priority support." />
+        <title>AMC Plans | Crystal Natural Water - RO Annual Maintenance</title>
+        <meta name="description" content="Affordable RO Water Purifier Annual Maintenance Contract (AMC) plans by Crystal Natural Water. Regular servicing, filter changes, and priority support." />
       </Helmet>
 
       <main className="bg-background min-h-screen">
@@ -182,7 +182,7 @@ export default function AMCPlans() {
         </section>
 
         {/* COMPARISON/BENEFITS */}
-        <section className="py-24 bg-gray-50 border-t border-gray-100">
+        <section className="py-24 lg:py-32 bg-gray-50 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">Why AMC?</h2>
@@ -209,7 +209,7 @@ export default function AMCPlans() {
         </section>
 
         {/* FAQ SECTION */}
-        <section className="py-24 bg-white border-t border-gray-100">
+        <section className="py-24 lg:py-32 bg-white border-t border-gray-100">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-4">Frequently Asked Questions</h2>
@@ -228,7 +228,7 @@ export default function AMCPlans() {
         </section>
 
         {/* CTA */}
-        <section className="py-24 bg-brand-primary text-white relative overflow-hidden">
+        <section className="py-24 lg:py-32 bg-brand-primary text-white relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-[-50%] left-[-10%] w-[50%] h-[100%] rounded-full bg-brand-secondary/10 blur-3xl"></div>
           </div>

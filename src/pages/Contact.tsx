@@ -8,7 +8,7 @@ import { InquiryService } from "@/services/inquiry.service";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
 };
 
 const staggerContainer = {
@@ -27,7 +27,7 @@ export default function Contact() {
   const whatsappNumber = settings.whatsappNumber ?? "919584024777";
   const email = settings.email ?? "crystalnaturalwater@gmail.com";
   const address = settings.address ?? "India | Established 2019";
-  const aboutSection = settings.aboutSection ?? "Founded in 2019, Crystal Water is a trusted name in RO Water Purifier sales and service.";
+  const aboutSection = settings.aboutSection ?? "Founded in 2019, Crystal Natural Water is a trusted name in RO Water Purifier sales and service.";
   const yearsExperience = settings.yearsExperience ?? "5+";
   const happyCustomers = settings.happyCustomers ?? "500+";
   const workingHoursMon = settings.workingHoursMon ?? "9:00 AM – 7:00 PM";
@@ -82,13 +82,13 @@ export default function Contact() {
   return (
     <>
       <Helmet>
-        <title>Contact Us | Crystal Water Solutions</title>
-        <meta name="description" content={`Contact Crystal Water for RO purifier sales, service, and AMC inquiries. Call ${contactNumber} or email ${email}.`} />
+        <title>Contact Us | Crystal Natural Water</title>
+        <meta name="description" content={`Contact Crystal Natural Water for RO purifier sales, service, and AMC inquiries. Call ${contactNumber} or email ${email}.`} />
       </Helmet>
 
       <main className="bg-background min-h-screen">
         {/* HERO SECTION */}
-        <section className="relative pt-32 pb-24 bg-brand-primary overflow-hidden text-white">
+        <section className="relative pt-40 pb-28 bg-[#0A0F1C] overflow-hidden text-white border-b border-primary-800">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-secondary/10 rounded-full blur-3xl -mr-32 -mt-32" />
             <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-white/5 rounded-full blur-3xl -ml-20 -mb-20" />
@@ -96,13 +96,13 @@ export default function Contact() {
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-2xl mx-auto">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 text-brand-secondary font-bold uppercase tracking-widest text-sm mb-6">
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 text-brand-secondary font-black uppercase tracking-widest text-xs mb-6">
                 <MessageCircle className="w-4 h-4" /> We're Here For You
               </motion.div>
-              <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
+              <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-none">
                 Let's get in touch.
               </motion.h1>
-              <motion.p variants={fadeUp} className="text-lg text-primary-200 leading-relaxed max-w-xl mx-auto">
+              <motion.p variants={fadeUp} className="text-lg text-gray-300 leading-relaxed max-w-xl mx-auto font-medium">
                 Have questions about our RO purifiers, need a service visit, or looking for AMC details? Our team is just a call or message away.
               </motion.p>
             </motion.div>
@@ -110,7 +110,7 @@ export default function Contact() {
         </section>
 
         {/* MAIN CONTENT GRID */}
-        <section className="py-24 relative z-20">
+        <section className="py-24 lg:py-32 relative z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
               
@@ -128,7 +128,7 @@ export default function Contact() {
                         <Phone className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-1">Direct Line</p>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Direct Line</p>
                         <p className="text-2xl font-extrabold text-gray-900 group-hover:text-brand-primary transition-colors">{contactNumber}</p>
                       </div>
                     </a>
@@ -141,7 +141,7 @@ export default function Contact() {
                         <Mail className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-1">Email Support</p>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Email Support</p>
                         <p className="text-lg font-bold text-gray-900 group-hover:text-brand-primary transition-colors break-all">{email}</p>
                       </div>
                     </a>
@@ -157,8 +157,8 @@ export default function Contact() {
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Office Location</p>
-                        <p className="text-base font-medium text-gray-900 leading-relaxed">{address}</p>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Office Location</p>
+                        <p className="text-base font-semibold text-gray-900 leading-relaxed">{address}</p>
                       </div>
                     </div>
 
@@ -167,13 +167,13 @@ export default function Contact() {
                         <Clock className="w-5 h-5" />
                       </div>
                       <div className="w-full">
-                        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-2">Business Hours</p>
-                        <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                          <span className="text-gray-600 font-medium">Monday – Saturday</span>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Business Hours</p>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-100 font-semibold text-sm">
+                          <span className="text-gray-500">Monday – Saturday</span>
                           <span className="text-gray-900 font-bold">{workingHoursMon}</span>
                         </div>
-                        <div className="flex justify-between items-center py-2">
-                          <span className="text-gray-600 font-medium">Sunday</span>
+                        <div className="flex justify-between items-center py-2 font-semibold text-sm">
+                          <span className="text-gray-500">Sunday</span>
                           <span className="text-gray-900 font-bold">{workingHoursSun}</span>
                         </div>
                       </div>
@@ -184,13 +184,13 @@ export default function Contact() {
               </motion.div>
 
               {/* CONTACT FORM */}
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
                 <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-primary-900/5 p-8 sm:p-12 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-primary to-brand-secondary"></div>
                   
                   <div className="mb-8">
                     <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-2">Send an Inquiry</h2>
-                    <p className="text-gray-500">Fill out the form and our team will get back to you shortly.</p>
+                    <p className="text-gray-500 font-medium">Fill out the form and our team will get back to you shortly.</p>
                   </div>
 
                   <AnimatePresence mode="wait">
@@ -200,10 +200,10 @@ export default function Contact() {
                           <CheckCircle2 className="w-10 h-10 text-brand-accent" />
                         </div>
                         <h3 className="text-2xl font-extrabold text-gray-900 mb-3 tracking-tight">Message Sent!</h3>
-                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">Thank you for reaching out. A representative will contact you soon.</p>
+                        <p className="text-gray-500 mb-8 max-w-sm mx-auto font-medium">Thank you for reaching out. A representative will contact you soon.</p>
                         <button
                           onClick={() => setSubmitted(false)}
-                          className="bg-gray-900 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-gray-800 transition-colors shadow-md"
+                          className="bg-gray-900 text-white font-bold px-8 py-3.5 rounded-full hover:bg-gray-800 transition-colors shadow-md hover:scale-\[1.01\]"
                         >
                           Send Another Message
                         </button>
@@ -215,41 +215,41 @@ export default function Contact() {
                         )}
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <div>
+                          <motion.div animate={formErrors.name ? { x: [-4, 4, -4, 4, 0] } : {}} transition={{ duration: 0.4 }}>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Full Name *</label>
                             <input name="name" value={form.name} onChange={handleChange} placeholder="John Doe"
-                              className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all ${formErrors.name ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-brand-primary focus:bg-white"}`} />
-                            {formErrors.name && <p className="mt-1.5 text-xs font-medium text-red-500">{formErrors.name}</p>}
-                          </div>
-                          <div>
+                              className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:bg-white transition-all ${formErrors.name ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"}`} />
+                            {formErrors.name && <p className="mt-1.5 text-xs font-semibold text-red-500">{formErrors.name}</p>}
+                          </motion.div>
+                          <motion.div animate={formErrors.phone ? { x: [-4, 4, -4, 4, 0] } : {}} transition={{ duration: 0.4 }}>
                             <label className="block text-sm font-bold text-gray-700 mb-2">Phone Number *</label>
                             <input name="phone" value={form.phone} onChange={handleChange} placeholder="10-digit number" maxLength={10}
-                              className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all ${formErrors.phone ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-brand-primary focus:bg-white"}`} />
-                            {formErrors.phone && <p className="mt-1.5 text-xs font-medium text-red-500">{formErrors.phone}</p>}
-                          </div>
+                              className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:bg-white transition-all ${formErrors.phone ? "border-red-300 focus:ring-red-500/20" : "border-gray-200"}`} />
+                            {formErrors.phone && <p className="mt-1.5 text-xs font-semibold text-red-500">{formErrors.phone}</p>}
+                          </motion.div>
                         </div>
 
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">Email Address <span className="text-gray-400 font-normal">(Optional)</span></label>
                           <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@example.com"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary focus:bg-white transition-all" />
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:bg-white transition-all" />
                         </div>
 
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
                           <input name="subject" value={form.subject} onChange={handleChange} placeholder="How can we help you?"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary focus:bg-white transition-all" />
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:bg-white transition-all" />
                         </div>
 
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">Message</label>
                           <textarea name="message" rows={4} value={form.message} onChange={handleChange} placeholder="Tell us more about your requirements..."
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary focus:bg-white transition-all resize-none" />
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:bg-white transition-all resize-none" />
                         </div>
 
                         <div className="pt-2">
                           <button type="submit" disabled={submitting}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary py-4 text-base font-bold text-white transition-all shadow-lg shadow-brand-primary/20 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed">
+                            className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-primary py-4 text-base font-bold text-white transition-all shadow-lg shadow-brand-primary/20 hover:scale-\[1.01\] active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed">
                             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                             {submitting ? "Sending…" : "Send Inquiry"}
                           </button>
@@ -263,7 +263,7 @@ export default function Contact() {
                       href={waUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-white text-base shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                      className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-white text-base shadow-lg hover:scale-\[1.01\] active:translate-y-0 transition-all"
                       style={{ backgroundColor: "#25D366", boxShadow: "0 10px 25px -5px rgba(37, 211, 102, 0.3)" }}
                     >
                       <MessageCircle className="w-6 h-6" />
@@ -278,14 +278,14 @@ export default function Contact() {
         </section>
 
         {/* ABOUT BOTTOM SECTION */}
-        <section className="py-24 bg-brand-primary text-white relative overflow-hidden">
+        <section className="py-24 lg:py-32 bg-[#0A0F1C] text-white relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl"></div>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-3xl mx-auto">
-              <h2 className="text-3xl font-extrabold mb-6 tracking-tight">About Crystal Water</h2>
-              <p className="text-lg text-primary-200 leading-relaxed mb-12">
+              <h2 className="text-3xl font-extrabold mb-6 tracking-tight">About Crystal Natural Water</h2>
+              <p className="text-lg text-gray-300 leading-relaxed mb-12 font-medium">
                 {aboutSection} Our expert technicians use only genuine spare parts to ensure your purifier delivers 100% safe, healthy water for years to come.
               </p>
               
@@ -295,9 +295,9 @@ export default function Contact() {
                   { value: happyCustomers, label: "Happy Customers" },
                   { value: "100%", label: "Genuine Parts" },
                 ].map((stat) => (
-                  <div key={stat.label} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                  <div key={stat.label} className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 shadow-sm">
                     <div className="text-4xl font-extrabold text-white mb-2">{stat.value}</div>
-                    <div className="text-sm font-bold text-brand-secondary tracking-widest uppercase">{stat.label}</div>
+                    <div className="text-xs font-black text-brand-secondary tracking-widest uppercase">{stat.label}</div>
                   </div>
                 ))}
               </div>

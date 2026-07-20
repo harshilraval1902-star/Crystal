@@ -49,7 +49,7 @@ export default function Login() {
             <Droplets className="h-8 w-8" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Admin Portal</h1>
-          <p className="mt-2 text-sm text-gray-500">Sign in to manage your Crystal Water enterprise dashboard.</p>
+          <p className="mt-2 text-sm text-gray-500">Sign in to manage your Crystal Natural Water enterprise dashboard.</p>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-xl shadow-gray-200/50">

@@ -5,7 +5,7 @@ import { CheckCircle2, Award, Users, Target } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
 };
 
 const staggerContainer = {
@@ -14,7 +14,7 @@ const staggerContainer = {
 };
 
 const timeline = [
-  { year: "2019", event: "Founded Crystal Water Solutions" },
+  { year: "2019", event: "Founded Crystal Natural Water" },
   { year: "2020", event: "Expanded service coverage across region" },
   { year: "2021", event: "Introduced comprehensive AMC plans" },
   { year: "2024", event: "Over 500+ happy households served" },
@@ -24,8 +24,8 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>About Us | Crystal Water Solutions</title>
-        <meta name="description" content="Crystal Water is a trusted RO water purifier sales and service company established in 2019. Learn about our mission, values, and commitment to pure water." />
+        <title>About Us | Crystal Natural Water</title>
+        <meta name="description" content="Crystal Natural Water is a trusted RO water purifier sales and service company established in 2019. Learn about our mission, values, and commitment to pure water." />
       </Helmet>
 
       <main className="bg-background min-h-screen">
@@ -43,13 +43,13 @@ export default function About() {
                 Building trust through <span className="text-gradient">pure water.</span>
               </motion.h1>
               <motion.p variants={fadeUp} className="text-lg text-primary-200 leading-relaxed max-w-2xl mx-auto mb-10">
-                Since 2019, Crystal Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly.
+                Since 2019, Crystal Natural Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly.
               </motion.p>
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/service-booking" className="inline-flex items-center justify-center bg-brand-secondary text-brand-primary font-bold px-8 py-4 rounded-xl hover:bg-white transition-all shadow-lg hover:-translate-y-0.5 text-base">
+                <Link href="/service-booking" className="inline-flex items-center justify-center bg-brand-secondary text-brand-primary font-bold px-8 py-4 rounded-xl hover:bg-white transition-all shadow-lg hover:scale-\[1.01\] text-base">
                   Book a Service
                 </Link>
-                <Link href="/ro-sales" className="inline-flex items-center justify-center border border-white/20 bg-white/10 text-white font-bold px-8 py-4 rounded-xl hover:bg-white/20 transition-all text-base hover:-translate-y-0.5">
+                <Link href="/ro-sales" className="inline-flex items-center justify-center border border-white/20 bg-white/10 text-white font-bold px-8 py-4 rounded-xl hover:bg-white/20 transition-all text-base hover:scale-\[1.01\]">
                   View Products
                 </Link>
               </motion.div>
@@ -58,7 +58,7 @@ export default function About() {
         </section>
 
         {/* MISSION & VALUES */}
-        <section className="py-24 bg-white relative">
+        <section className="py-24 lg:py-32 bg-white relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="space-y-8">
@@ -113,7 +113,7 @@ export default function About() {
         </section>
 
         {/* MILESTONES */}
-        <section className="py-24 bg-gray-50 border-t border-gray-100">
+        <section className="py-24 lg:py-32 bg-gray-50 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16">
               <p className="text-sm font-bold uppercase tracking-widest text-brand-secondary mb-3">Milestones</p>

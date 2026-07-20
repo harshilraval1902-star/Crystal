@@ -19,8 +19,6 @@ export default function Dashboard() {
   const { notify } = useToast();
   const [exporting, setExporting] = useState(false);
 
-  // Use the SAME queryKey + queryFn as TopBar/AdminSearchContext so the cache is shared correctly.
-  // All transformations happen in useMemo below, not inside the queryFn.
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["admin-dashboard"],
     queryFn: async () => DashboardService.getAll(),
@@ -32,13 +30,11 @@ export default function Dashboard() {
     catch { return value ?? ""; }
   };
 
-  // Derived data computed from raw API response
   const derived = useMemo(() => {
     if (!rawData) return null;
 
     const { products = [], amcPlans = [], serviceRequests = [], inquiries = [], testimonials = [] } = rawData as any;
 
-    // Monthly chart data
     const monthMap: Record<string, { requests: number; inquiries: number }> = {};
     const addCount = (dateStr: string, type: "requests" | "inquiries") => {
       if (!dateStr) return;
@@ -53,7 +49,6 @@ export default function Dashboard() {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthlyRequests = months.filter((m) => monthMap[m]).map((m) => ({ name: m, ...monthMap[m] }));
 
-    // Activity feed
     const allActivities: any[] = [];
     products.forEach((p: any) => allActivities.push({ id: `p-${p.id}`, type: "Product Added", title: p.name, subtitle: `Category: ${p.category ?? "—"}`, date: p.createdAt, icon: ShoppingBag }));
     serviceRequests.forEach((s: any) => allActivities.push({ id: `s-${s.id}`, type: "Service Request", title: s.customerName, subtitle: `Status: ${s.status}`, date: s.createdAt, icon: Activity }));
@@ -76,10 +71,8 @@ export default function Dashboard() {
     };
   }, [rawData]);
 
-  /** Format raw DB id → BK-000001 */
   const fmtBookingId = (id: number) => `BK-${String(id).padStart(6, "0")}`;
 
-  /** Map stored status values to human-readable labels */
   const fmtStatus = (status: string): string => {
     const map: Record<string, string> = {
       new: "Pending", contacted: "Contacted", in_progress: "In Progress",
@@ -130,7 +123,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-danger-200 bg-danger-50 p-8 text-danger-700 shadow-sm">
+      <div className="rounded-xl border border-danger-200 bg-danger-50 p-8 text-danger-700 shadow-sm font-semibold">
         Error loading dashboard data. Please try again.
       </div>
     );
@@ -138,49 +131,49 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-gray-100 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Overview</h1>
-          <p className="text-sm text-gray-500">Here's what's happening with your business today.</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight leading-none mb-2">Overview</h1>
+          <p className="text-sm text-gray-500 font-semibold">Here's what's happening with your business today.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative group inline-block">
-            <Button variant="secondary">
+            <Button variant="secondary" className="rounded-xl border border-gray-200">
               <Download className="h-4 w-4 mr-2" />
               Download Reports
             </Button>
-            <div className="absolute right-0 mt-2 w-52 rounded-lg shadow-xl bg-white ring-1 ring-black/5 hidden group-hover:block z-50">
-              <div className="py-1.5">
-                <p className="px-4 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-400">Service Requests</p>
-                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+            <div className="absolute right-0 mt-2 w-52 rounded-xl shadow-sm bg-white border border-gray-100 hidden group-hover:block z-50 overflow-hidden">
+              <div className="py-2">
+                <p className="px-4 pt-1.5 pb-2 text-[9px] font-black uppercase tracking-widest text-gray-400">Service Requests</p>
+                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
                   <FileText className="h-4 w-4 text-gray-500 shrink-0" /> CSV (.csv)
                 </button>
-                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
                   <FileSpreadsheet className="h-4 w-4 text-green-500 shrink-0" /> Excel (.xlsx)
                 </button>
-                <button onClick={() => handleExport("ODS")} disabled={exporting} className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2">
+                <button onClick={() => handleExport("ODS")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
                   <FileIcon className="h-4 w-4 text-orange-400 shrink-0" /> ODS (.ods)
                 </button>
               </div>
             </div>
           </div>
-          <Button variant="primary" onClick={() => setLocation("/admin/products/new")}>
+          <Button variant="primary" onClick={() => setLocation("/admin/products/new")} className="rounded-xl shadow-md">
             <Plus className="h-4 w-4 mr-2" />
             New Entry
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
         {isLoading ? (
           Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)
         ) : (
           <>
-            <KpiCard title="Revenue (Placeholder)" value={"₹0.00"} icon={<DollarSign className="h-6 w-6" />} trend={{ value: 0, isPositive: true, label: "Coming Soon" }} />
-            <KpiCard title="Service Requests" value={stats?.totalServiceRequests ?? 0} icon={<Activity className="h-6 w-6" />} trend={{ value: 12.5, isPositive: true, label: "vs last month" }} />
-            <KpiCard title="Total Inquiries" value={stats?.totalInquiries ?? 0} icon={<MessageCircle className="h-6 w-6" />} trend={{ value: 4.2, isPositive: true, label: "vs last month" }} />
-            <KpiCard title="Active AMC Plans" value={stats?.totalAmcPlans ?? 0} icon={<Layers className="h-6 w-6" />} trend={{ value: 2.1, isPositive: false, label: "vs last month" }} />
-            <KpiCard title="Products Listed" value={stats?.totalProducts ?? 0} icon={<ShoppingBag className="h-6 w-6" />} />
+            <KpiCard title="Revenue (Placeholder)" value={"₹0.00"} icon={<DollarSign className="h-6 w-6 text-brand-primary" />} trend={{ value: 0, isPositive: true, label: "Coming Soon" }} />
+            <KpiCard title="Service Requests" value={stats?.totalServiceRequests ?? 0} icon={<Activity className="h-6 w-6 text-brand-secondary" />} trend={{ value: 12.5, isPositive: true, label: "vs last month" }} />
+            <KpiCard title="Total Inquiries" value={stats?.totalInquiries ?? 0} icon={<MessageCircle className="h-6 w-6 text-brand-accent" />} trend={{ value: 4.2, isPositive: true, label: "vs last month" }} />
+            <KpiCard title="Active AMC Plans" value={stats?.totalAmcPlans ?? 0} icon={<Layers className="h-6 w-6 text-purple-500" />} trend={{ value: 2.1, isPositive: false, label: "vs last month" }} />
+            <KpiCard title="Products Listed" value={stats?.totalProducts ?? 0} icon={<ShoppingBag className="h-6 w-6 text-emerald-500" />} />
           </>
         )}
       </div>
@@ -190,60 +183,64 @@ export default function Dashboard() {
           {isLoading ? (
             <Skeleton className="h-[400px] rounded-xl" />
           ) : (
-            <AnalyticsChart title="Service Requests & Inquiries Volume" data={derived?.monthlyRequests || []} dataKey="requests" color="#2563EB" height={350} />
+            <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+              <AnalyticsChart title="Service Requests & Inquiries Volume" data={derived?.monthlyRequests || []} dataKey="requests" color="#2563EB" height={350} />
+            </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card>
+            <Card className="rounded-xl border-gray-100/80 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle>Recent Service Requests</CardTitle>
+                <CardTitle className="text-xl font-bold">Recent Service Requests</CardTitle>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
                   <div className="space-y-4 mt-4"><SkeletonText lines={5} /></div>
                 ) : derived?.recentServiceRequests?.length ? (
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-4 space-y-3">
                     {derived.recentServiceRequests.map((req: any) => (
-                      <div key={req.id} className="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                      <div key={req.id} className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0 hover:bg-gray-50/50 p-2 rounded-xl transition-colors">
                         <div>
-                          <p className="font-medium text-gray-900 text-sm">{req.customerName}</p>
-                          <p className="text-xs text-gray-500">{req.phone}</p>
+                          <p className="font-extrabold text-gray-900 text-sm leading-tight">{req.customerName}</p>
+                          <p className="text-xs text-gray-500 font-semibold mt-0.5">{req.phone}</p>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                          <Badge variant={req.status === "PENDING" ? "pending" : req.status === "COMPLETED" ? "active" : "default"}>{req.status}</Badge>
+                          <Badge variant={req.status === "PENDING" ? "pending" : req.status === "COMPLETED" ? "active" : "default"} className="rounded-full font-bold text-[10px]">
+                            {req.status}
+                          </Badge>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-sm text-gray-500">No recent service requests.</div>
+                  <div className="py-8 text-center text-sm text-gray-500 font-medium">No recent service requests.</div>
                 )}
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-xl border-gray-100/80 shadow-sm">
               <CardHeader className="pb-2">
-                <CardTitle>Latest Inquiries</CardTitle>
+                <CardTitle className="text-xl font-bold">Latest Inquiries</CardTitle>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
                   <div className="space-y-4 mt-4"><SkeletonText lines={5} /></div>
                 ) : derived?.recentInquiries?.length ? (
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-4 space-y-3">
                     {derived.recentInquiries.map((inq: any) => (
-                      <div key={inq.id} className="flex gap-3 items-center border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-50 text-secondary-600">
+                      <div key={inq.id} className="flex gap-3 items-center border-b border-gray-50 pb-3 last:border-0 last:pb-0 hover:bg-gray-50/50 p-2 rounded-xl transition-colors">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary-50 text-secondary-600 border border-secondary-100 shadow-sm">
                           <MessageCircle className="h-4 w-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 truncate">{inq.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{inq.subject || "No subject"}</p>
+                          <p className="text-sm font-extrabold text-gray-900 truncate leading-tight">{inq.name}</p>
+                          <p className="text-xs text-gray-500 font-semibold truncate mt-0.5">{inq.subject || "No subject"}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="py-8 text-center text-sm text-gray-500">No new inquiries.</div>
+                  <div className="py-8 text-center text-sm text-gray-500 font-medium">No new inquiries.</div>
                 )}
               </CardContent>
             </Card>
@@ -251,51 +248,51 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-8">
-          <Card className="bg-gradient-to-br from-brand-primary to-primary-900 text-white border-0 shadow-lg overflow-hidden relative">
+          <Card className="bg-gradient-to-br from-brand-primary to-primary-900 text-white border-0 shadow-sm rounded-xl overflow-hidden relative p-4">
             <div className="absolute right-0 top-0 opacity-5">
               <Droplets className="h-32 w-32 -mr-6 -mt-6" />
             </div>
             <CardHeader>
-              <CardTitle className="text-white opacity-90">System Status</CardTitle>
+              <CardTitle className="text-white opacity-90 text-lg">System Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="mt-2 space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="mt-2 space-y-4 font-semibold text-sm">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-primary-100">Database</span>
-                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-brand-secondary animate-pulse"></span> Online</span>
+                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-brand-secondary animate-pulse"></span> Online</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-primary-100">API Uptime</span>
-                  <span className="flex items-center gap-1.5 font-medium"><span className="h-2 w-2 rounded-full bg-brand-secondary"></span> 99.9%</span>
+                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-brand-secondary"></span> 99.9%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-xl border-gray-100/80 shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle>Activity Timeline</CardTitle>
-              <CardDescription>Latest system events</CardDescription>
+              <CardTitle className="text-xl font-bold">Activity Timeline</CardTitle>
+              <CardDescription className="font-semibold text-xs text-gray-400">Latest system events</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4 mt-4"><SkeletonText lines={6} /></div>
               ) : derived?.activityFeed?.length ? (
-                <div className="mt-4 relative before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-gray-200">
-                  <div className="space-y-6">
+                <div className="mt-4 relative before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-gray-100">
+                  <div className="space-y-5">
                     {derived.activityFeed.map((activity: any, index: number) => (
                       <div key={`${activity.id}-${index}`} className="relative flex gap-4">
                         <div className="absolute left-4 -ml-[5px] mt-1.5 h-2.5 w-2.5 rounded-full bg-brand-primary ring-4 ring-white" />
-                        <div className="ml-10 flex-1">
-                          <p className="text-sm font-medium text-gray-900">{activity.type}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{activity.title} &bull; <span className="text-gray-400">{formatStr(activity.date)}</span></p>
+                        <div className="ml-10 flex-1 hover:bg-gray-50/50 p-1 rounded-lg transition-colors">
+                          <p className="text-sm font-extrabold text-gray-900 leading-tight">{activity.type}</p>
+                          <p className="text-xs text-gray-500 font-semibold mt-0.5">{activity.title} &bull; <span className="text-gray-400 font-medium">{formatStr(activity.date)}</span></p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="py-8 text-center text-sm text-gray-500">No activity.</div>
+                <div className="py-8 text-center text-sm text-gray-500 font-medium">No activity.</div>
               )}
             </CardContent>
           </Card>

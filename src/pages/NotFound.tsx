@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <>
       <title>Page Not Found | Crystal Natural Water</title>
-      <main className="min-h-[70vh] bg-slate-50 text-slate-900 flex items-center justify-center px-4 py-16">
+      <main className="min-h-[70vh] bg-slate-50 text-slate-900 flex items-center justify-center px-4 py-24 lg:py-32">
         <div className="max-w-xl rounded-[2rem] border border-slate-200 bg-white p-10 text-center shadow-sm">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
             <Droplets className="h-8 w-8" />

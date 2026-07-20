@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <div className="mb-4">
-              <img src={logoImg} alt="Kenzora" className="h-9 w-auto object-contain brightness-0 invert" />
+              <img src={logoImg} alt="Crystal Natural Water" className="h-9 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-5">
               Trusted RO Water Purifier Sales & Service since 2019. Delivering pure, safe drinking water for homes and businesses.

@@ -160,7 +160,7 @@ export default function Home() {
                   </span>
                 </h1>
                 <p className="text-slate-300 text-lg leading-relaxed mb-8 max-w-lg">
-                  Crystal Natural Water provides expert RO purifier sales, installation, repair, and Annual Maintenance Contracts for homes and businesses across India.
+                  Crystal Provides expert RO purifier sales, installation, repair, and Annual Maintenance Contracts for homes and businesses across India.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-10">
                   <Link
