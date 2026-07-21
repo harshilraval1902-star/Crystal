@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
@@ -8,14 +8,18 @@ import { TestimonialService } from "@/services/testimonial.service";
 import { SiteServiceService } from "@/services/content.service";
 import { SettingsService } from "@/services/settings.service";
 import Hero from "@/components/Hero";
+import purifierImg from "@/assets/newfolder/purifier-Photoroom.png";
 import {
   Phone, Star, Droplets, Shield, Wrench,
-  Clock, Award, ArrowRight, Check, Leaf, ChevronDown, CheckCircle2, MessageSquare
+  Clock, ArrowRight, Check, ChevronDown, CheckCircle2,
+  ShieldCheck, Award, MessageCircle, Play,
+  Settings, Zap, Layers, Activity, Beaker
 } from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
+// Elegant motion variants
+const elegantFadeUp = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } }
 };
 
 const staggerContainer = {
@@ -23,21 +27,22 @@ const staggerContainer = {
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
+// --- DATA STRUCTURES --- //
+type Slide = { img: string; name: string; subtitle: string; price: string; tag: string; tagColor: string };
+
 const features = [
-  { icon: <Droplets className="w-6 h-6 text-brand-primary" />, title: "100% Pure Water", desc: "Multi-stage RO filtration removes bacteria, viruses, and chemicals, ensuring safe drinking water." },
-  { icon: <Shield className="w-6 h-6 text-brand-secondary" />, title: "Genuine Parts", desc: "Only certified and original spare parts for long-lasting purifier performance." },
-  { icon: <Wrench className="w-6 h-6 text-brand-accent" />, title: "Expert Technicians", desc: "Skilled technicians for installation, repair, and maintenance of all RO brands." },
-  { icon: <Clock className="w-6 h-6 text-purple-500" />, title: "Same-Day Service", desc: "Prompt after-sales support. Call us anytime for quick service visits." },
+  { icon: <Droplets className="w-5 h-5 text-brand-primary" />, title: "100% Pure Water", desc: "Multi-stage RO filtration removes all contaminants, ensuring safe drinking water." },
+  { icon: <Shield className="w-5 h-5 text-brand-primary" />, title: "Genuine Parts", desc: "Only certified and original spare parts for maximum lifespan." },
+  { icon: <Wrench className="w-5 h-5 text-brand-primary" />, title: "Expert Technicians", desc: "Highly skilled technicians for precision installation and repair." },
+  { icon: <Clock className="w-5 h-5 text-brand-primary" />, title: "Same-Day Service", desc: "Prompt after-sales support with guaranteed same-day visits." },
 ];
 
 const faqs = [
   { q: "How often should I service my RO purifier?", a: "We recommend regular servicing every 3 to 4 months to maintain filter efficiency and ensure water purity. Prefilters typically need changing every 3-6 months depending on local TDS." },
   { q: "What is covered under the RO AMC plan?", a: "Our Annual Maintenance Contracts (AMC) cover unlimited service visits, scheduled filter changes, free replacement of consumable membranes, electrical parts repair, and priority emergency support." },
   { q: "Do you use original spare parts?", a: "Yes, we exclusively use 100% genuine, certified spare parts and membranes approved by manufacturers to ensure maximum lifespan and healthy filtration." },
-  { q: "How quickly can a technician visit my house?", a: "We offer guaranteed same-day visits for all bookings done before 4:00 PM. Urgent emergency visits can be completed within 2 hours in Indore and Bhopal." },
+  { q: "How quickly can a technician visit my house?", a: "We offer guaranteed same-day visits for all bookings done before 4:00 PM. Urgent emergency visits can be completed within 2 hours in most areas." },
 ];
-
-type Slide = { img: string; name: string; subtitle: string; price: string; tag: string; tagColor: string };
 
 export default function Home() {
   const [managedTestimonials, setManagedTestimonials] = useState<{ name: string; rating: number; review: string }[]>([]);
@@ -46,6 +51,18 @@ export default function Home() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
   
+  // Before/After Slider State
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  
+  const handleSliderMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!sliderRef.current) return;
+    const rect = sliderRef.current.getBoundingClientRect();
+    const x = 'touches' in e ? e.touches[0].clientX - rect.left : (e as React.MouseEvent).clientX - rect.left;
+    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(position);
+  };
+
   const { data: productItems = [] } = useDataStore(() => ProductService.getAll());
 
   const managedProducts = useMemo(() => {
@@ -54,6 +71,8 @@ export default function Home() {
       price: `₹${item.price}`,
       img: item.mainImageUrl ?? item.image ?? "",
       tag: item.badge ?? "Featured",
+      tech: item.description ? item.description.substring(0, 40) + "..." : "RO + UV + UF",
+      capacity: "15 L/hr"
     }));
   }, [productItems]);
 
@@ -96,35 +115,52 @@ export default function Home() {
       <main className="bg-background selection:bg-brand-primary selection:text-white overflow-hidden">
         
         {/* HERO SECTION */}
-        <Hero slides={slides} settings={settings} yearsExperience={yearsExperience} />
+        <Hero />
+
+        {/* TRUST STRIP */}
+        <section className="py-8 border-y border-primary-100 bg-surface">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-sm font-semibold text-brand-primary">
+              <div className="flex items-center gap-2"><Award className="w-5 h-5 text-primary-500" /> {yearsExperience} Years Experience</div>
+              <div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-primary-500" /> Certified Technicians</div>
+              <div className="flex items-center gap-2"><Clock className="w-5 h-5 text-primary-500" /> Same-Day Emergency Service</div>
+            </div>
+          </div>
+        </section>
 
         {/* FEATURED PRODUCTS */}
-        <section className="py-24 lg:py-32 bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
-                <h2 className="text-xs font-black text-brand-secondary tracking-widest uppercase mb-3">Premium Collection</h2>
-                <h3 className="text-3xl sm:text-4xl font-extrabold text-[#0A0F1C] tracking-tight">Best-Selling Purifiers</h3>
+        <section className="py-24 lg:py-32 bg-background">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp}>
+                <h2 className="text-xs font-semibold text-slate tracking-widest uppercase mb-3">Premium Collection</h2>
+                <h3 className="text-3xl sm:text-4xl font-bold text-brand-primary tracking-tight">Best-Selling Purifiers</h3>
               </motion.div>
-              <Link href="/ro-sales" className="inline-flex items-center gap-2 text-brand-primary font-bold hover:text-brand-secondary transition-colors group">
+              <Link href="/ro-sales" className="inline-flex items-center gap-2 text-brand-primary font-medium hover:text-primary-600 transition-elegant group">
                 Explore Full Catalog <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {managedProducts.map((p, i) => (
-                <motion.div key={p.name} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} transition={{ delay: i * 0.1 }}>
-                  <Link href="/ro-sales" className="block bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary-900/10 hover:-translate-y-2 transition-all duration-300 group">
-                    <div className="h-56 bg-gray-50/50 p-6 flex items-center justify-center relative">
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-100/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <img src={p.img} alt={p.name} className="h-full w-full object-contain group-hover:scale-110 transition-transform duration-700 ease-[0.16,1,0.3,1] drop-shadow-md relative z-10" />
+                <motion.div key={p.name} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: i * 0.1 }}>
+                  <Link href="/ro-sales" className="block bg-surface rounded-2xl border border-primary-100 overflow-hidden hover:border-primary-300 transition-elegant group h-full flex flex-col">
+                    <div className="h-64 bg-white p-6 flex items-center justify-center relative">
+                      <img src={p.img} alt={p.name} className="h-full w-full object-contain group-hover:scale-105 transition-elegant-slow" />
                     </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] font-black tracking-widest uppercase text-brand-secondary">{p.tag}</span>
+                    <div className="p-6 flex flex-col flex-1">
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-slate mb-2">{p.tag}</span>
+                      <h4 className="font-semibold text-brand-primary text-lg mb-1 leading-tight">{p.name}</h4>
+                      <div className="text-xs text-slate space-y-1 mb-4 flex-1">
+                        <p>{p.tech}</p>
+                        <p>Capacity: {p.capacity}</p>
                       </div>
-                      <h4 className="font-extrabold text-[#0A0F1C] text-lg mb-1 leading-tight group-hover:text-brand-primary transition-colors">{p.name}</h4>
-                      <p className="text-brand-primary font-black text-xl mt-4">{p.price}</p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <p className="text-brand-primary font-bold text-lg">{p.price}</p>
+                        <span className="text-xs font-medium text-brand-primary opacity-0 group-hover:opacity-100 transition-elegant flex items-center gap-1">
+                          View Details <ArrowRight className="w-3 h-3" />
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>
@@ -133,86 +169,114 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WHY CHOOSE US (BENTO BOX FEATURES) */}
-        <section className="py-24 lg:py-32 bg-gray-50 relative border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-16 max-w-2xl mx-auto">
-              <h2 className="text-xs font-black text-brand-secondary tracking-widest uppercase mb-3">The Crystal Natural Water Standard</h2>
-              <h3 className="text-3xl md:text-4xl font-extrabold text-[#0A0F1C] tracking-tight">Engineered for purity,<br/>designed for peace of mind.</h3>
+        {/* RO TECHNOLOGY SHOWCASE */}
+        <section className="py-24 lg:py-32 bg-surface overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              
+              {/* Left Side: Tech Specs */}
+              <motion.div 
+                initial="hidden" 
+                whileInView="visible" 
+                viewport={{ once: true, margin: "-100px" }} 
+                variants={staggerContainer}
+                className="w-full lg:w-1/2"
+              >
+                <motion.h2 variants={elegantFadeUp} className="text-xs font-semibold text-slate tracking-widest uppercase mb-3">
+                  Advanced RO Technology
+                </motion.h2>
+                <motion.h3 variants={elegantFadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-primary tracking-tight mb-12">
+                  Purity You Can Trust.
+                </motion.h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                  {[
+                    { title: "7 Stage Purification", desc: "Removes 99.9% of harmful contaminants.", icon: <Layers className="w-5 h-5" /> },
+                    { title: "UV Protection", desc: "Deactivates bacteria and viruses completely.", icon: <Zap className="w-5 h-5" /> },
+                    { title: "TDS Controller", desc: "Maintains essential natural minerals.", icon: <Settings className="w-5 h-5" /> },
+                    { title: "Copper & Alkaline", desc: "Balances pH and boosts immunity naturally.", icon: <Beaker className="w-5 h-5" /> },
+                    { title: "Food Grade Tank", desc: "100% safe, non-toxic water storage.", icon: <ShieldCheck className="w-5 h-5" /> },
+                    { title: "Smart Auto Flush", desc: "Self-cleaning membrane for longer life.", icon: <Activity className="w-5 h-5" /> }
+                  ].map((feature, i) => (
+                    <motion.div key={feature.title} variants={elegantFadeUp} className="flex gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-primary-100 text-primary-500 shadow-sm">
+                        {feature.icon}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-brand-primary mb-1">{feature.title}</h4>
+                        <p className="text-sm text-slate leading-relaxed">{feature.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Right Side: Floating Purifier Image */}
+              <motion.div 
+                initial="hidden" 
+                whileInView="visible" 
+                viewport={{ once: true }}
+                variants={elegantFadeUp}
+                className="w-full lg:w-1/2 relative h-[400px] lg:h-[600px] flex items-center justify-center mt-12 lg:mt-0"
+              >
+                {/* Background Glow */}
+                <div className="absolute inset-0 bg-primary-100/50 rounded-full blur-3xl opacity-50 scale-75" />
+                
+                {/* Purifier Image */}
+                <motion.img 
+                  src={purifierImg} 
+                  alt="Premium RO Purifier" 
+                  className="relative z-10 w-auto h-full max-h-[500px] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
+                  animate={{ y: [-15, 15, -15] }}
+                  transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                />
+                
+                {/* Floating Callout 1 */}
+                <motion.div 
+                  className="absolute top-[20%] right-[0%] lg:-right-[10%] z-20 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-primary-100 flex items-center gap-3"
+                  animate={{ y: [-5, 5, -5] }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center">
+                    <Droplets className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <span className="text-sm font-bold text-brand-primary tracking-wide">100% Pure</span>
+                </motion.div>
+
+                {/* Floating Callout 2 */}
+                <motion.div 
+                  className="absolute bottom-[20%] left-[0%] lg:-left-[10%] z-20 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-primary-100 flex items-center gap-3"
+                  animate={{ y: [5, -5, 5] }}
+                  transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 2 }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  </div>
+                  <span className="text-sm font-bold text-brand-primary tracking-wide">Safe Storage</span>
+                </motion.div>
+                
+              </motion.div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* WHY CHOOSE US */}
+        <section className="py-24 lg:py-32 bg-background border-y border-primary-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="text-center mb-16 max-w-2xl mx-auto">
+              <h2 className="text-xs font-semibold text-slate tracking-widest uppercase mb-3">The Standard</h2>
+              <h3 className="text-3xl md:text-4xl font-bold text-brand-primary tracking-tight">Engineered for purity.</h3>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((f, i) => (
-                <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="group bg-white rounded-3xl p-8 border border-gray-100 hover:shadow-2xl hover:shadow-primary-900/10 hover:border-gray-200 hover:scale-\[1.02\] transition-all duration-300">
-                  <div className="w-14 h-14 bg-gray-50 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 ease-[0.16,1,0.3,1]">
+                <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: i * 0.1 }} className="group text-center sm:text-left">
+                  <div className="w-12 h-12 rounded-full bg-surface border border-primary-100 flex items-center justify-center mb-6 mx-auto sm:mx-0">
                     {f.icon}
                   </div>
-                  <h4 className="font-extrabold text-[#0A0F1C] text-lg mb-3">{f.title}</h4>
-                  <p className="text-gray-500 text-sm leading-relaxed font-medium">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICE PROCESS TIMELINE */}
-        <section className="py-24 lg:py-32 bg-white relative overflow-hidden border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-20 max-w-2xl mx-auto">
-              <h2 className="text-xs font-black text-brand-primary tracking-widest uppercase mb-3">How We Serve You</h2>
-              <h3 className="text-3xl sm:text-4xl font-extrabold text-[#0A0F1C] tracking-tight">Standardized Service Flow</h3>
-            </motion.div>
-
-            <div className="relative">
-              {/* Connector Line */}
-              <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-100 -translate-y-1/2 hidden lg:block z-0" />
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 relative z-10">
-                {[
-                  { step: "01", name: "Book Service", desc: "Easily request a visit online or by phone." },
-                  { step: "02", name: "Assign Engineer", desc: "A qualified technician is assigned instantly." },
-                  { step: "03", name: "Diagnostic Visit", desc: "Technician inspects your RO machine on-site." },
-                  { step: "04", name: "Prompt Repair", desc: "Repairs completed using 100% genuine spares." },
-                  { step: "05", name: "Warranty & Feedback", desc: "Enjoy a 1-year service warranty and submit ratings." },
-                ].map((item, i) => (
-                  <motion.div 
-                    key={i} 
-                    initial="hidden" 
-                    whileInView="visible" 
-                    viewport={{ once: true }} 
-                    variants={fadeUp} 
-                    transition={{ delay: i * 0.15 }}
-                    className="bg-gray-50 border border-gray-100 rounded-3xl p-8 hover:shadow-xl hover:bg-white transition-all flex flex-col group"
-                  >
-                    <span className="text-4xl font-black text-brand-primary/20 group-hover:text-brand-primary transition-colors leading-none mb-6">{item.step}</span>
-                    <h4 className="text-gray-900 font-extrabold text-lg mb-3">{item.name}</h4>
-                    <p className="text-gray-500 text-sm font-medium leading-relaxed">{item.desc}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICES */}
-        <section className="py-24 lg:py-32 bg-gray-50 relative overflow-hidden border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-16 max-w-2xl mx-auto">
-              <h2 className="text-xs font-black text-brand-secondary tracking-widest uppercase mb-3">Expert Care</h2>
-              <h3 className="text-3xl sm:text-4xl font-extrabold text-[#0A0F1C] tracking-tight">Complete Service Solutions</h3>
-            </motion.div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {siteServices.map((s, i) => (
-                <motion.div key={s.title} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary-900/5 hover:border-gray-200 hover:-translate-y-2 transition-all duration-500 flex flex-col h-full group">
-                  <div className="w-14 h-14 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center justify-center mb-6 group-hover:bg-brand-primary group-hover:text-white transition-colors duration-300 text-brand-primary">
-                    <Check className="w-6 h-6" />
-                  </div>
-                  <h4 className="font-extrabold text-[#0A0F1C] text-xl mb-3">{s.title}</h4>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-8 flex-1 font-medium">{s.desc}</p>
-                  <Link href={s.href} className="inline-flex items-center gap-2 text-brand-primary font-bold text-sm group-hover:text-brand-secondary transition-colors mt-auto">
-                    {s.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  <h4 className="font-semibold text-brand-primary text-lg mb-2">{f.title}</h4>
+                  <p className="text-slate text-sm leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -220,15 +284,15 @@ export default function Home() {
         </section>
 
         {/* GOOGLE REVIEW TESTIMONIALS */}
-        <section className="py-24 lg:py-32 bg-white overflow-hidden relative border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="mb-16 text-center lg:text-left flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <section className="py-24 lg:py-32 bg-surface overflow-hidden border-b border-primary-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
-                <h3 className="text-3xl sm:text-4xl font-semibold text-[#0A0F1C] tracking-tight">{settings.testimonialsTitle || "Testimonials"}</h3>
+                <h3 className="text-3xl sm:text-4xl font-bold text-brand-primary tracking-tight">Verified Trust.</h3>
               </div>
-              <div className="flex items-center gap-2 bg-gray-50 border border-gray-100 px-5 py-3 rounded-2xl shadow-sm">
+              <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                <span className="font-extrabold text-[#0A0F1C]">4.9 / 5.0 Rating</span>
+                <span className="font-semibold text-brand-primary">4.9 / 5.0 on Google</span>
               </div>
             </motion.div>
             
@@ -239,28 +303,28 @@ export default function Home() {
                   initial="hidden" 
                   whileInView="visible" 
                   viewport={{ once: true, margin: "-50px" }} 
-                  variants={fadeUp} 
+                  variants={elegantFadeUp} 
                   transition={{ delay: i * 0.1 }} 
-                  className="bg-gray-50 border border-gray-100 rounded-3xl p-8 hover:shadow-2xl hover:shadow-primary-900/5 transition-all flex flex-col justify-between"
+                  className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex gap-1 mb-6">
+                    <div className="flex gap-1 mb-4">
                       {Array.from({ length: 5 }).map((_, j) => (
                         <Star key={j} className={`w-4 h-4 ${j < t.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
                       ))}
                     </div>
-                    <p className="text-gray-600 text-base leading-relaxed mb-8 font-medium">"{t.review}"</p>
+                    <p className="text-brand-primary text-sm leading-relaxed mb-8">"{t.review}"</p>
                   </div>
-                  <div className="flex items-center gap-4 border-t border-gray-200/60 pt-6">
-                    <div className="w-12 h-12 rounded-full bg-brand-secondary/20 flex items-center justify-center font-bold text-brand-secondary text-lg border border-brand-secondary/30 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center font-medium text-brand-primary text-sm shrink-0 border border-primary-100">
                       {t.name.charAt(0)}
                     </div>
                     <div>
-                      <div className="font-bold text-[#0A0F1C] tracking-tight flex items-center gap-1.5">
+                      <div className="font-semibold text-brand-primary tracking-tight text-sm flex items-center gap-1.5">
                         {t.name}
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-50" />
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
                       </div>
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Customer</span>
+                      <span className="text-[10px] text-slate uppercase tracking-wider">Verified Purchase</span>
                     </div>
                   </div>
                 </motion.div>
@@ -270,25 +334,25 @@ export default function Home() {
         </section>
 
         {/* FAQ ACCORDION */}
-        <section className="py-24 lg:py-32 bg-gray-50 relative border-b border-gray-100">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="text-center mb-16">
-              <h2 className="text-xs font-black text-brand-primary tracking-widest uppercase mb-3">FAQ</h2>
-              <h3 className="text-3xl font-extrabold text-[#0A0F1C] tracking-tight">Frequently Asked Questions</h3>
+        <section className="py-24 lg:py-32 bg-background border-b border-primary-100">
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="mb-16">
+              <h3 className="text-3xl font-bold text-brand-primary tracking-tight mb-2">Common Questions.</h3>
+              <p className="text-slate">Everything you need to know about our services.</p>
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {faqs.map((faq, index) => {
                 const isOpen = faqOpenIndex === index;
                 return (
-                  <div key={index} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div key={index} className="border-b border-primary-100 last:border-0">
                     <button 
                       onClick={() => setFaqOpenIndex(isOpen ? null : index)}
-                      className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                      className="w-full py-5 flex items-center justify-between text-left focus:outline-none group"
                     >
-                      <span className="font-extrabold text-[#0A0F1C] text-base sm:text-lg">{faq.q}</span>
+                      <span className="font-medium text-brand-primary text-lg group-hover:text-primary-600 transition-colors">{faq.q}</span>
                       <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                        <ChevronDown className="w-5 h-5 text-slate" />
                       </motion.div>
                     </button>
                     <AnimatePresence initial={false}>
@@ -299,7 +363,7 @@ export default function Home() {
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
                         >
-                          <div className="px-6 pb-6 text-gray-500 font-medium text-sm leading-relaxed border-t border-gray-50 pt-4">
+                          <div className="pb-6 text-slate text-sm leading-relaxed">
                             {faq.a}
                           </div>
                         </motion.div>
@@ -313,24 +377,38 @@ export default function Home() {
         </section>
 
         {/* CTA */}
-        <section className="py-32 bg-white relative">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-[#0A0F1C] tracking-tighter mb-6">Ready to upgrade your water?</h2>
-              <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto font-medium">Get in touch with our experts today for a free consultation or to schedule a service visit.</p>
+        <section className="py-32 bg-brand-primary relative overflow-hidden">
+          {/* Subtle minimal bg pattern */}
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp}>
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">Ready for pure water?</h2>
+              <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">Get in touch with our experts today for a free consultation or to schedule a service visit.</p>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-brand-primary text-white font-bold px-10 py-4.5 rounded-full hover:bg-primary-800 transition-all shadow-xl shadow-brand-primary/20 hover:shadow-brand-primary/40 hover:scale-\[1.02\] text-lg group">
-                  Book a Service <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-white text-brand-primary font-medium px-8 py-4 rounded-lg hover:bg-surface transition-elegant text-base w-full sm:w-auto">
+                  Book a Service
                 </Link>
-                <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-white text-[#0A0F1C] border border-gray-200 font-bold px-10 py-4.5 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all hover:scale-\[1.02\] text-lg hover:shadow-lg">
-                  <Phone className="w-5 h-5 text-brand-secondary" />
+                <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/20 font-medium px-8 py-4 rounded-lg hover:bg-white/5 transition-elegant text-base w-full sm:w-auto">
+                  <Phone className="w-4 h-4" />
                   {contactNumber}
                 </a>
               </div>
             </motion.div>
           </div>
         </section>
+        
+        {/* STICKY WHATSAPP CTA */}
+        <a 
+          href={`https://wa.me/91${contactNumber}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-elegant focus:outline-none focus:ring-4 focus:ring-green-300"
+          aria-label="Contact on WhatsApp"
+        >
+          <MessageCircle className="w-7 h-7" />
+        </a>
+
       </main>
     </>
   );

@@ -2,59 +2,48 @@
 @import "tw-animate-css";
 
 @theme {
-  /* Deep Royal Blue */
-  --color-primary-50: #f0f4f8;
-  --color-primary-100: #d9e2ec;
-  --color-primary-200: #bcccdc;
-  --color-primary-300: #9fb3c8;
-  --color-primary-400: #829ab1;
-  --color-primary-500: #627d98;
-  --color-primary-600: #486581;
-  --color-primary-700: #334e68;
-  --color-primary-800: #243b53;
-  --color-primary-900: #102a43; /* Deep Royal */
+  /* Minimalist monochrome palette with restrained accents */
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a; /* Deep Charcoal/Navy */
   
-  --color-brand-primary: #102a43;
-  --color-brand-secondary: #00c4cc; /* Fresh Aqua */
-  --color-brand-accent: #10b981; /* Emerald Green */
+  --color-brand-primary: #0f172a;
+  --color-brand-secondary: #000000;
+  --color-brand-accent: #0f172a;
 
-  /* Fresh Aqua */
-  --color-secondary-50: #e0fbfc;
-  --color-secondary-100: #bcf4f6;
-  --color-secondary-200: #89ecef;
-  --color-secondary-300: #4de1e6;
-  --color-secondary-400: #15d2db;
-  --color-secondary-500: #00c4cc; /* Aqua */
-  --color-secondary-600: #009ba1;
-  --color-secondary-700: #007c82;
-  --color-secondary-800: #026166;
-  --color-secondary-900: #054f54;
+  /* Restrained accent for water context (very subtle use) */
+  --color-accent-50: #eff6ff;
+  --color-accent-100: #dbeafe;
+  --color-accent-500: #3b82f6; /* Blue for trust */
+  --color-accent-600: #2563eb;
+  --color-accent-900: #1e3a8a;
 
-  /* Emerald Green */
-  --color-accent-50: #ecfdf5;
-  --color-accent-500: #10b981;
-  --color-accent-600: #059669;
-
-  --color-background: #fafafa; /* Off-White Neutral */
-  --color-surface: #ffffff;
-  --color-slate: #64748b; /* Slate Gray Neutral */
+  --color-background: #ffffff; /* Clean white */
+  --color-surface: #f8fafc; /* Subtle off-white for contrast */
+  --color-slate: #64748b;
   
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  /* Precision radii */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
   
-  /* Premium Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-  --shadow-blue: 0 10px 25px -5px rgba(16, 42, 67, 0.15), 0 8px 10px -6px rgba(16, 42, 67, 0.1);
-  --shadow-aqua: 0 10px 25px -5px rgba(0, 196, 204, 0.2), 0 8px 10px -6px rgba(0, 196, 204, 0.1);
+  /* Restrained, non-expensive shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.04), 0 8px 10px -6px rgb(0 0 0 / 0.04);
 }
 
 @layer base {
@@ -68,12 +57,18 @@
 
   html {
     scroll-behavior: smooth;
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      scroll-behavior: auto;
+    }
   }
 
   body {
     @apply bg-background text-gray-900 font-sans antialiased;
     margin: 0;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   img {
@@ -93,12 +88,29 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20;
+    @apply bg-white/60 backdrop-blur-md border border-white/40;
   }
   .glass-card {
-    @apply bg-white/80 backdrop-blur-xl border border-gray-100 shadow-xl rounded-2xl;
+    @apply bg-white/70 backdrop-blur-lg border border-gray-100/50 shadow-sm rounded-xl;
   }
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-900 to-secondary-500;
+  
+  /* Invisible, elegant transitions */
+  .transition-elegant {
+    transition-property: opacity, transform, background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 300ms;
+  }
+
+  .transition-elegant-slow {
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    transition-duration: 500ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .transition-elegant,
+    .transition-elegant-slow {
+      transition-duration: 0.01ms !important;
+    }
   }
 }

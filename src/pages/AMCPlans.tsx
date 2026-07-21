@@ -7,9 +7,9 @@ import { FaqService } from "@/services/content.service";
 import { SettingsService } from "@/services/settings.service";
 import { Phone, CheckCircle2, X, ArrowRight, ShieldCheck, Sparkles, Plus } from "lucide-react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const } }
+const elegantFadeUp = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } }
 };
 
 const staggerContainer = {
@@ -19,26 +19,26 @@ const staggerContainer = {
 
 const AMC_STYLES = [
   {
-    borderClass: "border-gray-200 hover:border-gray-300",
-    headerBg: "bg-white",
-    headerText: "text-gray-900",
-    btnClass: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50",
+    borderClass: "border-primary-100 hover:border-primary-300",
+    headerBg: "bg-surface",
+    headerText: "text-brand-primary",
+    btnClass: "bg-white text-brand-primary border border-primary-200 hover:bg-surface",
     period: "/year",
     isPopular: false,
   },
   {
-    borderClass: "border-brand-primary shadow-2xl shadow-primary-900/10 scale-[1.02]",
+    borderClass: "border-brand-primary shadow-sm scale-[1.02]",
     headerBg: "bg-brand-primary text-white",
     headerText: "text-white",
-    btnClass: "bg-brand-secondary text-brand-primary hover:bg-white border border-transparent hover:border-brand-secondary",
+    btnClass: "bg-white text-brand-primary hover:bg-surface border border-transparent",
     period: "/year",
     isPopular: true,
   },
   {
-    borderClass: "border-gray-200 hover:border-gray-300",
-    headerBg: "bg-white",
-    headerText: "text-gray-900",
-    btnClass: "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50",
+    borderClass: "border-primary-100 hover:border-primary-300",
+    headerBg: "bg-surface",
+    headerText: "text-brand-primary",
+    btnClass: "bg-white text-brand-primary border border-primary-200 hover:bg-surface",
     period: "/year",
     isPopular: false,
   },
@@ -110,20 +110,16 @@ export default function AMCPlans() {
 
       <main className="bg-background min-h-screen">
         {/* HEADER SECTION */}
-        <section className="relative pt-32 pb-32 overflow-hidden border-b border-gray-100 bg-white">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-brand-secondary/5 blur-3xl"></div>
-          </div>
-          
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <section className="relative pt-40 pb-32 overflow-hidden border-b border-primary-100 bg-surface">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 text-center">
             <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-3xl mx-auto">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 text-brand-secondary font-bold uppercase tracking-widest text-sm mb-6">
-                <ShieldCheck className="w-4 h-4" /> Peace of Mind
+              <motion.div variants={elegantFadeUp} className="inline-flex items-center gap-2 text-slate font-semibold uppercase tracking-widest text-xs mb-6">
+                <ShieldCheck className="w-4 h-4 text-primary-500" /> Peace of Mind
               </motion.div>
-              <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-gray-900">
-                Simple, transparent <br className="hidden sm:block" /> <span className="text-gradient">maintenance plans</span>
+              <motion.h1 variants={elegantFadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-brand-primary leading-tight">
+                Simple, transparent <br className="hidden sm:block" /> maintenance plans
               </motion.h1>
-              <motion.p variants={fadeUp} className="text-lg text-gray-500 leading-relaxed mb-10 max-w-2xl mx-auto">
+              <motion.p variants={elegantFadeUp} className="text-lg text-slate leading-relaxed mb-10 max-w-2xl mx-auto font-medium">
                 Protect your family's health and your purifier's lifespan with our comprehensive Annual Maintenance Contracts. No surprise costs.
               </motion.p>
             </motion.div>
@@ -132,45 +128,45 @@ export default function AMCPlans() {
 
         {/* PRICING CARDS */}
         <section className="relative -mt-16 pb-24 z-20">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
               {managedPlans.map((plan, i) => (
                 <motion.div
                   key={plan.name}
-                  initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeUp} transition={{ delay: i * 0.1 }}
-                  className={`bg-white rounded-3xl border ${plan.borderClass} flex flex-col relative transition-all duration-300 ${plan.isPopular ? "md:-mt-8 shadow-2xl z-10" : "shadow-sm hover:shadow-xl"}`}
+                  initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: i * 0.1 }}
+                  className={`bg-white rounded-2xl border ${plan.borderClass} flex flex-col relative transition-elegant ${plan.isPopular ? "md:-mt-8 z-10" : "shadow-sm"}`}
                 >
                   {plan.isPopular && (
                     <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-                      <span className="flex items-center gap-1.5 bg-gradient-to-r from-brand-secondary to-blue-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
+                      <span className="flex items-center gap-1.5 bg-brand-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider border border-primary-700">
                         <Sparkles className="w-3 h-3" /> Most Popular
                       </span>
                     </div>
                   )}
 
-                  <div className={`p-8 rounded-t-3xl ${plan.headerBg}`}>
-                    <h3 className={`font-bold text-xl mb-4 ${plan.headerText}`}>{plan.name}</h3>
+                  <div className={`p-8 rounded-t-2xl border-b border-primary-100 ${plan.headerBg}`}>
+                    <h3 className={`font-semibold text-xl mb-4 ${plan.headerText}`}>{plan.name}</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className={`text-4xl font-extrabold tracking-tight ${plan.headerText}`}>{plan.price}</span>
-                      <span className={`text-sm font-medium ${plan.isPopular ? "text-primary-200" : "text-gray-500"}`}>{plan.period}</span>
+                      <span className={`text-4xl font-bold tracking-tight ${plan.headerText}`}>{plan.price}</span>
+                      <span className={`text-sm font-medium ${plan.isPopular ? "text-primary-200" : "text-slate"}`}>{plan.period}</span>
                     </div>
                   </div>
 
-                  <div className="p-8 flex flex-col flex-1 bg-white rounded-b-3xl">
+                  <div className="p-8 flex flex-col flex-1 bg-white rounded-b-2xl">
                     <ul className="space-y-4 mb-8 flex-1">
                       {plan.features.map((f) => (
-                        <li key={f.text} className={`flex items-start gap-3 text-sm font-medium ${f.included ? "text-gray-700" : "text-gray-400 line-through"}`}>
+                        <li key={f.text} className={`flex items-start gap-3 text-sm font-medium ${f.included ? "text-brand-primary" : "text-primary-300 line-through"}`}>
                           {f.included
-                            ? <CheckCircle2 className="w-5 h-5 text-brand-accent shrink-0" />
-                            : <X className="w-5 h-5 text-gray-300 shrink-0" />
+                            ? <CheckCircle2 className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
+                            : <X className="w-4 h-4 text-primary-200 shrink-0 mt-0.5" />
                           }
-                          <span className="pt-0.5">{f.text}</span>
+                          <span>{f.text}</span>
                         </li>
                       ))}
                     </ul>
                     <a
                       href={`tel:${contactNumber}`}
-                      className={`w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl transition-all text-sm shadow-sm hover:shadow-md active:scale-[0.98] ${plan.btnClass}`}
+                      className={`w-full flex items-center justify-center gap-2 font-medium py-3.5 rounded-lg transition-elegant text-sm group ${plan.btnClass}`}
                     >
                       Subscribe Plan
                     </a>
@@ -182,11 +178,11 @@ export default function AMCPlans() {
         </section>
 
         {/* COMPARISON/BENEFITS */}
-        <section className="py-24 lg:py-32 bg-gray-50 border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-24 lg:py-32 bg-background border-t border-primary-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-sm font-bold text-brand-secondary tracking-widest uppercase mb-3">Why AMC?</h2>
-              <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">Benefits of Annual Maintenance</h3>
+              <h2 className="text-xs font-semibold text-slate tracking-widest uppercase mb-3">Why AMC?</h2>
+              <h3 className="text-3xl font-bold text-brand-primary tracking-tight">Benefits of Annual Maintenance</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -196,12 +192,12 @@ export default function AMCPlans() {
                 { title: "Priority Support", desc: "Skip the queue. Get same-day service visits for breakdowns." },
                 { title: "Extended Lifespan", desc: "Routine maintenance adds years to your purifier's life." },
               ].map((b, i) => (
-                <motion.div key={b.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-white p-8 rounded-3xl border border-gray-100">
-                  <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center mb-4 text-brand-primary">
-                    <Plus className="w-5 h-5" />
+                <motion.div key={b.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={elegantFadeUp} transition={{ delay: i * 0.1 }} className="bg-surface p-8 rounded-2xl border border-primary-100 hover:border-primary-300 transition-elegant">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mb-6 text-brand-primary border border-primary-100">
+                    <Plus className="w-4 h-4" />
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-2">{b.title}</h4>
-                  <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>
+                  <h4 className="font-semibold text-brand-primary mb-2">{b.title}</h4>
+                  <p className="text-slate text-sm leading-relaxed">{b.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -209,18 +205,18 @@ export default function AMCPlans() {
         </section>
 
         {/* FAQ SECTION */}
-        <section className="py-24 lg:py-32 bg-white border-t border-gray-100">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-24 lg:py-32 bg-surface border-t border-primary-100">
+          <div className="max-w-3xl mx-auto px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-4">Frequently Asked Questions</h2>
-              <p className="text-gray-500 text-lg">Everything you need to know about our plans.</p>
+              <h2 className="text-3xl font-bold text-brand-primary tracking-tight mb-4">Frequently Asked Questions</h2>
+              <p className="text-slate text-base">Everything you need to know about our plans.</p>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               {faqs.map((faq, i) => (
-                <motion.div key={faq.q} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:bg-white hover:border-gray-200 transition-colors">
-                  <h3 className="font-bold text-gray-900 text-lg mb-3">{faq.q}</h3>
-                  <p className="text-gray-600 leading-relaxed">{faq.a}</p>
+                <motion.div key={faq.q} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={elegantFadeUp} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl p-8 border border-primary-100 hover:border-primary-300 transition-elegant">
+                  <h3 className="font-semibold text-brand-primary text-lg mb-3">{faq.q}</h3>
+                  <p className="text-slate leading-relaxed text-sm">{faq.a}</p>
                 </motion.div>
               ))}
             </div>
@@ -229,19 +225,17 @@ export default function AMCPlans() {
 
         {/* CTA */}
         <section className="py-24 lg:py-32 bg-brand-primary text-white relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-[-50%] left-[-10%] w-[50%] h-[100%] rounded-full bg-brand-secondary/10 blur-3xl"></div>
-          </div>
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-6 tracking-tight">Need a custom plan for commercial use?</h2>
-            <p className="text-xl text-primary-200 mb-10">We offer specialized AMC plans for offices, schools, and hospitals.</p>
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+          <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Need a custom plan for commercial use?</h2>
+            <p className="text-lg text-primary-200 mb-10 max-w-2xl mx-auto">We offer specialized AMC plans for offices, schools, and hospitals.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-brand-secondary text-brand-primary font-bold px-8 py-4 rounded-xl hover:bg-white transition-all text-lg shadow-lg shadow-brand-secondary/20">
-                <Phone className="w-5 h-5" />
+              <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-white text-brand-primary font-medium px-8 py-4 rounded-lg hover:bg-surface transition-elegant text-base">
+                <Phone className="w-4 h-4" />
                 Contact Sales
               </a>
-              <Link href="/contact" className="inline-flex items-center justify-center gap-2 border border-primary-700 bg-primary-800 text-white font-bold px-8 py-4 rounded-xl hover:bg-primary-700 transition-all text-lg">
-                View Contact Info <ArrowRight className="w-5 h-5" />
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 border border-primary-700 bg-transparent text-white font-medium px-8 py-4 rounded-lg hover:bg-white/10 transition-elegant text-base">
+                View Contact Info <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
