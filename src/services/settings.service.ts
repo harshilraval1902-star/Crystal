@@ -10,7 +10,12 @@ export const SettingsService = {
   },
 
   async getById(id: string): Promise<string | null> {
-    return apiJson<Record<string, string>>(`${API_PATH}/${id}`).then((data) => data[id] ?? null);
+    try {
+      const data = await apiJson<Record<string, string>>(API_PATH);
+      return data[id] ?? null;
+    } catch {
+      return null;
+    }
   },
 
   async create(data: Record<string, string>): Promise<Settings> {

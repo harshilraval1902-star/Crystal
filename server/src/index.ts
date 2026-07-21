@@ -21,6 +21,8 @@ import inquiryRoutes from "./routes/inquiry.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import uploadRoutes from "./routes/upload.routes";
 import usersRoutes from "./routes/users.routes";
+import heroSlideRoutes from "./routes/heroSlide.routes";
+import roFeatureRoutes from "./routes/roFeature.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { UPLOAD_DIR } from "./middleware/upload";
 import prisma from "./config/db";
@@ -71,7 +73,7 @@ app.use(limiter);
 // Auth endpoint stricter limit
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === "development" ? 200 : 20,
+  max: 200, // Temporarily increased from 20 to allow user login after crash loops
   message: { error: "Too many login attempts. Please try again later." },
 });
 app.use("/api/admin/auth/login", authLimiter);
@@ -102,6 +104,8 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/hero-slides", heroSlideRoutes);
+app.use("/api/ro-features", roFeatureRoutes);
 
 // ── Health Check ──────────────────────────────────────────
 app.get("/api/health", (_req, res) => {

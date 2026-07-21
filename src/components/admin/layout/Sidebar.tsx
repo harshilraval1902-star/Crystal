@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Globe,
+  MonitorPlay,
+  Layers
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -23,6 +25,13 @@ const navGroups = [
     title: "Overview",
     items: [
       { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    ],
+  },
+  {
+    title: "Homepage",
+    items: [
+      { href: "/admin/hero-slides", icon: MonitorPlay, label: "Hero Slides" },
+      { href: "/admin/ro-features", icon: Layers, label: "RO Features" },
     ],
   },
   {

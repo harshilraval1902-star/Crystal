@@ -2,28 +2,57 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Phone } from "lucide-react";
-import bgImg from "@/assets/newfolder/BG.png";
-import purifier1 from "@/assets/newfolder/purifier-Photoroom.png";
-import purifier2 from "@/assets/newfolder/Gemini_Generated_Image_af4odsaf4odsaf4o-Photoroom.png";
-import purifier3 from "@/assets/newfolder/Gemini_Generated_Image_azuxplazuxplazux-Photoroom.png";
-
-const purifiers = [
-  { id: 1, img: purifier1, name: "Zuric White Edition" },
-  { id: 2, img: purifier2, name: "Zuric Copper Gold" },
-  { id: 3, img: purifier3, name: "Refocus Your Life Black" },
-];
+import bgImgFallback from "@/assets/newfolder/BG.png";
+import purifier1 from "@/assets/Aqua-Zuric-Water-Purifier._1775412426686.jpg";
+import purifier2 from "@/assets/Aqua_Moor_(2)_1775412426683.jpg";
+import purifier3 from "@/assets/Aqua2090_(2)_1775412426685.jpg";
+import { HeroSlideService, HeroSlide } from "@/services/heroSlide.service";
+import { SettingsService } from "@/services/settings.service";
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [purifiers, setPurifiers] = useState<HeroSlide[]>([]);
+  const [bgImage, setBgImage] = useState<string>(bgImgFallback);
 
-  const nextSlide = () => setCurrentSlide((p) => (p + 1) % purifiers.length);
-  const prevSlide = () => setCurrentSlide((p) => (p - 1 + purifiers.length) % purifiers.length);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [slidesData, bgSetting] = await Promise.all([
+          HeroSlideService.getAllActive(),
+          SettingsService.getById('hero_bg_image')
+        ]);
+        if (slidesData && slidesData.length > 0) {
+          setPurifiers(slidesData);
+        } else {
+          setPurifiers([
+            { id: 997, name: "Zuric White Edition", imgUrl: purifier1, isActive: true, displayOrder: 1 },
+            { id: 998, name: "Zuric Copper Gold", imgUrl: purifier2, isActive: true, displayOrder: 2 },
+            { id: 999, name: "Refocus Your Life Black", imgUrl: purifier3, isActive: true, displayOrder: 3 },
+          ]);
+        }
+        if (bgSetting) {
+          setBgImage(bgSetting);
+        }
+      } catch (error) {
+        console.error("Failed to load hero data", error);
+      }
+    };
+    fetchData();
+  }, []);
+  const nextSlide = () => {
+    if (purifiers.length > 0) setCurrentSlide((p) => (p + 1) % purifiers.length);
+  };
+  
+  const prevSlide = () => {
+    if (purifiers.length > 0) setCurrentSlide((p) => (p - 1 + purifiers.length) % purifiers.length);
+  };
 
   // Auto slide every 5 seconds
   useEffect(() => {
+    if (purifiers.length <= 1) return;
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [purifiers.length]);
 
   return (
     <section className="relative w-full h-[100vh] min-h-[800px] flex flex-col overflow-hidden bg-[#0A0F1C]">
@@ -32,7 +61,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-80 mix-blend-screen"
-          style={{ backgroundImage: `url(${bgImg})` }}
+          style={{ backgroundImage: `url(${bgImage})` }}
         />
         {/* Soft gradient overlay for depth and text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
@@ -100,23 +129,33 @@ export default function Hero() {
                 let scale = 1;
                 let zIndex = 30;
                 let opacity = 1;
-                let blur = 0;
 
-                if (isPrev) { x = -120; scale = 0.7; zIndex = 10; opacity = 0.4; blur = 4; }
-                if (isNext) { x = 120; scale = 0.7; zIndex = 10; opacity = 0.4; blur = 4; }
+                if (isPrev) { x = -100; scale = 0.7; zIndex = 10; opacity = 0.4; }
+                if (isNext) { x = 100; scale = 0.7; zIndex = 10; opacity = 0.4; }
+                if (isActive) { x = 0; scale = 1; zIndex = 30; opacity = 1; }
 
                 return (
                   <motion.div
                     key={p.id}
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ x, scale, zIndex, opacity, filter: `blur(${blur}px)` }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    initial={false}
+                    animate={{
+                      x: `${x}%`,
+                      scale,
+                      opacity,
+                      zIndex,
+                      rotateY: isActive ? 0 : isPrev ? 15 : -15,
+                    }}
+                    transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+                    className="absolute w-full h-full flex flex-col items-center justify-center cursor-pointer"
+                    onClick={() => {
+                      if (isPrev) prevSlide();
+                      if (isNext) nextSlide();
+                    }}
                   >
                     <img 
-                      src={p.img} 
-                      alt={p.name} 
-                      className="max-h-full w-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
+                      src={p.imgUrl} 
+                      alt={p.name}
+                      className="max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                     />
                   </motion.div>
                 );

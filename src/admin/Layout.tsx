@@ -15,6 +15,8 @@ import Settings from "./Settings";
 import { useAuth } from "@/contexts/AuthContext";
 import NewProductPage from "./NewProductPage";
 import EditProductPage from "./EditProductPage";
+import AdminHeroSlides from "./AdminHeroSlides";
+import AdminROFeatures from "./AdminROFeatures";
 
 export default function AdminLayout() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -52,6 +54,8 @@ export default function AdminLayout() {
         <Route path="/admin/faqs" component={Faqs} />
         <Route path="/admin/site-services" component={SiteServices} />
         <Route path="/admin/settings" component={Settings} />
+        <Route path="/admin/hero-slides" component={AdminHeroSlides} />
+        <Route path="/admin/ro-features" component={AdminROFeatures} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

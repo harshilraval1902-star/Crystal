@@ -7,6 +7,7 @@ import { useDataStore } from "@/hooks/useDataStore";
 import { TestimonialService } from "@/services/testimonial.service";
 import { SiteServiceService } from "@/services/content.service";
 import { SettingsService } from "@/services/settings.service";
+import { ROFeatureService, ROFeature } from "@/services/roFeature.service";
 import Hero from "@/components/Hero";
 import purifierImg from "@/assets/newfolder/purifier-Photoroom.png";
 import {
@@ -49,6 +50,7 @@ export default function Home() {
   const [siteServices, setSiteServices] = useState<{ title: string; desc: string; href: string; cta: string }[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [settings, setSettings] = useState<Record<string, string>>({});
+  const [roFeatures, setRoFeatures] = useState<ROFeature[]>([]);
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(null);
   
   // Before/After Slider State
@@ -100,6 +102,7 @@ export default function Home() {
       setSiteServices(items.filter((item) => item.isActive).sort((a, b) => a.displayOrder - b.displayOrder).map((item) => ({ title: item.title, desc: item.description, href: item.href, cta: item.cta })))
     );
     SettingsService.getAll().then(setSettings);
+    ROFeatureService.getAllActive().then(setRoFeatures).catch(() => {});
   }, [productItems]);
 
   const contactNumber = settings.contactNumber ?? "9584024777";
@@ -190,24 +193,44 @@ export default function Home() {
                 </motion.h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
-                  {[
-                    { title: "7 Stage Purification", desc: "Removes 99.9% of harmful contaminants.", icon: <Layers className="w-5 h-5" /> },
-                    { title: "UV Protection", desc: "Deactivates bacteria and viruses completely.", icon: <Zap className="w-5 h-5" /> },
-                    { title: "TDS Controller", desc: "Maintains essential natural minerals.", icon: <Settings className="w-5 h-5" /> },
-                    { title: "Copper & Alkaline", desc: "Balances pH and boosts immunity naturally.", icon: <Beaker className="w-5 h-5" /> },
-                    { title: "Food Grade Tank", desc: "100% safe, non-toxic water storage.", icon: <ShieldCheck className="w-5 h-5" /> },
-                    { title: "Smart Auto Flush", desc: "Self-cleaning membrane for longer life.", icon: <Activity className="w-5 h-5" /> }
-                  ].map((feature, i) => (
-                    <motion.div key={feature.title} variants={elegantFadeUp} className="flex gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-primary-100 text-primary-500 shadow-sm">
-                        {feature.icon}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-brand-primary mb-1">{feature.title}</h4>
-                        <p className="text-sm text-slate leading-relaxed">{feature.desc}</p>
-                      </div>
-                    </motion.div>
-                  ))}
+                  {roFeatures.length > 0 ? (
+                    roFeatures.map((feature) => (
+                      <motion.div key={feature.id} variants={elegantFadeUp} className="flex gap-4">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-primary-100 text-primary-500 shadow-sm">
+                          {feature.iconName === 'Zap' && <Zap className="w-5 h-5" />}
+                          {feature.iconName === 'Settings' && <Settings className="w-5 h-5" />}
+                          {feature.iconName === 'Beaker' && <Beaker className="w-5 h-5" />}
+                          {feature.iconName === 'ShieldCheck' && <ShieldCheck className="w-5 h-5" />}
+                          {feature.iconName === 'Activity' && <Activity className="w-5 h-5" />}
+                          {feature.iconName === 'Layers' && <Layers className="w-5 h-5" />}
+                          {!['Zap', 'Settings', 'Beaker', 'ShieldCheck', 'Activity', 'Layers'].includes(feature.iconName ?? '') && <CheckCircle2 className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-brand-primary mb-1">{feature.title}</h4>
+                          <p className="text-sm text-slate leading-relaxed">{feature.description}</p>
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    [
+                      { title: "7 Stage Purification", desc: "Removes 99.9% of harmful contaminants.", icon: <Layers className="w-5 h-5" /> },
+                      { title: "UV Protection", desc: "Deactivates bacteria and viruses completely.", icon: <Zap className="w-5 h-5" /> },
+                      { title: "TDS Controller", desc: "Maintains essential natural minerals.", icon: <Settings className="w-5 h-5" /> },
+                      { title: "Copper & Alkaline", desc: "Balances pH and boosts immunity naturally.", icon: <Beaker className="w-5 h-5" /> },
+                      { title: "Food Grade Tank", desc: "100% safe, non-toxic water storage.", icon: <ShieldCheck className="w-5 h-5" /> },
+                      { title: "Smart Auto Flush", desc: "Self-cleaning membrane for longer life.", icon: <Activity className="w-5 h-5" /> }
+                    ].map((feature) => (
+                      <motion.div key={feature.title} variants={elegantFadeUp} className="flex gap-4">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-primary-100 text-primary-500 shadow-sm">
+                          {feature.icon}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-brand-primary mb-1">{feature.title}</h4>
+                          <p className="text-sm text-slate leading-relaxed">{feature.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))
+                  )}
                 </div>
               </motion.div>
 
