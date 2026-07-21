@@ -130,8 +130,8 @@ export default function Hero() {
                 let zIndex = 30;
                 let opacity = 1;
 
-                if (isPrev) { x = -100; scale = 0.7; zIndex = 10; opacity = 0.4; }
-                if (isNext) { x = 100; scale = 0.7; zIndex = 10; opacity = 0.4; }
+                if (isPrev) { x = -100; scale = 0.7; zIndex = 10; opacity = 0; }
+                if (isNext) { x = 100; scale = 0.7; zIndex = 10; opacity = 0; }
                 if (isActive) { x = 0; scale = 1; zIndex = 30; opacity = 1; }
 
                 return (
