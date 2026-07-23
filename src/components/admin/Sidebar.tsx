@@ -124,8 +124,7 @@ export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }: 
             <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-blue-50 text-blue-700 text-sm font-semibold shadow-sm">{admin?.name?.[0] ?? "A"}</div>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-950">{admin?.name ?? "Admin"}</p>
-                <p className="truncate text-xs text-slate-500">{admin?.email ?? "admin@crystalwater.in"}</p>
+                <p className="truncate text-sm font-semibold text-slate-950">Crystal Admin</p>
               </div>
             )}
           </div>

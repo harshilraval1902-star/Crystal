@@ -247,7 +247,7 @@ export default function Home() {
                 
                 {/* Purifier Image */}
                 <motion.img 
-                  src={purifierImg} 
+                  src={settings.ro_promo_img || purifierImg} 
                   alt="Premium RO Purifier" 
                   className="relative z-10 w-auto h-full max-h-[500px] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
                   animate={{ y: [-15, 15, -15] }}
@@ -261,9 +261,12 @@ export default function Home() {
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }}
                 >
                   <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center">
-                    <Droplets className="w-4 h-4 text-emerald-500" />
+                    {settings.ro_badge_1_icon === 'ShieldCheck' ? <ShieldCheck className="w-4 h-4 text-emerald-500" /> : 
+                     settings.ro_badge_1_icon === 'Settings' ? <Settings className="w-4 h-4 text-emerald-500" /> :
+                     settings.ro_badge_1_icon === 'CheckCircle2' ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> :
+                     <Droplets className="w-4 h-4 text-emerald-500" />}
                   </div>
-                  <span className="text-sm font-bold text-brand-primary tracking-wide">100% Pure</span>
+                  <span className="text-sm font-bold text-brand-primary tracking-wide">{settings.ro_badge_1_text || "100% Pure"}</span>
                 </motion.div>
 
                 {/* Floating Callout 2 */}
@@ -273,9 +276,12 @@ export default function Home() {
                   transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 2 }}
                 >
                   <div className="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                    {settings.ro_badge_2_icon === 'Droplets' ? <Droplets className="w-4 h-4 text-emerald-500" /> :
+                     settings.ro_badge_2_icon === 'Settings' ? <Settings className="w-4 h-4 text-emerald-500" /> :
+                     settings.ro_badge_2_icon === 'CheckCircle2' ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> :
+                     <ShieldCheck className="w-4 h-4 text-emerald-500" />}
                   </div>
-                  <span className="text-sm font-bold text-brand-primary tracking-wide">Safe Storage</span>
+                  <span className="text-sm font-bold text-brand-primary tracking-wide">{settings.ro_badge_2_text || "Safe Storage"}</span>
                 </motion.div>
                 
               </motion.div>

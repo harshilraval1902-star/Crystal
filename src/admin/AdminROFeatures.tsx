@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, CheckCircle2, XCircle, Save } from "lucide-react";
 import { ROFeature, ROFeatureService } from "@/services/roFeature.service";
+import { SettingsService } from "@/services/settings.service";
 
 export default function AdminROFeatures() {
   const [features, setFeatures] = useState<ROFeature[]>([]);
@@ -11,16 +12,36 @@ export default function AdminROFeatures() {
   const [currentId, setCurrentId] = useState<number | null>(null);
   const [formData, setFormData] = useState({ title: "", description: "", iconName: "", displayOrder: 0, isActive: true });
 
+  // Promotional Config States
+  const [promoConfig, setPromoConfig] = useState({
+    ro_promo_img: "",
+    ro_badge_1_text: "",
+    ro_badge_1_icon: "",
+    ro_badge_2_text: "",
+    ro_badge_2_icon: "",
+  });
+  const [isSavingPromo, setIsSavingPromo] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const data = await ROFeatureService.getAllAdmin();
+      const [data, settings] = await Promise.all([
+        ROFeatureService.getAllAdmin(),
+        SettingsService.getAll()
+      ]);
       setFeatures(data);
+      setPromoConfig({
+        ro_promo_img: settings.ro_promo_img || "",
+        ro_badge_1_text: settings.ro_badge_1_text || "",
+        ro_badge_1_icon: settings.ro_badge_1_icon || "",
+        ro_badge_2_text: settings.ro_badge_2_text || "",
+        ro_badge_2_icon: settings.ro_badge_2_icon || "",
+      });
     } catch (error) {
-      console.error("Error fetching features", error);
+      console.error("Error fetching features or settings", error);
     } finally {
       setIsLoading(false);
     }
@@ -40,6 +61,19 @@ export default function AdminROFeatures() {
       fetchData();
     } catch (error) {
       alert("Failed to save feature.");
+    }
+  };
+
+  const handlePromoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingPromo(true);
+    try {
+      await SettingsService.update("ro_promo_config", promoConfig);
+      alert("Promotional configuration saved successfully.");
+    } catch (error) {
+      alert("Failed to save promotional configuration.");
+    } finally {
+      setIsSavingPromo(false);
     }
   };
 
@@ -137,6 +171,56 @@ export default function AdminROFeatures() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Promotional Image & Callouts Config */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-slate-800">Promotional Image & Callouts</h2>
+          <p className="text-sm text-slate-500">Configure the large purifier image and floating badges displayed next to the features.</p>
+        </div>
+        
+        <form onSubmit={handlePromoSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-slate-700 mb-1">Promotional Image URL</label>
+            <input type="text" placeholder="/uploads/..." value={promoConfig.ro_promo_img} onChange={e => setPromoConfig({...promoConfig, ro_promo_img: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
+            <p className="text-xs text-slate-500 mt-1">Leave empty to use the default hardcoded image.</p>
+          </div>
+          
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <h3 className="font-semibold text-slate-700 mb-3">Badge 1 (Top Right)</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Text</label>
+                <input type="text" placeholder="100% Pure" value={promoConfig.ro_badge_1_text} onChange={e => setPromoConfig({...promoConfig, ro_badge_1_text: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Lucide Icon (e.g. Droplets)</label>
+                <input type="text" placeholder="Droplets" value={promoConfig.ro_badge_1_icon} onChange={e => setPromoConfig({...promoConfig, ro_badge_1_icon: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <h3 className="font-semibold text-slate-700 mb-3">Badge 2 (Bottom Left)</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Text</label>
+                <input type="text" placeholder="Safe Storage" value={promoConfig.ro_badge_2_text} onChange={e => setPromoConfig({...promoConfig, ro_badge_2_text: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Lucide Icon (e.g. ShieldCheck)</label>
+                <input type="text" placeholder="ShieldCheck" value={promoConfig.ro_badge_2_icon} onChange={e => setPromoConfig({...promoConfig, ro_badge_2_icon: e.target.value})} className="w-full px-4 py-2 border rounded-lg bg-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-2 flex justify-end mt-2">
+            <button type="submit" disabled={isSavingPromo} className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 font-semibold shadow-sm flex items-center gap-2 disabled:opacity-50">
+              <Save className="w-4 h-4" /> {isSavingPromo ? "Saving..." : "Save Configuration"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -141,6 +141,22 @@ async function seed() {
     console.log("✅ Products seeded (without images — upload via admin panel).");
   }
 
+  // ── RO Features ─────────────────────────────────────────────────────────────
+  const roFeatureCount = await prisma.rOFeature.count();
+  if (!roFeatureCount) {
+    await prisma.rOFeature.createMany({
+      data: [
+        { title: "7 Stage Purification", description: "Removes 99.9% of harmful contaminants.", iconName: "Layers", isActive: true, displayOrder: 1 },
+        { title: "UV Protection", description: "Deactivates bacteria and viruses completely.", iconName: "Zap", isActive: true, displayOrder: 2 },
+        { title: "TDS Controller", description: "Maintains essential natural minerals.", iconName: "Settings", isActive: true, displayOrder: 3 },
+        { title: "Copper & Alkaline", description: "Balances pH and boosts immunity naturally.", iconName: "Beaker", isActive: true, displayOrder: 4 },
+        { title: "Food Grade Tank", description: "100% safe, non-toxic water storage.", iconName: "ShieldCheck", isActive: true, displayOrder: 5 },
+        { title: "Smart Auto Flush", description: "Self-cleaning membrane for longer life.", iconName: "Activity", isActive: true, displayOrder: 6 }
+      ],
+    });
+    console.log("✅ RO Features seeded.");
+  }
+
   console.log("🎉 Seeding complete!");
 }
 

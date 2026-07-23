@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Globe,
   MonitorPlay,
-  Layers
+  Layers,
+  LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -73,7 +74,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
   const [location, navigate] = useLocation();
-  const { admin } = useAuth();
+  const { admin, logout } = useAuth();
 
   return (
     <motion.aside
@@ -151,7 +152,18 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
       </div>
 
       {/* Footer / Collapse */}
-      <div className="border-t border-primary-800 p-4">
+      <div className="border-t border-primary-800 p-4 space-y-2">
+        <button
+          onClick={async () => {
+            await logout();
+            navigate("/admin/login");
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl py-2 text-sm text-primary-200 hover:bg-white/5 hover:text-white transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+
         <button
           onClick={onToggleCollapse}
           className="flex w-full items-center justify-center gap-2 rounded-xl py-2 text-sm text-primary-200 hover:bg-white/5 hover:text-white transition-colors"

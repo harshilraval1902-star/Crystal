@@ -109,10 +109,10 @@ export function TopBar({ onOpenMobileSidebar }: TopBarProps) {
         
         <button className="flex items-center gap-3 rounded-full hover:bg-gray-50 p-1 pr-3 transition-colors">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-700 font-semibold text-sm">
-            {admin?.name?.[0]?.toUpperCase() || "A"}
+            C
           </div>
           <div className="hidden text-left md:block">
-            <p className="text-sm font-semibold text-gray-900 leading-tight">{admin?.name || "Admin User"}</p>
+            <p className="text-sm font-semibold text-gray-900 leading-tight">Crystal Admin</p>
             <p className="text-xs text-gray-500 leading-tight">Administrator</p>
           </div>
         </button>
