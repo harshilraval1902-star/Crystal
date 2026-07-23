@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { ToastProvider } from "@/components/admin/ToastProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Lazy Loaded Pages
 const Home = lazy(() => import("@/pages/Home"));
@@ -41,6 +42,7 @@ function AppRoutes() {
 
   return (
     <>
+      <ScrollToTop />
       {!isAdminRoute && <Navbar />}
       <Suspense fallback={<PageLoader />}>
         <Switch>

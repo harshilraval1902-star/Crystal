@@ -142,18 +142,20 @@ export default function Dashboard() {
               <Download className="h-4 w-4 mr-2" />
               Download Reports
             </Button>
-            <div className="absolute right-0 mt-2 w-52 rounded-xl shadow-sm bg-white border border-gray-100 hidden group-hover:block z-50 overflow-hidden">
-              <div className="py-2">
-                <p className="px-4 pt-1.5 pb-2 text-[9px] font-black uppercase tracking-widest text-gray-400">Service Requests</p>
-                <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
-                  <FileText className="h-4 w-4 text-gray-500 shrink-0" /> CSV (.csv)
-                </button>
-                <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
-                  <FileSpreadsheet className="h-4 w-4 text-green-500 shrink-0" /> Excel (.xlsx)
-                </button>
-                <button onClick={() => handleExport("ODS")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
-                  <FileIcon className="h-4 w-4 text-orange-400 shrink-0" /> ODS (.ods)
-                </button>
+            <div className="absolute right-0 pt-2 w-52 hidden group-hover:block z-50">
+              <div className="rounded-xl shadow-sm bg-white border border-gray-100 overflow-hidden">
+                <div className="py-2">
+                  <p className="px-4 pt-1.5 pb-2 text-[9px] font-black uppercase tracking-widest text-gray-400">Service Requests</p>
+                  <button onClick={() => handleExport("CSV")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
+                    <FileText className="h-4 w-4 text-gray-500 shrink-0" /> CSV (.csv)
+                  </button>
+                  <button onClick={() => handleExport("Excel")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
+                    <FileSpreadsheet className="h-4 w-4 text-green-500 shrink-0" /> Excel (.xlsx)
+                  </button>
+                  <button onClick={() => handleExport("ODS")} disabled={exporting} className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 gap-2 font-semibold">
+                    <FileIcon className="h-4 w-4 text-orange-400 shrink-0" /> ODS (.ods)
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -248,26 +250,7 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-8">
-          <Card className="bg-gradient-to-br from-brand-primary to-primary-900 text-white border-0 shadow-sm rounded-xl overflow-hidden relative p-4">
-            <div className="absolute right-0 top-0 opacity-5">
-              <Droplets className="h-32 w-32 -mr-6 -mt-6" />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-white opacity-90 text-lg">System Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mt-2 space-y-4 font-semibold text-sm">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <span className="text-primary-100">Database</span>
-                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-brand-secondary animate-pulse"></span> Online</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-primary-100">API Uptime</span>
-                  <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-brand-secondary"></span> 99.9%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+
 
           <Card className="rounded-xl border-gray-100/80 shadow-sm">
             <CardHeader className="pb-2">
