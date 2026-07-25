@@ -124,95 +124,114 @@ export default function AMCPlans() {
           <Skeleton className="h-[400px] rounded-2xl" />
         </div>
       ) : data.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {data.map((plan) => (
-            <div 
-              key={plan.id} 
-              className={`relative flex flex-col overflow-hidden rounded-2xl border transition-all duration-200 hover:shadow-lg ${
-                plan.badge ? 'border-primary-500 shadow-blue' : 'border-gray-200 bg-white'
-              } ${!plan.isActive && 'opacity-60 grayscale-[0.5]'}`}
-            >
-              {/* Badge Ribbon */}
-              {plan.badge && (
-                <div className="absolute top-0 right-0 bg-primary-500 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-lg">
-                  {plan.badge}
-                </div>
-              )}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+          {data.map((plan, index) => {
+            const isBasic = index % 3 === 0;
+            const isComplete = index % 3 === 1;
+            const isPremium = index % 3 === 2;
 
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-3 rounded-xl ${plan.badge ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600'}`}>
-                    <Shield className="h-6 w-6" />
+            let cardStyles = "border-gray-200 bg-white text-gray-900";
+            let buttonPanelStyles = "border-t border-gray-100 bg-gray-50";
+            let textMuted = "text-gray-500";
+            let textDesc = "text-gray-600";
+            let badgeRibbonStyle = "bg-primary-500 text-white";
+
+            if (isComplete) {
+              cardStyles = "border-primary-300 bg-blue-50/20 text-brand-primary ring-1 ring-primary-500/10 shadow-sm";
+              buttonPanelStyles = "border-t border-primary-100 bg-blue-50/50";
+              textMuted = "text-primary-700/80";
+              textDesc = "text-brand-primary/95";
+              badgeRibbonStyle = "bg-gradient-to-r from-primary-600 to-blue-600 text-white";
+            } else if (isPremium) {
+              cardStyles = "border-slate-800 bg-slate-900 text-white";
+              buttonPanelStyles = "border-t border-slate-800 bg-slate-950/60";
+              textMuted = "text-slate-400";
+              textDesc = "text-slate-200";
+              badgeRibbonStyle = "bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950";
+            }
+
+            return (
+              <div 
+                key={plan.id} 
+                className={`relative flex flex-col overflow-hidden rounded-[2rem] border transition-all duration-200 hover:shadow-lg ${cardStyles} ${!plan.isActive && 'opacity-60 grayscale-[0.5]'}`}
+              >
+                {/* Badge Ribbon */}
+                {plan.badge && (
+                  <div className={`absolute top-0 right-0 text-[10px] font-extrabold uppercase tracking-wider px-3.5 py-1.5 rounded-bl-xl ${badgeRibbonStyle}`}>
+                    {plan.badge}
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-                    <p className="text-sm text-gray-500">{plan.durationMonths} Months Coverage</p>
-                  </div>
-                </div>
-
-                <div className="mb-6 flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-gray-900">₹{plan.price}</span>
-                  <span className="text-sm font-medium text-gray-500">/ plan</span>
-                </div>
-
-                {plan.description && (
-                  <p className="text-sm text-gray-600 mb-6 line-clamp-2">{plan.description}</p>
                 )}
 
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-accent-500 shrink-0" />
-                    <span className="text-sm text-gray-700">{plan.serviceVisits} Scheduled Service Visits</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    {plan.sparePartsCovered ? (
-                      <Check className="h-5 w-5 text-accent-500 shrink-0" />
-                    ) : (
-                      <Wrench className="h-5 w-5 text-gray-400 shrink-0" />
-                    )}
-                    <span className={`text-sm ${plan.sparePartsCovered ? 'text-gray-700' : 'text-gray-400'}`}>
-                      {plan.sparePartsCovered ? 'Free Spare Parts Coverage' : 'Spare Parts at Additional Cost'}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    {plan.prioritySupport ? (
-                      <Check className="h-5 w-5 text-accent-500 shrink-0" />
-                    ) : (
-                      <Star className="h-5 w-5 text-gray-400 shrink-0" />
-                    )}
-                    <span className={`text-sm ${plan.prioritySupport ? 'text-gray-700' : 'text-gray-400'}`}>
-                      {plan.prioritySupport ? '24/7 Priority Support' : 'Standard Business Hours Support'}
-                    </span>
-                  </li>
-                </ul>
-              </div>
+                <div className="p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-3 rounded-xl ${isPremium ? 'bg-slate-800 text-amber-400' : isComplete ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600'}`}>
+                      <Shield className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-extrabold">{plan.name}</h3>
+                      <p className={`text-xs font-bold ${textMuted}`}>{plan.durationMonths} Months Coverage</p>
+                    </div>
+                  </div>
 
-              <div className="mt-auto border-t border-gray-100 bg-gray-50 p-4 flex gap-2">
-                <Button 
-                  variant="secondary" 
-                  className="flex-1"
-                  onClick={() => toggleActive.mutate(plan)}
-                >
-                  {plan.isActive ? 'Deactivate' : 'Activate'}
-                </Button>
-                <Button variant="secondary" size="icon" onClick={() => handleEdit(plan)}>
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  size="icon" 
-                  className="text-danger-600 hover:text-danger-700 hover:bg-danger-50"
-                  onClick={() => {
-                    if (confirm("Delete this AMC plan?")) {
-                      deletePlan.mutate(plan.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  <div className="mb-6 flex items-baseline gap-1">
+                    <span className="text-3xl font-black">₹{plan.price}</span>
+                    <span className={`text-xs font-semibold ${textMuted}`}>/ year</span>
+                  </div>
+
+                  {plan.description && (
+                    <p className={`text-xs font-medium mb-6 line-clamp-2 ${textDesc}`}>{plan.description}</p>
+                  )}
+
+                  <div className="border-t border-current/10 my-4" />
+
+                  <div className="space-y-4 mb-4">
+                    <div>
+                      <span className="block text-[9px] font-extrabold uppercase tracking-widest mb-1 opacity-60">Maintenance</span>
+                      <p className="text-xs font-bold leading-relaxed">
+                        {isBasic ? "Basic preventive checkup & filter cleaning." : isComplete ? "Complete preventive servicing, chemical cleaning, and inspection." : "Unlimited preventive servicing, booster pump checkup, and membrane flushing."}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="block text-[9px] font-extrabold uppercase tracking-widest mb-1 opacity-60">Coverage</span>
+                      <p className="text-xs font-bold leading-relaxed">
+                        {isBasic ? `Includes ${plan.serviceVisits} visits. Parts charged extra.` : isComplete ? `Includes ${plan.serviceVisits} visits, 100% genuine spare parts covered.` : `Includes ${plan.serviceVisits} visits, full filter kit, pump, and priority emergency dispatch.`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`mt-auto p-4 flex gap-2 ${buttonPanelStyles}`}>
+                  <Button 
+                    variant="secondary" 
+                    className={`flex-1 font-bold text-xs ${isPremium ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : ''}`}
+                    onClick={() => toggleActive.mutate(plan)}
+                  >
+                    {plan.isActive ? 'Deactivate' : 'Activate'}
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="icon" 
+                    className={isPremium ? 'border-slate-800 text-slate-200 hover:bg-slate-800' : ''}
+                    onClick={() => handleEdit(plan)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    size="icon" 
+                    className="text-danger-600 hover:text-danger-700 hover:bg-danger-50"
+                    onClick={() => {
+                      if (confirm("Delete this AMC plan?")) {
+                        deletePlan.mutate(plan.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <BlockCard>
