@@ -97,7 +97,9 @@ export default function Settings() {
                 </div>
               ) : (
                 <div className="grid gap-6">
-                  {Object.entries(fields).map(([key, value]) => (
+                  {Object.entries(fields)
+                    .filter(([key]) => !["ro_promo_img", "ro_badge_1_text", "ro_badge_1_icon", "ro_badge_2_text", "ro_badge_2_icon"].includes(key))
+                    .map(([key, value]) => (
                     <div key={key} className="flex gap-4 items-start group">
                       <div className="w-1/3 pt-2">
                         <label className="text-sm font-semibold text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded inline-block truncate max-w-full" title={key}>
