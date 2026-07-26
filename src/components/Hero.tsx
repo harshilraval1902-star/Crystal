@@ -60,7 +60,7 @@ export default function Hero() {
   }, [purifiers.length]);
 
   return (
-    <section className="relative w-full h-[100vh] min-h-[800px] flex flex-col overflow-hidden bg-[#0A0F1C]">
+    <section className="relative w-full min-h-[100dvh] lg:h-[100vh] lg:min-h-[800px] flex flex-col overflow-hidden bg-[#0A0F1C]">
       
       {/* 1. Full-screen premium interior background image */}
       <div className="absolute inset-0 z-0">
@@ -75,20 +75,20 @@ export default function Hero() {
       {/* Navigation Layer handled globally */}
 
       {/* Main Content Area */}
-      <div className="relative z-20 flex-1 w-full max-w-7xl mx-auto px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between h-full pb-10">
+      <div className="relative z-20 flex-1 w-full max-w-7xl mx-auto px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between h-full pt-28 lg:pt-0 pb-10 lg:pb-0">
         
         {/* Left: Typography & CTAs */}
-        <div className="w-full lg:w-[50%] flex flex-col items-start pt-10 lg:pt-0">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.05] mb-6 drop-shadow-2xl">
+        <div className="w-full lg:w-[50%] flex flex-col items-start pt-0">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.05] mb-4 sm:mb-6 drop-shadow-2xl">
             Pure Water.<br />
             Zero Compromise.
           </h1>
           
-          <p className="text-lg md:text-xl text-white/90 leading-relaxed font-medium mb-10 max-w-lg drop-shadow-md">
+          <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed font-medium mb-6 sm:mb-10 max-w-lg drop-shadow-md">
             Protect your family with premium RO purifiers, expert installation, and fast doorstep service backed by trusted professionals.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12 lg:mb-16 w-full sm:w-auto">
             <Link 
               href="/service-booking" 
               className="inline-flex items-center justify-center bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl hover:bg-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all"
@@ -104,7 +104,7 @@ export default function Hero() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="bg-[#1A1A1A]/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-wrap gap-x-6 gap-y-3 w-full sm:w-auto">
+          <div className="bg-[#1A1A1A]/80 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6 flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-3 w-full sm:w-auto mb-8 lg:mb-0">
             {[
               "Expert Installation",
               "AMC Available",
@@ -120,8 +120,8 @@ export default function Hero() {
         </div>
 
         {/* Right: Product Slider (3D Carousel) */}
-        <div className="w-full lg:w-[50%] h-[50vh] lg:h-full relative flex flex-col items-center justify-center mt-12 lg:mt-0">
-          <div className="relative w-full h-[70%] flex items-center justify-center">
+        <div className="w-full lg:w-[50%] h-[40vh] sm:h-[50vh] lg:h-full relative flex flex-col items-center justify-between mt-6 lg:mt-0 pb-16 lg:pb-0">
+          <div className="relative w-full h-[65%] lg:h-[70%] flex items-center justify-center">
             <AnimatePresence mode="popLayout">
               {purifiers.map((p, i) => {
                 const isActive = i === currentSlide;
@@ -158,7 +158,7 @@ export default function Hero() {
                     }}
                   >
                     <img 
-                      src={p.imgUrl} 
+                      src={p.imgUrl.startsWith("http://localhost:3001") ? p.imgUrl.replace("http://localhost:3001", "") : p.imgUrl} 
                       alt={p.name}
                       className="max-h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                     />
@@ -169,7 +169,7 @@ export default function Hero() {
           </div>
 
           {/* Slider Controls */}
-          <div className="absolute bottom-10 flex flex-col items-center gap-4">
+          <div className="absolute bottom-0 lg:bottom-10 flex flex-col items-center gap-2 sm:gap-4">
             <p className="text-white/60 text-xs font-bold tracking-widest uppercase">
               Discover More Models
             </p>
