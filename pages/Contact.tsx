@@ -2,14 +2,14 @@ import { Link } from "wouter";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 
 export default function Contact() {
-  const phone = "919584024777";
+  const phone = "916359585515";
   const message = encodeURIComponent("Hello! I'd like to know more about your RO Water Purifier services.");
   const waUrl = `https://wa.me/${phone}?text=${message}`;
 
   return (
     <>
       <title>Contact Us | Crystal Natural Water</title>
-      <meta name="description" content="Contact Crystal Natural Water for RO purifier sales, service, and AMC inquiries. Call 9584024777 or email crystalnaturalwater@gmail.com." />
+      <meta name="description" content="Contact Crystal Natural Water for RO purifier sales, service, and AMC inquiries. Call 6359585515 or email crystalnaturalwater@gmail.com." />
 
       <main>
         <section className="bg-gradient-to-r from-blue-700 to-cyan-600 text-white py-14">
@@ -35,7 +35,7 @@ export default function Contact() {
 
                   <div className="space-y-4">
                     <a
-                      href="tel:9584024777"
+                      href="tel:6359585515"
                       className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group"
                     >
                       <div className="bg-blue-600 text-white p-2.5 rounded-lg group-hover:bg-blue-700 transition-colors">
@@ -43,7 +43,7 @@ export default function Contact() {
                       </div>
                       <div>
                         <div className="text-xs text-gray-500 mb-0.5">Call / WhatsApp</div>
-                        <div className="font-bold text-gray-900">9584024777</div>
+                        <div className="font-bold text-gray-900">6359585515</div>
                       </div>
                     </a>
 

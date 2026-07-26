@@ -1,5 +1,5 @@
 export default function WhatsAppButton() {
-  const phone = "919584024777";
+  const phone = "916359585515";
   const message = encodeURIComponent("Hello! I'd like to know more about your RO Water Purifier services.");
   const url = `https://wa.me/${phone}?text=${message}`;
 

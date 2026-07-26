@@ -18,7 +18,7 @@ export default function Footer() {
     );
   }, []);
 
-  const contactNumber = settings.contactNumber ?? "9584024777";
+  const contactNumber = settings.contactNumber ?? "6359585515";
   const email = settings.email ?? "crystalnaturalwater@gmail.com";
   const address = settings.address ?? "India | Est. 2019";
   const footerText = settings.footerText ?? "Premium RO water purification systems. We engineer solutions that deliver pure, safe, and healthy drinking water for families and businesses.";
@@ -63,10 +63,10 @@ export default function Footer() {
               <div className="flex items-center gap-1.5"><Award className="w-4 h-4" /> Top Rated</div>
             </div>
             <div className="flex gap-4">
-              <a href={settings.facebook || "#"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Facebook">
+              <a href={settings.facebook || "https://www.facebook.com/share/1LY8rLPkfD/"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Facebook">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href={settings.instagram || "#"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Instagram">
+              <a href={settings.instagram || "https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
               <a href={settings.youtube || "#"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Twitter">

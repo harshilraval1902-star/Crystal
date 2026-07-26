@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { SettingsService } from "@/services/settings.service";
 
 export default function WhatsAppButton() {
-  const [whatsappNumber, setWhatsappNumber] = useState("919584024777");
+  const [whatsappNumber, setWhatsappNumber] = useState("916359585515");
 
   useEffect(() => {
-    SettingsService.getAll().then((s) => setWhatsappNumber(s.whatsappNumber ?? "919584024777"));
+    SettingsService.getAll().then((s) => setWhatsappNumber(s.whatsappNumber ?? "916359585515"));
   }, []);
 
   const message = encodeURIComponent("Hello! I'd like to know more about your RO Water Purifier services.");

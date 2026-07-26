@@ -170,11 +170,11 @@ export default function Home() {
                     Book a Service <ArrowRight className="w-4 h-4" />
                   </Link>
                   <a
-                    href="tel:9584024777"
+                    href="tel:6359585515"
                     className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all text-base"
                   >
                     <Phone className="w-4 h-4 text-cyan-300" />
-                    9584024777
+                    6359585515
                   </a>
                 </div>
                 <div className="flex flex-wrap gap-5">
@@ -354,11 +354,11 @@ export default function Home() {
                 Book a Service <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="tel:9584024777"
+                href="tel:6359585515"
                 className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-9 py-4 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all text-base"
               >
                 <Phone className="w-4 h-4 text-cyan-300" />
-                9584024777
+                6359585515
               </a>
             </div>
           </div>

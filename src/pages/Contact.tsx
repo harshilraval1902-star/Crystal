@@ -23,8 +23,8 @@ export default function Contact() {
     SettingsService.getAll().then(setSettings);
   }, []);
 
-  const contactNumber = settings.contactNumber ?? "9584024777";
-  const whatsappNumber = settings.whatsappNumber ?? "919584024777";
+  const contactNumber = settings.contactNumber ?? "6359585515";
+  const whatsappNumber = settings.whatsappNumber ?? "916359585515";
   const email = settings.email ?? "crystalnaturalwater@gmail.com";
   const address = settings.address ?? "India | Established 2019";
   const aboutSection = settings.aboutSection ?? "Founded in 2019, Crystal Natural Water is a trusted name in RO Water Purifier sales and service.";

@@ -16,7 +16,7 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [contactNumber, setContactNumber] = useState("9584024777");
+  const [contactNumber, setContactNumber] = useState("6359585515");
   const [location] = useLocation();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    SettingsService.getAll().then((s) => setContactNumber(s.contactNumber ?? "9584024777"));
+    SettingsService.getAll().then((s) => setContactNumber(s.contactNumber ?? "6359585515"));
   }, []);
 
   const isHome = location === "/";

@@ -85,7 +85,8 @@ const planStaticDetails = [
 export default function AMCPlans() {
   const [managedPlans, setManagedPlans] = useState<ManagedPlan[]>([]);
   const [faqs, setFaqs] = useState<{ q: string; a: string }[]>([]);
-  const [contactNumber, setContactNumber] = useState("9584024777");
+  const [contactNumber, setContactNumber] = useState("6359585515");
+  const [whatsappNumber, setWhatsappNumber] = useState("916359585515");
   const [selectedFeature, setSelectedFeature] = useState("spareParts");
 
   useEffect(() => {
@@ -121,7 +122,10 @@ export default function AMCPlans() {
           .map((item) => ({ q: item.question, a: item.answer })),
       ),
     );
-    SettingsService.getAll().then((s) => setContactNumber(s.contactNumber ?? "9584024777"));
+    SettingsService.getAll().then((s) => {
+      setContactNumber(s.contactNumber ?? "6359585515");
+      setWhatsappNumber(s.whatsappNumber ?? "916359585515");
+    });
   }, []);
 
   const featuresComparisonList = [
@@ -568,7 +572,7 @@ export default function AMCPlans() {
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                   <a 
-                    href={`https://wa.me/91${contactNumber}`} 
+                    href={`https://wa.me/${whatsappNumber}`} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-extrabold px-8 py-4 rounded-xl hover:shadow-lg transition-all duration-300 text-base"

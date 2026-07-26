@@ -64,7 +64,7 @@ const faqs = [
   { q: "What is an AMC plan?", a: "An Annual Maintenance Contract (AMC) is a yearly service agreement that covers regular servicing, filter changes, and repairs for your RO purifier, saving you from unexpected maintenance costs." },
   { q: "When does the AMC start?", a: "The AMC starts from the date of enrollment. You'll receive a service confirmation via call or WhatsApp." },
   { q: "Are spare parts included?", a: "Basic AMC does not include spare parts. Standard includes membrane replacement. Premium covers all parts and components." },
-  { q: "How do I book a service under AMC?", a: "Simply call us at 9584024777 or use our Service Booking form. We'll schedule a visit at your convenience." },
+  { q: "How do I book a service under AMC?", a: "Simply call us at 6359585515 or use our Service Booking form. We'll schedule a visit at your convenience." },
 ];
 
 export default function AMCPlans() {
@@ -128,9 +128,10 @@ export default function AMCPlans() {
                       ))}
                     </ul>
                     <a
-                      href="tel:9584024777"
+                      href="tel:6359585515"
                       className={`flex items-center justify-center gap-2 font-semibold py-3 rounded-xl transition-colors text-sm ${plan.btnClass}`}
                     >
+                      <Star className="hidden" />
                       <Phone className="w-4 h-4" />
                       Subscribe Now
                     </a>
@@ -165,7 +166,7 @@ export default function AMCPlans() {
               <p className="text-blue-100">Our team will help you pick the best plan based on your RO model and usage.</p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <a href="tel:9584024777" className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+              <a href="tel:6359585515" className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                 <Phone className="w-4 h-4" />
                 Call Now
               </a>

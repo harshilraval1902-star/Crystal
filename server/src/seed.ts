@@ -30,8 +30,10 @@ async function seed() {
   if (!settingsCount) {
     const defaults = [
       { key: "companyName",       value: "Crystal Natural Water" },
-      { key: "contactNumber",     value: "9584024777" },
-      { key: "whatsappNumber",    value: "919584024777" },
+      { key: "contactNumber",     value: "6359585515" },
+      { key: "whatsappNumber",    value: "916359585515" },
+      { key: "facebook",          value: "https://www.facebook.com/share/1LY8rLPkfD/" },
+      { key: "instagram",         value: "https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh" },
       { key: "email",             value: "crystalnaturalwater@gmail.com" },
       { key: "address",           value: "India | Established 2019" },
       { key: "homeHeroTitle",     value: "Pure Water, Healthy Life." },
@@ -95,9 +97,9 @@ async function seed() {
         { question: "What is an AMC plan?",               answer: "An Annual Maintenance Contract (AMC) is a yearly service agreement that covers regular servicing, filter changes, and repairs for your RO purifier, saving you from unexpected maintenance costs.", category: "AMC",     isActive: true, displayOrder: 1 },
         { question: "When does the AMC start?",           answer: "The AMC starts from the date of enrollment. You'll receive a service confirmation via call or WhatsApp.", category: "AMC",     isActive: true, displayOrder: 2 },
         { question: "Are spare parts included?",          answer: "Basic AMC does not include spare parts. Standard includes membrane replacement. Premium covers all parts and components.", category: "AMC",     isActive: true, displayOrder: 3 },
-        { question: "How do I book a service under AMC?", answer: "Simply call us at 9584024777 or use our Service Booking form. We'll schedule a visit at your convenience.", category: "AMC",     isActive: true, displayOrder: 4 },
+        { question: "How do I book a service under AMC?", answer: "Simply call us at 6359585515 or use our Service Booking form. We'll schedule a visit at your convenience.", category: "AMC",     isActive: true, displayOrder: 4 },
         { question: "Which RO brands do you service?",    answer: "We service all major RO brands including Kent, Aquaguard, Livpure, Pureit, Aqua, OLiX, and more.", category: "General", isActive: true, displayOrder: 5 },
-        { question: "Do you offer same-day service?",     answer: "Yes! We offer same-day service for most requests. Call us at 9584024777 to book an emergency visit.", category: "General", isActive: true, displayOrder: 6 },
+        { question: "Do you offer same-day service?",     answer: "Yes! We offer same-day service for most requests. Call us at 6359585515 to book an emergency visit.", category: "General", isActive: true, displayOrder: 6 },
       ],
     });
     console.log("✅ FAQs seeded.");

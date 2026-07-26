@@ -47,11 +47,11 @@ export default function Navbar() {
           </nav>
 
           <a
-            href="tel:9584024777"
+            href="tel:6359585515"
             className="hidden md:flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm shadow-blue-500/25"
           >
-            <Phone className="w-3.5 h-3.5" />
-            9584024777
+             <Phone className="w-3.5 h-3.5" />
+            6359585515
           </a>
 
           <button
@@ -82,11 +82,11 @@ export default function Navbar() {
               </Link>
             ))}
             <a
-              href="tel:9584024777"
+              href="tel:6359585515"
               className="flex items-center gap-2 mt-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold"
             >
               <Phone className="w-4 h-4" />
-              Call: 9584024777
+              Call: 6359585515
             </a>
           </div>
         </div>

@@ -150,7 +150,7 @@ export default function ROSales() {
                     </div>
 
                     <a
-                      href="tel:9584024777"
+                      href="tel:6359585515"
                       className="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold py-2.5 rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm"
                     >
                       <Phone className="w-4 h-4" />
@@ -182,7 +182,7 @@ export default function ROSales() {
                     />
                   </div>
                   <p className="text-sm font-semibold text-gray-700">{item.name}</p>
-                  <a href="tel:9584024777" className="text-xs text-blue-600 hover:underline mt-1 inline-block">
+                  <a href="tel:6359585515" className="text-xs text-blue-600 hover:underline mt-1 inline-block">
                     Call for Price
                   </a>
                 </div>
@@ -198,7 +198,7 @@ export default function ROSales() {
               <p className="text-blue-100">Talk to our experts — we'll recommend the best fit for your water quality and budget.</p>
             </div>
             <div className="flex gap-3 shrink-0">
-              <a href="tel:9584024777" className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+              <a href="tel:6359585515" className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
                 <Phone className="w-4 h-4" />
                 Call Now
               </a>

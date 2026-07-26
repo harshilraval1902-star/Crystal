@@ -1,6 +1,26 @@
 import { apiJson } from "@/lib/api";
 
-export type Settings = Record<string, string>;
+export interface WebsiteSettings extends Record<string, string> {
+  companyName: string;
+  contactNumber: string;
+  whatsappNumber: string;
+  email: string;
+  address: string;
+  homeHeroTitle: string;
+  homeHeroSubtitle: string;
+  aboutSection: string;
+  missionText: string;
+  footerText: string;
+  workingHoursMon: string;
+  workingHoursSun: string;
+  yearsExperience: string;
+  happyCustomers: string;
+  facebook: string;
+  instagram: string;
+  youtube: string;
+}
+
+export type Settings = WebsiteSettings;
 
 const API_PATH = "/settings";
 

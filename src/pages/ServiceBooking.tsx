@@ -49,8 +49,8 @@ export default function ServiceBooking() {
     SettingsService.getAll().then(setSettings);
   }, []);
 
-  const contactNumber = settings.contactNumber ?? "9584024777";
-  const whatsappNumber = settings.whatsappNumber ?? "919584024777";
+  const contactNumber = settings.contactNumber ?? "6359585515";
+  const whatsappNumber = settings.whatsappNumber ?? "916359585515";
   const workingHoursMon = settings.workingHoursMon ?? "9:00 AM – 7:00 PM";
   const workingHoursSun = settings.workingHoursSun ?? "10:00 AM – 4:00 PM";
 

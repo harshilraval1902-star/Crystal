@@ -49,8 +49,10 @@ export async function migrateInitialWebsiteData() {
 
   await SettingsService.update("settings", {
     companyName: "Crystal Natural Water",
-    contactNumber: "9584024777",
-    whatsappNumber: "919584024777",
+    contactNumber: "6359585515",
+    whatsappNumber: "916359585515",
+    facebook: "https://www.facebook.com/share/1LY8rLPkfD/",
+    instagram: "https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh",
     email: "crystalnaturalwater@gmail.com",
     address: "India | Established 2019",
     homeHeroTitle: "Pure Water, Healthy Life.",
@@ -79,8 +81,8 @@ export async function migrateV2() {
     FaqService.create({ question: "What is an AMC plan?", answer: "An Annual Maintenance Contract (AMC) is a yearly service agreement that covers regular servicing, filter changes, and repairs for your RO purifier, saving you from unexpected maintenance costs.", category: "AMC", isActive: true, displayOrder: 1 }),
     FaqService.create({ question: "When does the AMC start?", answer: "The AMC starts from the date of enrollment. You'll receive a service confirmation via call or WhatsApp.", category: "AMC", isActive: true, displayOrder: 2 }),
     FaqService.create({ question: "Are spare parts included?", answer: "Basic AMC does not include spare parts. Standard includes membrane replacement. Premium covers all parts and components.", category: "AMC", isActive: true, displayOrder: 3 }),
-    FaqService.create({ question: "How do I book a service under AMC?", answer: "Simply call us at 9584024777 or use our Service Booking form. We'll schedule a visit at your convenience.", category: "AMC", isActive: true, displayOrder: 4 }),
+    FaqService.create({ question: "How do I book a service under AMC?", answer: "Simply call us at 6359585515 or use our Service Booking form. We'll schedule a visit at your convenience.", category: "AMC", isActive: true, displayOrder: 4 }),
     FaqService.create({ question: "Which RO brands do you service?", answer: "We service all major RO brands including Kent, Aquaguard, Livpure, Pureit, Aqua, OLiX, and more.", category: "General", isActive: true, displayOrder: 5 }),
-    FaqService.create({ question: "Do you offer same-day service?", answer: "Yes! We offer same-day service for most requests. Call us at 9584024777 to book an emergency visit.", category: "General", isActive: true, displayOrder: 6 }),
+    FaqService.create({ question: "Do you offer same-day service?", answer: "Yes! We offer same-day service for most requests. Call us at 6359585515 to book an emergency visit.", category: "General", isActive: true, displayOrder: 6 }),
   ]);
 }

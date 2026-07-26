@@ -15,10 +15,10 @@ export default function Footer() {
               Trusted RO Water Purifier Sales & Service since 2019. Delivering pure, safe drinking water for homes and businesses.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Facebook">
+              <a href="https://www.facebook.com/share/1LY8rLPkfD/" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Facebook">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-pink-600 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Instagram">
+              <a href="https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-pink-600 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
               <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-sky-500 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Twitter">
@@ -63,11 +63,11 @@ export default function Footer() {
             <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-widest">Get In Touch</h3>
             <ul className="space-y-3">
               <li>
-                <a href="tel:9584024777" className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors group">
+                <a href="tel:6359585515" className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors group">
                   <div className="w-8 h-8 rounded-lg bg-slate-800 group-hover:bg-blue-600 flex items-center justify-center transition-colors shrink-0">
                     <Phone className="w-4 h-4" />
                   </div>
-                  <span className="text-sm">9584024777</span>
+                  <span className="text-sm">6359585515</span>
                 </a>
               </li>
               <li>

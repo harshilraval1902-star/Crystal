@@ -59,7 +59,7 @@ export default function ServiceBooking() {
     if (!validate()) return;
     setLoading(true);
 
-    const phone = "919584024777";
+    const phone = "916359585515";
     const text = encodeURIComponent(
       `*New Service Booking - Crystal Natural Water*\n\n` +
       `*Name:* ${form.name}\n` +
@@ -120,7 +120,7 @@ export default function ServiceBooking() {
                         Book Another Service
                       </button>
                       <a
-                        href="tel:9584024777"
+                        href="tel:6359585515"
                         className="border border-blue-200 text-blue-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-2 justify-center"
                       >
                         <Phone className="w-4 h-4" />
@@ -239,13 +239,13 @@ export default function ServiceBooking() {
                 <div className="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm">
                   <h3 className="font-bold text-gray-900 mb-4">Call Us Directly</h3>
                   <a
-                    href="tel:9584024777"
+                    href="tel:6359585515"
                     className="flex items-center gap-3 bg-blue-600 text-white font-semibold px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors"
                   >
                     <Phone className="w-5 h-5" />
                     <div>
                       <div className="text-sm">Mobile / WhatsApp</div>
-                      <div className="font-bold">9584024777</div>
+                      <div className="font-bold">6359585515</div>
                     </div>
                   </a>
                 </div>

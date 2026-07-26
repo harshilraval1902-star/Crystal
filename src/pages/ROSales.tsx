@@ -20,7 +20,7 @@ const staggerContainer = {
 
 export default function ROSales() {
   const { data: productItems = [] } = useDataStore(() => ProductService.getAll());
-  const [contactNumber, setContactNumber] = useState("9584024777");
+  const [contactNumber, setContactNumber] = useState("6359585515");
   const [extraModels, setExtraModels] = useState<{ img: string; name: string }[]>([]);
 
   const catalog = useMemo(() => {
@@ -53,7 +53,7 @@ export default function ROSales() {
   }, [productItems]);
 
   useEffect(() => {
-    SettingsService.getAll().then((s) => setContactNumber(s.contactNumber ?? "9584024777"));
+    SettingsService.getAll().then((s) => setContactNumber(s.contactNumber ?? "6359585515"));
   }, []);
 
   return (

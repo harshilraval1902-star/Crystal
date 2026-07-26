@@ -13,13 +13,15 @@ export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [purifiers, setPurifiers] = useState<HeroSlide[]>([]);
   const [bgImage, setBgImage] = useState<string>(bgImgFallback);
+  const [whatsappNumber, setWhatsappNumber] = useState("916359585515");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [slidesData, bgSetting] = await Promise.all([
+        const [slidesData, bgSetting, whatsappSetting] = await Promise.all([
           HeroSlideService.getAllActive(),
-          SettingsService.getById('hero_bg_image')
+          SettingsService.getById('hero_bg_image'),
+          SettingsService.getById('whatsappNumber')
         ]);
         if (slidesData && slidesData.length > 0) {
           setPurifiers(slidesData);
@@ -32,6 +34,9 @@ export default function Hero() {
         }
         if (bgSetting) {
           setBgImage(bgSetting);
+        }
+        if (whatsappSetting) {
+          setWhatsappNumber(whatsappSetting);
         }
       } catch (error) {
         console.error("Failed to load hero data", error);
@@ -189,7 +194,7 @@ export default function Hero() {
 
       {/* Floating WhatsApp Feature */}
       <a 
-        href="https://wa.me/919584024777" 
+        href={`https://wa.me/${whatsappNumber}`} 
         target="_blank" 
         rel="noreferrer"
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
