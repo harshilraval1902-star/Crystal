@@ -1,8 +1,15 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 import logoImg from "@/assets/Logo-png_1775412426687.png";
+import { SettingsService } from "@/services/settings.service";
 
 export default function Footer() {
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    SettingsService.getAll().then(setSettings).catch(() => {});
+  }, []);
   return (
     <footer className="bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
@@ -78,11 +85,18 @@ export default function Footer() {
                   <span className="text-sm break-all">crystalnaturalwater@gmail.com</span>
                 </a>
               </li>
-              <li className="flex items-center gap-3 text-slate-400">
-                <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <span className="text-sm">India | Est. 2019</span>
+              <li>
+                <a 
+                  href={settings.locationUrl || "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en"} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 group-hover:bg-blue-600 flex items-center justify-center transition-colors shrink-0">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm">India | Est. 2019</span>
+                </a>
               </li>
             </ul>
           </div>

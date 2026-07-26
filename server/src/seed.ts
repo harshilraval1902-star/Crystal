@@ -45,6 +45,7 @@ async function seed() {
       { key: "workingHoursSun",   value: "10 AM – 4 PM" },
       { key: "yearsExperience",   value: "5+" },
       { key: "happyCustomers",    value: "500+" },
+      { key: "locationUrl",       value: "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en" },
     ];
     await prisma.setting.createMany({ data: defaults });
     console.log("✅ Default settings seeded.");

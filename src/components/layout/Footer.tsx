@@ -134,11 +134,18 @@ export default function Footer() {
                   <span className="text-sm font-medium">{email}</span>
                 </a>
               </li>
-              <li className="flex items-start gap-4 text-primary-300">
-                <div className="w-10 h-10 rounded-full border border-primary-700 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <span className="text-sm leading-relaxed mt-2">{address}</span>
+              <li>
+                <a 
+                  href={settings.locationUrl || "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en"} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-start gap-4 text-primary-300 hover:text-white transition-elegant group"
+                >
+                  <div className="w-10 h-10 rounded-full border border-primary-700 flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-brand-primary group-hover:border-white transition-elegant">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm leading-relaxed mt-2">{address}</span>
+                </a>
               </li>
             </ul>
           </div>

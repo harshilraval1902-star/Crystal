@@ -18,6 +18,7 @@ export interface WebsiteSettings extends Record<string, string> {
   facebook: string;
   instagram: string;
   youtube: string;
+  locationUrl: string;
 }
 
 export type Settings = WebsiteSettings;

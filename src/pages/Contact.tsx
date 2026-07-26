@@ -147,15 +147,20 @@ export default function Contact() {
                   <h3 className="text-xl font-bold text-brand-primary mb-8">Visit or Find Us</h3>
                   
                   <div className="space-y-8">
-                    <div className="flex items-start gap-5">
-                      <div className="w-10 h-10 rounded-full bg-white text-brand-primary border border-primary-100 flex items-center justify-center shrink-0">
+                    <a 
+                      href={settings.locationUrl || "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en"} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-start gap-5 group hover:opacity-85 transition-all"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-white text-brand-primary border border-primary-100 flex items-center justify-center shrink-0 group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-all">
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div>
                         <p className="text-xs font-semibold text-slate uppercase tracking-wider mb-2">Office Location</p>
-                        <p className="text-base font-medium text-brand-primary leading-relaxed">{address}</p>
+                        <p className="text-base font-medium text-brand-primary leading-relaxed group-hover:text-primary-600 transition-colors">{address}</p>
                       </div>
-                    </div>
+                    </a>
 
                     <div className="flex items-start gap-5">
                       <div className="w-10 h-10 rounded-full bg-white text-brand-primary border border-primary-100 flex items-center justify-center shrink-0">

@@ -64,6 +64,7 @@ export async function migrateInitialWebsiteData() {
     workingHoursSun: "10 AM – 4 PM",
     yearsExperience: "5+",
     happyCustomers: "500+",
+    locationUrl: "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en",
   });
 }
 
