@@ -69,7 +69,7 @@ export default function Footer() {
               <a href={settings.instagram || "https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href={settings.youtube || "#"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Twitter">
+              <a href={settings.twitter || "https://x.com/"} className="w-10 h-10 rounded-full border border-primary-700 hover:bg-white hover:text-brand-primary hover:border-white flex items-center justify-center text-primary-300 transition-elegant" aria-label="Twitter">
                 <Twitter className="w-4 h-4" />
               </a>
             </div>

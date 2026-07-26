@@ -46,6 +46,18 @@ async function seed() {
       { key: "yearsExperience",   value: "5+" },
       { key: "happyCustomers",    value: "500+" },
       { key: "locationUrl",       value: "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en" },
+      { key: "twitter",           value: "https://x.com/" },
+      { key: "aboutHeroTitle",    value: "Building trust through pure water." },
+      { key: "aboutHeroText",     value: "Since 2019, Crystal Natural Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly." },
+      { key: "aboutPartnerTitle", value: "A local RO partner for families and offices." },
+      { key: "aboutPartnerText",  value: "We provide complete RO solutions from purifier selection to installation, scheduled maintenance, and emergency service. Our trained technicians use genuine parts and follow strict quality checks on every visit." },
+      { key: "aboutBullets",      value: "Trusted service in Indore, Bhopal, Ujjain, and Dewas\nCertified technicians and genuine RO parts\nConvenient WhatsApp service booking\nSimple AMC plans with clear pricing" },
+      { key: "aboutCustomerCareText", value: "Responsive support and same-day technician visits when needed." },
+      { key: "aboutQualityText",  value: "Only genuine, branded RO components for durable performance." },
+      { key: "aboutJourney2019",  value: "Founded Crystal Natural Water" },
+      { key: "aboutJourney2020",  value: "Expanded service coverage across region" },
+      { key: "aboutJourney2021",  value: "Introduced comprehensive AMC plans" },
+      { key: "aboutJourney2024",  value: "Over 500+ happy households served" },
     ];
     await prisma.setting.createMany({ data: defaults });
     console.log("✅ Default settings seeded.");

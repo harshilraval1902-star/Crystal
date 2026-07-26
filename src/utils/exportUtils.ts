@@ -3,21 +3,59 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+function downloadBlob(blob: Blob, filename: string) {
+  const isDownloadSupported = "download" in document.createElement("a");
+
+  // Map file extensions to correct MIME types to ensure proper OS/browser handling on mobile
+  const mimeTypes: Record<string, string> = {
+    csv: "text/csv;charset=utf-8;",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ods: "application/vnd.oasis.opendocument.spreadsheet",
+    pdf: "application/pdf"
+  };
+
+  const extension = filename.split(".").pop()?.toLowerCase() || "";
+  const targetMimeType = mimeTypes[extension] || blob.type;
+
+  // Ensure blob uses the correct explicit MIME type
+  const typedBlob = blob.type === targetMimeType ? blob : new Blob([blob], { type: targetMimeType });
+  const url = URL.createObjectURL(typedBlob);
+
+  if (isDownloadSupported) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Keep URL alive for 5 seconds to ensure mobile download manager connects before revocation
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 5000);
+  } else {
+    // Fallback for browsers that do not support the download attribute (e.g. older iOS Safari / WebViews)
+    const newWindow = window.open(url, "_blank");
+    if (!newWindow || newWindow.closed) {
+      // If popup blocker prevents opening a new tab, navigate the current tab directly
+      window.location.href = url;
+    }
+
+    // Keep the object URL alive for 20 seconds so the new window/tab has time to load it
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 20000);
+  }
+}
+
 export function exportToCSV(data: any[], filename: string) {
   if (!data || data.length === 0) {
     throw new Error("No data to export.");
   }
   const csv = Papa.unparse(data);
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${filename}.csv`);
-  link.style.visibility = "hidden";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, `${filename}.csv`);
 }
 
 /** Shared helper — builds an XLSX workbook from an array of plain objects. */
@@ -32,7 +70,10 @@ export function exportToExcel(data: any[], filename: string) {
   if (!data || data.length === 0) {
     throw new Error("No data to export.");
   }
-  XLSX.writeFile(buildWorkbook(data), `${filename}.xlsx`);
+  const wb = buildWorkbook(data);
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  downloadBlob(blob, `${filename}.xlsx`);
 }
 
 /** Export as OpenDocument Spreadsheet (.ods).
@@ -43,7 +84,10 @@ export function exportToODS(data: any[], filename: string) {
   if (!data || data.length === 0) {
     throw new Error("No data to export.");
   }
-  XLSX.writeFile(buildWorkbook(data), `${filename}.ods`);
+  const wb = buildWorkbook(data);
+  const wbout = XLSX.write(wb, { bookType: "ods", type: "array" });
+  const blob = new Blob([wbout], { type: "application/vnd.oasis.opendocument.spreadsheet" });
+  downloadBlob(blob, `${filename}.ods`);
 }
 
 export function exportToPDF(data: any[], filename: string, columns: { header: string; dataKey: string }[]) {
@@ -61,5 +105,6 @@ export function exportToPDF(data: any[], filename: string, columns: { header: st
     headStyles: { fillColor: [37, 99, 235] },
   });
 
-  doc.save(`${filename}.pdf`);
+  const blob = doc.output("blob");
+  downloadBlob(blob, `${filename}.pdf`);
 }

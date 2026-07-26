@@ -65,6 +65,18 @@ export async function migrateInitialWebsiteData() {
     yearsExperience: "5+",
     happyCustomers: "500+",
     locationUrl: "https://google.com/maps?q=23.0010944,72.5102179&z=17&hl=en",
+    twitter: "https://x.com/",
+    aboutHeroTitle: "Building trust through pure water.",
+    aboutHeroText: "Since 2019, Crystal Natural Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly.",
+    aboutPartnerTitle: "A local RO partner for families and offices.",
+    aboutPartnerText: "We provide complete RO solutions from purifier selection to installation, scheduled maintenance, and emergency service. Our trained technicians use genuine parts and follow strict quality checks on every visit.",
+    aboutBullets: "Trusted service in Indore, Bhopal, Ujjain, and Dewas\nCertified technicians and genuine RO parts\nConvenient WhatsApp service booking\nSimple AMC plans with clear pricing",
+    aboutCustomerCareText: "Responsive support and same-day technician visits when needed.",
+    aboutQualityText: "Only genuine, branded RO components for durable performance.",
+    aboutJourney2019: "Founded Crystal Natural Water",
+    aboutJourney2020: "Expanded service coverage across region",
+    aboutJourney2021: "Introduced comprehensive AMC plans",
+    aboutJourney2024: "Over 500+ happy households served",
   });
 }
 

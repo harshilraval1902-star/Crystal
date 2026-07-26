@@ -28,7 +28,7 @@ export default function Footer() {
               <a href="https://www.instagram.com/kenzoraindia?igsh=d3ZpMGw1NnJmdGVh" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-pink-600 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Instagram">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-sky-500 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Twitter">
+              <a href={settings.twitter || "https://x.com/"} className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-sky-500 flex items-center justify-center text-slate-400 hover:text-white transition-all" aria-label="Twitter">
                 <Twitter className="w-4 h-4" />
               </a>
             </div>

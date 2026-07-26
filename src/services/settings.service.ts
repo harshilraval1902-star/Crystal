@@ -19,6 +19,18 @@ export interface WebsiteSettings extends Record<string, string> {
   instagram: string;
   youtube: string;
   locationUrl: string;
+  twitter: string;
+  aboutHeroTitle: string;
+  aboutHeroText: string;
+  aboutPartnerTitle: string;
+  aboutPartnerText: string;
+  aboutBullets: string;
+  aboutCustomerCareText: string;
+  aboutQualityText: string;
+  aboutJourney2019: string;
+  aboutJourney2020: string;
+  aboutJourney2021: string;
+  aboutJourney2024: string;
 }
 
 export type Settings = WebsiteSettings;

@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { CheckCircle2, Award, Users, Target } from "lucide-react";
+import { useState, useEffect } from "react";
+import { SettingsService } from "@/services/settings.service";
 
 const elegantFadeUp = {
   hidden: { opacity: 0, y: 15 },
@@ -13,19 +15,36 @@ const staggerContainer = {
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-const timeline = [
-  { year: "2019", event: "Founded Crystal Natural Water" },
-  { year: "2020", event: "Expanded service coverage across region" },
-  { year: "2021", event: "Introduced comprehensive AMC plans" },
-  { year: "2024", event: "Over 500+ happy households served" },
-];
-
 export default function About() {
+  const [settings, setSettings] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    SettingsService.getAll()
+      .then(setSettings)
+      .catch((err) => console.error("Failed to load about settings", err));
+  }, []);
+
+  const bullets = settings.aboutBullets
+    ? settings.aboutBullets.split("\n").filter(Boolean)
+    : [
+        "Trusted service in Indore, Bhopal, Ujjain, and Dewas",
+        "Certified technicians and genuine RO parts",
+        "Convenient WhatsApp service booking",
+        "Simple AMC plans with clear pricing",
+      ];
+
+  const timeline = [
+    { year: "2019", event: settings.aboutJourney2019 || "Founded Crystal Natural Water" },
+    { year: "2020", event: settings.aboutJourney2020 || "Expanded service coverage across region" },
+    { year: "2021", event: settings.aboutJourney2021 || "Introduced comprehensive AMC plans" },
+    { year: "2024", event: settings.aboutJourney2024 || "Over 500+ happy households served" },
+  ];
+
   return (
     <>
       <Helmet>
-        <title>About Us | Crystal Natural Water</title>
-        <meta name="description" content="Crystal Natural Water is a trusted RO water purifier sales and service company established in 2019. Learn about our mission, values, and commitment to pure water." />
+        <title>About Us | {settings.companyName || "Crystal Natural Water"}</title>
+        <meta name="description" content={`${settings.companyName || "Crystal Natural Water"} is a trusted RO water purifier sales and service company. Learn about our mission, values, and commitment to pure water.`} />
       </Helmet>
 
       <main className="bg-background min-h-screen">
@@ -37,10 +56,10 @@ export default function About() {
                 <Award className="w-4 h-4" /> Trusted Since 2019
               </motion.div>
               <motion.h1 variants={elegantFadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                Building trust through pure water.
+                {settings.aboutHeroTitle || "Building trust through pure water."}
               </motion.h1>
               <motion.p variants={elegantFadeUp} className="text-lg text-slate leading-relaxed max-w-2xl mx-auto mb-10 font-medium">
-                Since 2019, Crystal Natural Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly.
+                {settings.aboutHeroText || "Since 2019, Crystal Natural Water has delivered RO purification solutions with a focus on reliability, transparency, and customer care. We help families and businesses choose the right systems and keep them running flawlessly."}
               </motion.p>
               <motion.div variants={elegantFadeUp} className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/service-booking" className="inline-flex items-center justify-center bg-brand-primary text-white font-medium px-8 py-4 rounded-lg hover:bg-primary-900 transition-elegant text-base">
@@ -60,18 +79,13 @@ export default function About() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="space-y-8">
                 <motion.h2 variants={elegantFadeUp} className="text-3xl sm:text-4xl font-bold text-brand-primary tracking-tight">
-                  A local RO partner for families and offices.
+                  {settings.aboutPartnerTitle || "A local RO partner for families and offices."}
                 </motion.h2>
                 <motion.p variants={elegantFadeUp} className="text-lg text-slate leading-relaxed">
-                  We provide complete RO solutions from purifier selection to installation, scheduled maintenance, and emergency service. Our trained technicians use genuine parts and follow strict quality checks on every visit.
+                  {settings.aboutPartnerText || "We provide complete RO solutions from purifier selection to installation, scheduled maintenance, and emergency service. Our trained technicians use genuine parts and follow strict quality checks on every visit."}
                 </motion.p>
                 <motion.ul variants={elegantFadeUp} className="space-y-4">
-                  {[
-                    "Trusted service in Indore, Bhopal, Ujjain, and Dewas",
-                    "Certified technicians and genuine RO parts",
-                    "Convenient WhatsApp service booking",
-                    "Simple AMC plans with clear pricing",
-                  ].map((item) => (
+                  {bullets.map((item) => (
                     <li key={item} className="flex items-start gap-4 text-brand-primary font-medium">
                       <div className="w-6 h-6 rounded-full bg-surface text-primary-500 border border-primary-100 flex items-center justify-center shrink-0 mt-0.5">
                         <CheckCircle2 className="w-4 h-4" />
@@ -88,20 +102,20 @@ export default function About() {
                   <Target className="w-6 h-6 text-primary-300" /> Our Mission
                 </h3>
                 <p className="text-primary-200 leading-relaxed mb-10 text-lg relative z-10">
-                  To make safe drinking water accessible by delivering thoughtfully selected RO systems, expert service, and honest guidance for every customer.
+                  {settings.missionText || "To make safe drinking water accessible by delivering thoughtfully selected RO systems, expert service, and honest guidance for every customer."}
                 </p>
                 <div className="space-y-4 relative z-10">
                   <div className="bg-primary-900 rounded-xl p-6 border border-primary-700">
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary-300 mb-2 flex items-center gap-2">
                       <Users className="w-4 h-4" /> Customer Care
                     </p>
-                    <p className="text-white">Responsive support and same-day technician visits when needed.</p>
+                    <p className="text-white">{settings.aboutCustomerCareText || "Responsive support and same-day technician visits when needed."}</p>
                   </div>
                   <div className="bg-primary-900 rounded-xl p-6 border border-primary-700">
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary-300 mb-2 flex items-center gap-2">
                       <Award className="w-4 h-4" /> Quality Commitment
                     </p>
-                    <p className="text-white">Only genuine, branded RO components for durable performance.</p>
+                    <p className="text-white">{settings.aboutQualityText || "Only genuine, branded RO components for durable performance."}</p>
                   </div>
                 </div>
               </motion.div>
