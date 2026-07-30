@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import prisma from "../config/db";
 import {
   generateAccessToken,
@@ -9,6 +10,7 @@ import {
 } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import { createError } from "../middleware/errorHandler";
+import { logActivity } from "../utils/audit";
 
 const REFRESH_TOKEN_TTL_DAYS = 7;
 
@@ -47,9 +49,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   });
 
   // Log activity
-  await prisma.activityLog.create({
-    data: { adminId: admin.id, action: "LOGIN", entity: "Admin", entityId: admin.id },
-  });
+  await logActivity(req, admin.id, "LOGIN", "Admin", admin.id);
 
   res.json({
     accessToken,
@@ -60,14 +60,21 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 // POST /api/admin/auth/logout
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken } = req.body as { refreshToken?: string };
+  const { refreshToken, allDevices } = req.body as { refreshToken?: string; allDevices?: boolean };
 
   if (refreshToken) {
-    await prisma.refreshToken
-      .delete({ where: { token: refreshToken } })
-      .catch(() => {
-        /* token may already not exist */
-      });
+    const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+    if (stored) {
+      if (allDevices) {
+        await prisma.refreshToken.deleteMany({
+          where: { adminId: stored.adminId }
+        });
+      } else {
+        await prisma.refreshToken.delete({
+          where: { id: stored.id }
+        }).catch(() => {});
+      }
+    }
   }
 
   res.json({ message: "Logged out successfully." });
@@ -81,12 +88,26 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     throw createError("Refresh token is required.", 400);
   }
 
-  const payload = await verifyRefreshToken(refreshToken);
-  if (!payload) {
+  // Reuse Detection: Verify token against DB
+  const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+  if (!stored) {
+    try {
+      const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { adminId: number };
+      // Revoke all active sessions on token reuse detection (theft protection)
+      await prisma.refreshToken.deleteMany({ where: { adminId: payload.adminId } });
+      throw createError("Refresh token reuse detected. All sessions revoked.", 401);
+    } catch (err: any) {
+      if (err.statusCode === 401) throw err;
+      throw createError("Invalid or expired refresh token.", 401);
+    }
+  }
+
+  if (stored.expiresAt < new Date()) {
+    await prisma.refreshToken.delete({ where: { id: stored.id } }).catch(() => {});
     throw createError("Invalid or expired refresh token.", 401);
   }
 
-  const admin = await prisma.admin.findUnique({ where: { id: payload.adminId } });
+  const admin = await prisma.admin.findUnique({ where: { id: stored.adminId } });
   if (!admin || !admin.isActive) {
     throw createError("Admin not found or inactive.", 401);
   }
@@ -98,7 +119,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_TTL_DAYS);
 
   // Rotate refresh token
-  await prisma.refreshToken.delete({ where: { token: refreshToken } }).catch(() => {});
+  await prisma.refreshToken.delete({ where: { id: stored.id } }).catch(() => {});
   await prisma.refreshToken.create({
     data: { token: newRefreshToken, adminId: admin.id, expiresAt },
   });

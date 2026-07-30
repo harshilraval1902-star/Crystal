@@ -4,10 +4,15 @@ import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, ArrowRight, ShieldCh
 import logoImg from "@/assets/Logo-png_1775412426687.png";
 import { SettingsService } from "@/services/settings.service";
 import { SiteServiceService } from "@/services/content.service";
+import { SubscriberService } from "@/services/subscriber.service";
+import { useToast } from "@/components/admin/ToastProvider";
 
 export default function Footer() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [services, setServices] = useState<string[]>([]);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { notify } = useToast();
 
   useEffect(() => {
     SettingsService.getAll().then(setSettings);
@@ -18,8 +23,40 @@ export default function Footer() {
     );
   }, []);
 
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      notify({ title: "Error", description: "Email is required.", variant: "error" });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      notify({ title: "Error", description: "Please enter a valid email address.", variant: "error" });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await SubscriberService.subscribe(email);
+      notify({
+        title: "Subscribed!",
+        description: "Thank you for subscribing to our newsletter.",
+        variant: "success",
+      });
+      setEmail("");
+    } catch (err: any) {
+      notify({
+        title: "Subscription Failed",
+        description: err.message || "Something went wrong. Please try again.",
+        variant: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const contactNumber = settings.contactNumber ?? "6359585515";
-  const email = settings.email ?? "crystalnaturalwater@gmail.com";
+  const emailVal = settings.email ?? "crystalnaturalwater@gmail.com";
   const address = settings.address ?? "India | Est. 2019";
   const footerText = settings.footerText ?? "Premium RO water purification systems. We engineer solutions that deliver pure, safe, and healthy drinking water for families and businesses.";
   const companyName = settings.companyName ?? "Crystal Natural Water";
@@ -34,16 +71,23 @@ export default function Footer() {
             <h2 className="text-3xl font-bold tracking-tight mb-2">Subscribe to Purity</h2>
             <p className="text-primary-300">Join our newsletter for maintenance tips and exclusive offers.</p>
           </div>
-          <div className="flex w-full md:w-auto gap-2">
+          <form onSubmit={handleSubscribe} className="flex w-full md:w-auto gap-2">
             <input 
               type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address" 
               className="bg-primary-900 border border-primary-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white w-full md:w-72 transition-elegant placeholder:text-primary-500"
+              disabled={isSubmitting}
             />
-            <button className="bg-white text-brand-primary px-6 py-3 rounded-lg font-medium hover:bg-surface transition-elegant whitespace-nowrap">
-              Subscribe
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="bg-white text-brand-primary px-6 py-3 rounded-lg font-medium hover:bg-surface transition-elegant whitespace-nowrap disabled:opacity-75"
+            >
+              {isSubmitting ? "Subscribing..." : "Subscribe"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -127,11 +171,11 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href={`mailto:${email}`} className="flex items-center gap-4 text-primary-300 hover:text-white transition-elegant group">
+                <a href={`mailto:${emailVal}`} className="flex items-center gap-4 text-primary-300 hover:text-white transition-elegant group">
                   <div className="w-10 h-10 rounded-full border border-primary-700 flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-brand-primary group-hover:border-white transition-elegant">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-medium">{email}</span>
+                  <span className="text-sm font-medium">{emailVal}</span>
                 </a>
               </li>
               <li>

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "./Button";
 
+import { backdropVariants, dialogVariants, dialogTransition } from "@/utils/motion";
+
 interface DialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,43 +51,49 @@ export function Dialog({ isOpen, onClose, title, description, children, footer, 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={dialogTransition}
             className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.2 }}
+            variants={dialogVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={dialogTransition}
             className={cn(
               "relative z-10 w-full overflow-hidden rounded-2xl bg-white shadow-xl",
               maxWidthClasses[maxWidth]
             )}
+            aria-labelledby={title ? "dialog-title" : undefined}
+            aria-describedby={description ? "dialog-description" : undefined}
             role="dialog"
             aria-modal="true"
           >
             {(title || description) && (
               <div className="border-b border-gray-100 px-6 py-4">
                 <div className="flex items-center justify-between">
-                  {title && <h2 className="text-lg font-semibold text-gray-900">{title}</h2>}
+                  {title && <h2 id="dialog-title" className="text-lg font-semibold text-gray-900">{title}</h2>}
                   <button
                     onClick={onClose}
+                    aria-label="Close dialog"
                     className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
-                {description && <p className="mt-1 text-sm text-gray-500">{description}</p>}
+                {description && <p id="dialog-description" className="mt-1 text-sm text-gray-500">{description}</p>}
               </div>
             )}
             {!title && (
               <button
                 onClick={onClose}
+                aria-label="Close dialog"
                 className="absolute right-4 top-4 z-10 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
               >
                 <X className="h-5 w-5" />

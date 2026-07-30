@@ -15,6 +15,7 @@ export {
   type SiteServiceItem,
 } from "./content.service";
 export { InquiryService, type Inquiry } from "./inquiry.service";
+export { SubscriberService, type Subscriber } from "./subscriber.service";
 export { DashboardService } from "./dashboard.service";
 export { ReviewService, type Review } from "./review.service";
 export { migrateInitialWebsiteData, migrateV2 } from "./migration.service";

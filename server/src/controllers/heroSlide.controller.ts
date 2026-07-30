@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db';
+import { deleteUploadedFile } from '../utils/file';
 
 export class HeroSlideController {
   // Get all active slides (for public UI)
@@ -70,6 +71,11 @@ export class HeroSlideController {
   static async delete(req: Request, res: Response) {
     try {
       const id = parseInt(req.params.id);
+      const existing = await prisma.heroSlide.findFirst({ where: { id, isDeleted: false } });
+      if (existing) {
+        await deleteUploadedFile(existing.imgUrl);
+      }
+      
       await prisma.heroSlide.update({
         where: { id },
         data: { isDeleted: true, isActive: false }

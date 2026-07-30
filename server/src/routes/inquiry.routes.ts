@@ -1,15 +1,17 @@
 import { Router } from "express";
 import * as ctrl from "../controllers/inquiry.controller";
 import { authenticate } from "../middleware/auth";
+import { validateBody } from "../middleware/validation.middleware";
+import { inquiryCreateSchema, inquiryUpdateSchema } from "../validators";
 
 const router = Router();
 
 // Public — customers can submit inquiries
-router.post("/", ctrl.create);
+router.post("/", validateBody(inquiryCreateSchema), ctrl.create);
 // Protected — admin reads and manages
 router.get("/", authenticate, ctrl.getAll);
 router.get("/:id", authenticate, ctrl.getById);
-router.put("/:id", authenticate, ctrl.update);
+router.put("/:id", authenticate, validateBody(inquiryUpdateSchema), ctrl.update);
 router.delete("/:id", authenticate, ctrl.remove);
 
 export default router;

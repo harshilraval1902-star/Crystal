@@ -67,11 +67,15 @@ export function Drawer({ isOpen, onClose, title, children, footer, size = "md", 
               isRight ? "ml-auto border-l" : "mr-auto border-r",
               sizeClasses[size]
             )}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="drawer-title"
           >
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+              <h2 id="drawer-title" className="text-lg font-semibold text-gray-900">{title}</h2>
               <button
                 onClick={onClose}
+                aria-label="Close drawer"
                 className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
               >
                 <X className="h-5 w-5" />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Edit2, Trash2, ChevronDown, ChevronUp, MessageCircleQuestion } from "lucide-react";
+import { Plus, Edit2, Trash2, ChevronDown, ChevronUp, MessageCircleQuestion, Settings2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaqService, type Faq } from "@/services/content.service";
 import { Button } from "@/components/admin/ui/Button";
@@ -10,6 +10,8 @@ import { Badge } from "@/components/admin/ui/Badge";
 import { SkeletonText } from "@/components/admin/ui/Skeleton";
 import { useToast } from "@/components/admin/ToastProvider";
 import { EmptyState } from "@/components/admin/ui/EmptyState";
+import { useTableDensity } from "@/hooks/useTableDensity";
+import { DensitySelector } from "@/components/admin/ui/DensitySelector";
 
 const CATEGORIES = ["AMC", "General", "Products", "Service"];
 
@@ -20,6 +22,8 @@ export default function Faqs() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Faq | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const { density, setDensity } = useTableDensity("faqs", "normal");
+  const [showConfig, setShowConfig] = useState(false);
 
   // Form State
   const [question, setQuestion] = useState("");
@@ -87,10 +91,23 @@ export default function Faqs() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">FAQs</h1>
           <p className="text-sm text-gray-500">Manage Frequently Asked Questions across your website.</p>
         </div>
-        <Button variant="primary" onClick={() => { resetForm(); setIsDrawerOpen(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add FAQ
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Button variant="secondary" size="sm" onClick={() => setShowConfig(!showConfig)}>
+              <Settings2 className="h-4 w-4 mr-2" />
+              View Options
+            </Button>
+            {showConfig && (
+              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-20">
+                <DensitySelector density={density} onChange={setDensity} />
+              </div>
+            )}
+          </div>
+          <Button variant="primary" onClick={() => { resetForm(); setIsDrawerOpen(true); }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add FAQ
+          </Button>
+        </div>
       </div>
 
       <BlockCard className="p-0 overflow-hidden">
@@ -105,7 +122,7 @@ export default function Faqs() {
             {faqs.map((faq) => (
               <div key={faq.id} className={`group transition-colors ${!faq.isActive ? 'bg-gray-50/50' : 'hover:bg-gray-50/50'}`}>
                 <div 
-                  className="flex items-start justify-between gap-4 p-4 sm:p-6 cursor-pointer"
+                  className={`flex items-start justify-between gap-4 cursor-pointer transition-all duration-200 ${density === "compact" ? "p-3" : density === "spacious" ? "p-8" : "p-4 sm:p-6"}`}
                   onClick={() => setExpandedId(expandedId === faq.id ? null : faq.id)}
                 >
                   <div className="flex items-start gap-4 flex-1">

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Search, Bell, Menu, X, ShoppingBag, Activity, MessageCircle, Star } from "lucide-react";
+import { Search, Bell, Menu, X, ShoppingBag, Activity, MessageCircle, Star, Sun, Moon, Monitor } from "lucide-react";
+import { useAdminTheme } from "./AdminThemeContext";
+
 import { Input } from "../ui/Input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminSearch } from "@/components/admin/AdminSearchContext";
@@ -15,6 +17,9 @@ export function TopBar({ onOpenMobileSidebar }: TopBarProps) {
   const { admin } = useAuth();
   const { search, setSearch, setIsSearchOpen } = useAdminSearch();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const { theme, setTheme } = useAdminTheme();
+
 
   // Fetch data to generate notifications (relies on react-query cache from dashboard)
   const { data } = useQuery({
@@ -71,6 +76,36 @@ export function TopBar({ onOpenMobileSidebar }: TopBarProps) {
           <Bell className="h-5 w-5" />
           {notifications.length > 0 && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-danger-500 ring-2 ring-white"></span>}
         </button>
+
+        <div className="relative">
+          <button 
+            onClick={() => setShowThemeMenu(!showThemeMenu)}
+            className="rounded-full p-2 text-gray-500 hover:bg-gray-50 transition-colors"
+            title="Switch theme"
+          >
+            {theme === "light" && <Sun className="h-5 w-5" />}
+            {theme === "dark" && <Moon className="h-5 w-5" />}
+            {theme === "system" && <Monitor className="h-5 w-5" />}
+          </button>
+          {showThemeMenu && (
+            <div className="absolute top-12 right-0 w-36 bg-white border border-gray-100 shadow-xl rounded-xl p-1.5 z-50">
+              {([
+                { name: "light", label: "Light", icon: Sun },
+                { name: "dark", label: "Dark", icon: Moon },
+                { name: "system", label: "System", icon: Monitor }
+              ] as const).map(({ name, label, icon: Icon }) => (
+                <button
+                  key={name}
+                  onClick={() => { setTheme(name); setShowThemeMenu(false); }}
+                  className={`flex items-center w-full gap-2.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${theme === name ? "bg-primary-50 text-primary-700" : "text-gray-600 hover:bg-gray-50"}`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {showNotifications && (
           <div className="absolute top-12 right-12 w-80 bg-white border border-gray-100 shadow-xl rounded-xl overflow-hidden z-50">

@@ -14,6 +14,21 @@ const prisma =
         : ["warn", "error"],
   });
 
+// Enterprise Hardening: Prevent updates or deletions on ActivityLog audit trails
+prisma.$use(async (params, next) => {
+  if (params.model === "ActivityLog") {
+    if (params.action === "update" || params.action === "updateMany") {
+      throw new Error("ActivityLog audit records cannot be modified.");
+    }
+    if (params.action === "delete" || params.action === "deleteMany") {
+      if (process.env.ALLOW_LOG_PRUNING !== "true") {
+        throw new Error("ActivityLog audit records cannot be deleted.");
+      }
+    }
+  }
+  return next(params);
+});
+
 if (process.env.NODE_ENV !== "production") {
   global.__prisma = prisma;
 }

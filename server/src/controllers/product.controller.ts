@@ -2,6 +2,27 @@ import { Request, Response } from "express";
 import prisma from "../config/db";
 import { asyncHandler } from "../utils/asyncHandler";
 import { createError } from "../middleware/errorHandler";
+import { deleteUploadedFile } from "../utils/file";
+
+function safeParseJsonArray(jsonStr: string | null | undefined): string[] {
+  if (!jsonStr) return [];
+  try {
+    const parsed = JSON.parse(jsonStr);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function parseProduct(product: any) {
+  return {
+    ...product,
+    features: safeParseJsonArray(product.features),
+    images: safeParseJsonArray(product.images),
+    variants: safeParseJsonArray(product.variants),
+    tags: safeParseJsonArray(product.tags),
+  };
+}
 
 // GET /api/products
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
@@ -11,13 +32,7 @@ export const getAll = asyncHandler(async (_req: Request, res: Response) => {
   });
 
   // Parse JSON fields
-  const parsed = products.map((p) => ({
-    ...p,
-    features: p.features ? JSON.parse(p.features) : [],
-    images: p.images ? JSON.parse(p.images) : [],
-    variants: p.variants ? JSON.parse(p.variants) : [],
-    tags: p.tags ? JSON.parse(p.tags) : [],
-  }));
+  const parsed = products.map(parseProduct);
 
   res.json(parsed);
 });
@@ -29,13 +44,7 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
 
   if (!product) throw createError("Product not found.", 404);
 
-  res.json({
-    ...product,
-    features: product.features ? JSON.parse(product.features) : [],
-    images: product.images ? JSON.parse(product.images) : [],
-    variants: product.variants ? JSON.parse(product.variants) : [],
-    tags: product.tags ? JSON.parse(product.tags) : [],
-  });
+  res.json(parseProduct(product));
 });
 
 // POST /api/products
@@ -106,13 +115,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     },
   });
 
-  res.status(201).json({
-    ...product,
-    features: product.features ? JSON.parse(product.features) : [],
-    images: product.images ? JSON.parse(product.images) : [],
-    variants: product.variants ? JSON.parse(product.variants) : [],
-    tags: product.tags ? JSON.parse(product.tags) : [],
-  });
+  res.status(201).json(parseProduct(product));
 });
 
 // PUT /api/products/:id
@@ -188,13 +191,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
     },
   });
 
-  res.json({
-    ...updated,
-    features: updated.features ? JSON.parse(updated.features) : [],
-    images: updated.images ? JSON.parse(updated.images) : [],
-    variants: updated.variants ? JSON.parse(updated.variants) : [],
-    tags: updated.tags ? JSON.parse(updated.tags) : [],
-  });
+  res.json(parseProduct(updated));
 });
 
 // DELETE /api/products/:id
@@ -202,6 +199,22 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const existing = await prisma.product.findFirst({ where: { id, isDeleted: false } });
   if (!existing) throw createError("Product not found.", 404);
+
+  // Safely delete uploaded files
+  await deleteUploadedFile(existing.mainImageUrl);
+  await deleteUploadedFile(existing.thumbnail);
+  await deleteUploadedFile(existing.image);
+  
+  if (existing.images) {
+    try {
+      const parsedImages = JSON.parse(existing.images);
+      if (Array.isArray(parsedImages)) {
+        await Promise.all(parsedImages.map(img => deleteUploadedFile(img)));
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
 
   await prisma.product.update({ where: { id }, data: { isDeleted: true } });
   res.status(204).send();

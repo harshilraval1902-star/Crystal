@@ -25,6 +25,10 @@ const storage = multer.diskStorage({
   },
 });
 
+import { NextFunction, Response } from "express";
+import sharp from "sharp";
+import { promises as fsPromises } from "fs";
+
 const fileFilter = (
   _req: Request,
   file: Express.Multer.File,
@@ -38,10 +42,13 @@ const fileFilter = (
     "image/gif",
     "image/svg+xml",
   ];
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"];
+
+  if (!allowedExtensions.includes(ext) || !allowedMimes.includes(file.mimetype)) {
     cb(new Error("Only image files are allowed (JPEG, PNG, WebP, GIF, SVG)."));
+  } else {
+    cb(null, true);
   }
 };
 
@@ -61,5 +68,65 @@ export function getUploadUrl(req: Request, filename: string): string {
     `${req.protocol}://${req.get("host")}`;
   return `${baseUrl}/uploads/${filename}`;
 }
+
+export const optimizeImage = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.file) {
+    return next();
+  }
+
+  try {
+    const filePath = req.file.path;
+    const ext = path.extname(filePath).toLowerCase();
+
+    // Only optimize standard image formats
+    if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
+      const buffer = await fsPromises.readFile(filePath);
+      let sharpInstance = sharp(buffer);
+
+      // Auto-orient based on EXIF and strip other metadata
+      sharpInstance = sharpInstance.rotate();
+
+      const metadata = await sharpInstance.metadata();
+      const maxDimension = Number(process.env.MAX_IMAGE_DIMENSION ?? 4096);
+
+      // Reject files exceeding maximum resolution limits
+      if (metadata.width && metadata.height) {
+        if (metadata.width > maxDimension || metadata.height > maxDimension) {
+          await fsPromises.unlink(filePath).catch(() => {});
+          res.status(400).json({
+            success: false,
+            message: `Image dimensions exceed the maximum allowed limit of ${maxDimension}x${maxDimension}px.`,
+          });
+          return;
+        }
+      }
+
+      // Resize: max width 1920px (keep aspect ratio)
+      if (metadata.width && metadata.width > 1920) {
+        sharpInstance = sharpInstance.resize({
+          width: 1920,
+          withoutEnlargement: true,
+        });
+      }
+
+      // Compress and convert transparent png safely
+      if (ext === ".png") {
+        sharpInstance = sharpInstance.png({ quality: 80, palette: true });
+      } else if ([".jpg", ".jpeg"].includes(ext)) {
+        sharpInstance = sharpInstance.jpeg({ quality: 80, progressive: true });
+      } else if (ext === ".webp") {
+        sharpInstance = sharpInstance.webp({ quality: 80 });
+      }
+
+      const optimizedBuffer = await sharpInstance.toBuffer();
+      await fsPromises.writeFile(filePath, optimizedBuffer);
+    }
+  } catch (error) {
+    console.error("Image optimization failed:", error);
+    // Never break uploads: proceed even if optimization fails
+  }
+
+  next();
+};
 
 export { UPLOAD_DIR };

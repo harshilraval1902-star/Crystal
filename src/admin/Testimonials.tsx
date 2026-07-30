@@ -123,6 +123,7 @@ export default function Testimonials() {
       </div>
 
       <DataTable 
+        densityKey="testimonials"
         searchPlaceholder="Search testimonials by name or review content..."
         onSearch={setSearch}
         pagination={{

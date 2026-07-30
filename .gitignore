@@ -48,3 +48,8 @@ uploads/
 # Prisma
 server/prisma/dev.db
 server/prisma/dev.db-journal
+
+# Backups and archives
+*.zip
+server/backups/
+*.sql

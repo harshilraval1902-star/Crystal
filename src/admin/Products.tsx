@@ -97,6 +97,7 @@ export default function Products() {
       </div>
 
       <DataTable 
+        densityKey="products"
         searchPlaceholder="Search products by name or SKU..."
         onSearch={setSearch}
         selectedCount={selectedIds.length}

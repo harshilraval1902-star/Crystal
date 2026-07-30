@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Check, Edit2, Trash2, Shield, Wrench, Star } from "lucide-react";
+import { Plus, Check, Edit2, Trash2, Shield, Wrench, Star, Settings2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AmcService, type AmcPlan as Plan } from "@/services/amc.service";
 import { Button } from "@/components/admin/ui/Button";
@@ -10,6 +10,8 @@ import { Input } from "@/components/admin/ui/Input";
 import { SkeletonText, Skeleton } from "@/components/admin/ui/Skeleton";
 import { useToast } from "@/components/admin/ToastProvider";
 import { EmptyState } from "@/components/admin/ui/EmptyState";
+import { useTableDensity } from "@/hooks/useTableDensity";
+import { DensitySelector } from "@/components/admin/ui/DensitySelector";
 
 export default function AMCPlans() {
   const qc = useQueryClient();
@@ -17,6 +19,8 @@ export default function AMCPlans() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const { density, setDensity } = useTableDensity("amc-plans", "normal");
+  const [showConfig, setShowConfig] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
@@ -111,20 +115,33 @@ export default function AMCPlans() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">AMC Plans</h1>
           <p className="text-sm text-gray-500">Manage Annual Maintenance Contracts and pricing tiers.</p>
         </div>
-        <Button variant="primary" onClick={() => { resetForm(); setIsDrawerOpen(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Plan
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Button variant="secondary" size="sm" onClick={() => setShowConfig(!showConfig)}>
+              <Settings2 className="h-4 w-4 mr-2" />
+              View Options
+            </Button>
+            {showConfig && (
+              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-20">
+                <DensitySelector density={density} onChange={setDensity} />
+              </div>
+            )}
+          </div>
+          <Button variant="primary" onClick={() => { resetForm(); setIsDrawerOpen(true); }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Plan
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid md:grid-cols-2 lg:grid-cols-3 ${density === "compact" ? "gap-4" : density === "spacious" ? "gap-8" : "gap-6"}`}>
           <Skeleton className="h-[400px] rounded-2xl" />
           <Skeleton className="h-[400px] rounded-2xl" />
           <Skeleton className="h-[400px] rounded-2xl" />
         </div>
       ) : data.length > 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+        <div className={`grid md:grid-cols-2 lg:grid-cols-3 items-stretch ${density === "compact" ? "gap-4" : density === "spacious" ? "gap-8" : "gap-6"}`}>
           {data.map((plan, index) => {
             const isBasic = index % 3 === 0;
             const isComplete = index % 3 === 1;
@@ -162,7 +179,7 @@ export default function AMCPlans() {
                   </div>
                 )}
 
-                <div className="p-8">
+                <div className={density === "compact" ? "p-4" : density === "spacious" ? "p-10" : "p-8"}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`p-3 rounded-xl ${isPremium ? 'bg-slate-800 text-amber-400' : isComplete ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600'}`}>
                       <Shield className="h-6 w-6" />

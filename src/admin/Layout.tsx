@@ -1,11 +1,12 @@
 import { Redirect, Route, Switch } from "wouter";
 import { AdminLayout as Layout } from "@/components/admin/layout/AdminLayout";
-import NotFound from "./NotFound";
+import Admin404 from "./Admin404";
 import Dashboard from "./Dashboard";
 import Products from "./Products";
 import AMCPlans from "./AMCPlans";
 import ServiceRequests from "./ServiceRequests";
 import Inquiries from "./Inquiries";
+import Subscribers from "./Subscribers";
 import Testimonials from "./Testimonials";
 import Gallery from "./Gallery";
 import Reviews from "./Reviews";
@@ -48,6 +49,7 @@ export default function AdminLayout() {
         <Route path="/admin/amc" component={AMCPlans} />
         <Route path="/admin/services" component={ServiceRequests} />
         <Route path="/admin/inquiries" component={Inquiries} />
+        <Route path="/admin/subscribers" component={Subscribers} />
         <Route path="/admin/testimonials" component={Testimonials} />
         <Route path="/admin/gallery" component={Gallery} />
         <Route path="/admin/reviews" component={Reviews} />
@@ -56,7 +58,7 @@ export default function AdminLayout() {
         <Route path="/admin/settings" component={Settings} />
         <Route path="/admin/hero-slides" component={AdminHeroSlides} />
         <Route path="/admin/ro-features" component={AdminROFeatures} />
-        <Route component={NotFound} />
+        <Route component={Admin404} />
       </Switch>
     </Layout>
   );

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "rhel-openssl-1.0.x", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -185,6 +186,18 @@ model Setting {
 
   @@map("setting")
 }
+
+// ─── Subscriber ───────────────────────────────────────────────────────────────
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique(map: "Subscriber_email_key")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriber")
+}
+
 
 // ─── Service Requests ─────────────────────────────────────────────────────────
 model ServiceRequest {

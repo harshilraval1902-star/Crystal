@@ -425,6 +425,7 @@ export default function ServiceRequests() {
 
       {/* ── Table ───────────────────────────────────────────── */}
       <DataTable
+        densityKey="bookings"
         pagination={{
           currentPage: page,
           totalPages:  pageCount,

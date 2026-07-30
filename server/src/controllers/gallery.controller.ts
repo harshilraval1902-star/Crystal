@@ -6,6 +6,7 @@ import { getUploadUrl } from "../middleware/upload";
 import path from "path";
 import fs from "fs";
 import { UPLOAD_DIR } from "../middleware/upload";
+import { deleteUploadedFile } from "../utils/file";
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
   const items = await prisma.galleryImage.findMany({
@@ -61,10 +62,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   if (file) {
     imageUrl = getUploadUrl(req, file.filename);
     // Delete old file if it was a local upload
-    if (existing.imageUrl.includes("/uploads/")) {
-      const oldFile = path.join(UPLOAD_DIR, path.basename(existing.imageUrl));
-      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
-    }
+    await deleteUploadedFile(existing.imageUrl);
   }
 
   const updated = await prisma.galleryImage.update({
@@ -86,10 +84,7 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
   if (!existing) throw createError("Gallery image not found.", 404);
 
   // Delete physical file if local
-  if (existing.imageUrl.includes("/uploads/")) {
-    const filePath = path.join(UPLOAD_DIR, path.basename(existing.imageUrl));
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  }
+  await deleteUploadedFile(existing.imageUrl);
 
   await prisma.galleryImage.update({ where: { id }, data: { isDeleted: true } });
   res.status(204).send();

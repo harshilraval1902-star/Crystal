@@ -17,6 +17,7 @@ import {
   Globe,
   MonitorPlay,
   Layers,
+  Mail,
   LogOut
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,6 +50,7 @@ const navGroups = [
       { href: "/admin/testimonials", icon: Star, label: "Testimonials" },
       { href: "/admin/reviews", icon: Star, label: "Reviews" },
       { href: "/admin/faqs", icon: HelpCircle, label: "FAQs" },
+      { href: "/admin/subscribers", icon: Mail, label: "Subscribers" },
     ],
   },
   {

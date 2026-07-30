@@ -11,6 +11,10 @@ import { EmptyState } from "@/components/admin/ui/EmptyState";
 import { UploadZone } from "@/components/admin/gallery/UploadZone";
 import { MediaDetailDrawer } from "@/components/admin/gallery/MediaDetailDrawer";
 import { useToast } from "@/components/admin/ToastProvider";
+import { Settings2 } from "lucide-react";
+import { useTableDensity } from "@/hooks/useTableDensity";
+import { DensitySelector } from "@/components/admin/ui/DensitySelector";
+
 
 export default function Gallery() {
   const qc = useQueryClient();
@@ -21,6 +25,9 @@ export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const { density, setDensity, paddingClass } = useTableDensity("gallery", "normal");
+  const [showConfig, setShowConfig] = useState(false);
+
 
   const { data: items = [], isLoading } = useQuery<GalleryImage[]>({
     queryKey: ["admin-gallery"],
@@ -131,7 +138,7 @@ export default function Gallery() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+             <div className="flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
               <button 
                 onClick={() => setViewMode("grid")}
                 className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
@@ -144,6 +151,17 @@ export default function Gallery() {
               >
                 <List className="h-4 w-4" />
               </button>
+            </div>
+            <div className="relative">
+              <Button variant="secondary" size="sm" onClick={() => setShowConfig(!showConfig)}>
+                <Settings2 className="h-4 w-4 mr-2" />
+                View Options
+              </Button>
+              {showConfig && (
+                <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-20">
+                  <DensitySelector density={density} onChange={setDensity} />
+                </div>
+              )}
             </div>
             <Button variant="secondary" size="icon">
               <Filter className="h-4 w-4" />
@@ -169,7 +187,7 @@ export default function Gallery() {
           </div>
         ) : filteredItems.length > 0 ? (
           viewMode === "grid" ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className={`grid ${density === "compact" ? "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2" : density === "spacious" ? "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"}`}>
               {filteredItems.map(item => (
                 <div 
                   key={item.id} 
@@ -207,7 +225,7 @@ export default function Gallery() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 w-12 text-center">
+                    <th className={`w-12 text-center ${paddingClass}`}>
                       <input 
                         type="checkbox"
                         checked={filteredItems.length > 0 && selectedIds.length === filteredItems.length}
@@ -215,16 +233,16 @@ export default function Gallery() {
                         className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                       />
                     </th>
-                    <th className="px-4 py-3 font-medium text-gray-500">Image</th>
-                    <th className="px-4 py-3 font-medium text-gray-500">Details</th>
-                    <th className="px-4 py-3 font-medium text-gray-500">Category</th>
-                    <th className="px-4 py-3 font-medium text-gray-500">Status</th>
+                    <th className={`font-medium text-gray-500 ${paddingClass}`}>Image</th>
+                    <th className={`font-medium text-gray-500 ${paddingClass}`}>Details</th>
+                    <th className={`font-medium text-gray-500 ${paddingClass}`}>Category</th>
+                    <th className={`font-medium text-gray-500 ${paddingClass}`}>Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 bg-white">
                   {filteredItems.map(item => (
                     <tr key={item.id} className={`hover:bg-gray-50 cursor-pointer ${selectedIds.includes(item.id) ? 'bg-primary-50/30' : ''}`} onClick={(e) => handleImageClick(item, e)}>
-                      <td className="px-4 py-3 text-center">
+                      <td className={`text-center ${paddingClass}`}>
                         <input 
                           type="checkbox"
                           checked={selectedIds.includes(item.id)}
@@ -232,17 +250,17 @@ export default function Gallery() {
                           className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                         />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={paddingClass}>
                         <div className="h-12 w-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
                           <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover" />
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={paddingClass}>
                         <div className="font-medium text-gray-900">{item.title}</div>
                         <div className="text-xs text-gray-400 truncate max-w-[200px]">{item.imageUrl}</div>
                       </td>
-                      <td className="px-4 py-3 text-gray-500">{item.category}</td>
-                      <td className="px-4 py-3">
+                      <td className={`text-gray-500 ${paddingClass}`}>{item.category}</td>
+                      <td className={paddingClass}>
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${item.isActive ? 'bg-accent-50 text-accent-700' : 'bg-gray-100 text-gray-600'}`}>
                           {item.isActive ? "Published" : "Hidden"}
                         </span>

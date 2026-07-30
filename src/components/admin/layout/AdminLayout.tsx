@@ -4,13 +4,16 @@ import { TopBar } from "./TopBar";
 import { AdminSearchProvider } from "@/components/admin/AdminSearchContext";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { AdminThemeProvider } from "./AdminThemeContext";
+
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <AdminSearchProvider>
-      <div className="min-h-screen bg-background text-gray-900 flex">
+    <AdminThemeProvider>
+      <AdminSearchProvider>
+        <div className="min-h-screen bg-background text-gray-900 flex">
         
         {/* Desktop Sidebar */}
         <div className="hidden lg:block">
@@ -52,6 +55,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </div>
-    </AdminSearchProvider>
+      </AdminSearchProvider>
+    </AdminThemeProvider>
   );
 }

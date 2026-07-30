@@ -7,6 +7,9 @@ import { BlockCard } from "@/components/admin/ui/Card";
 import { Input } from "@/components/admin/ui/Input";
 import { SkeletonText } from "@/components/admin/ui/Skeleton";
 import { useToast } from "@/components/admin/ToastProvider";
+import { useTableDensity } from "@/hooks/useTableDensity";
+import { DensitySelector } from "@/components/admin/ui/DensitySelector";
+
 
 export default function Settings() {
   const qc = useQueryClient();
@@ -15,6 +18,9 @@ export default function Settings() {
   const [fields, setFields] = useState<Record<string, string>>({});
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
+  const { density, setDensity } = useTableDensity("settings", "normal");
+  const [showConfig, setShowConfig] = useState(false);
+
 
   const { data, isLoading, error } = useQuery<Record<string, string>>({
     queryKey: ["admin-settings"],
@@ -67,14 +73,27 @@ export default function Settings() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">System Settings</h1>
           <p className="text-sm text-gray-500">Manage global website configuration and environment variables.</p>
         </div>
-        <Button 
-          variant="primary" 
-          onClick={() => saveSettings.mutate()}
-          disabled={saveSettings.isPending}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          {saveSettings.isPending ? "Saving..." : "Save Settings"}
-        </Button>
+        <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+          <div className="relative">
+            <Button variant="secondary" size="sm" onClick={() => setShowConfig(!showConfig)}>
+              <SettingsIcon className="h-4 w-4 mr-2" />
+              View Options
+            </Button>
+            {showConfig && (
+              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-20">
+                <DensitySelector density={density} onChange={setDensity} />
+              </div>
+            )}
+          </div>
+          <Button 
+            variant="primary" 
+            onClick={() => saveSettings.mutate()}
+            disabled={saveSettings.isPending}
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {saveSettings.isPending ? "Saving..." : "Save Settings"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6">
@@ -100,8 +119,8 @@ export default function Settings() {
                   {Object.entries(fields)
                     .filter(([key]) => !["ro_promo_img", "ro_badge_1_text", "ro_badge_1_icon", "ro_badge_2_text", "ro_badge_2_icon"].includes(key))
                     .map(([key, value]) => (
-                    <div key={key} className="flex gap-4 items-start group">
-                      <div className="w-1/3 pt-2">
+                    <div key={key} className={`flex items-start group ${density === "compact" ? "gap-2 py-1" : density === "spacious" ? "gap-6 py-4" : "gap-4 py-2"}`}>
+                      <div className={`w-1/3 ${density === "compact" ? "pt-1" : "pt-2"}`}>
                         <label className="text-sm font-semibold text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded inline-block truncate max-w-full" title={key}>
                           {key}
                         </label>
