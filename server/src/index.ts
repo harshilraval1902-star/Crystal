@@ -31,7 +31,7 @@ import { env } from "./config/env";
 
 import { auditRequestMiddleware } from "./utils/audit";
 import { metrics } from "./utils/metrics";
-import { runBackup } from "./scripts/backup";
+
 import v1Router from "./routes/v1";
 import fs, { promises as fsPromises } from "fs";
 
@@ -257,8 +257,7 @@ async function main() {
     await prisma.$connect();
     console.log("✅ Database connected.");
 
-    // Trigger database backup asynchronously on startup
-    runBackup().catch((err) => console.error("❌ Database backup trigger failed on startup:", err));
+
 
     server = app.listen(PORT, () => {
       console.log(`🚀 Crystal Water API running at http://localhost:${PORT}`);
