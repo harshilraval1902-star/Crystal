@@ -312,45 +312,66 @@ export default function Home() {
         </section>
 
         {/* WHY CHOOSE CRYSTAL RO CARE */}
-        <section className="py-24 lg:py-32 bg-surface overflow-hidden border-b border-primary-100">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <section className="py-24 lg:py-32 bg-gradient-to-b from-surface via-white to-surface overflow-hidden relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary-50 rounded-full blur-[120px] opacity-50 -z-10 pointer-events-none"></div>
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="mb-16 flex flex-col items-center text-center gap-4">
-              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-primary tracking-tight">Why Choose Crystal RO Care</h3>
-              <p className="text-slate text-lg max-w-2xl">Premium service, guaranteed purity, and unmatched reliability for your home.</p>
+              <h3 className="text-4xl sm:text-5xl font-extrabold text-brand-primary tracking-tight">Why Choose Crystal RO Care</h3>
+              <p className="text-slate text-lg max-w-2xl leading-relaxed">Premium service, guaranteed purity, and unmatched reliability for your home.</p>
+            </motion.div>
+
+            {/* TRUST METRICS */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="max-w-4xl mx-auto mb-20">
+              <div className="flex flex-col md:flex-row justify-between items-center bg-white/60 backdrop-blur-md border border-primary-100 rounded-3xl p-8 gap-8 md:gap-4 shadow-sm hover:shadow-md hover:border-primary-200 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <span className="text-4xl font-extrabold text-brand-primary">{settings.yearsExperience ?? "5+"}</span>
+                  <span className="text-xs font-semibold text-slate uppercase tracking-widest mt-2">Years of Experience</span>
+                </div>
+                <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-primary-200 to-transparent"></div>
+                <div className="flex flex-col items-center text-center">
+                  <span className="text-4xl font-extrabold text-brand-primary">{settings.happyCustomers ?? "1000+"}</span>
+                  <span className="text-xs font-semibold text-slate uppercase tracking-widest mt-2">Happy Customers</span>
+                </div>
+                <div className="hidden md:block w-px h-16 bg-gradient-to-b from-transparent via-primary-200 to-transparent"></div>
+                <div className="flex flex-col items-center text-center">
+                  <span className="text-4xl font-extrabold text-brand-primary">5000+</span>
+                  <span className="text-xs font-semibold text-slate uppercase tracking-widest mt-2">Services Completed</span>
+                </div>
+              </div>
             </motion.div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.1 }}
-                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+                className="bg-white border border-primary-100 rounded-[2rem] p-8 md:p-10 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-300 transition-all duration-300 ease-out flex flex-col items-center text-center group h-full"
               >
-                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-8 h-8 text-primary-600" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-primary-100/50 flex items-center justify-center mb-8 group-hover:scale-105 transition-transform duration-300">
+                  <ShieldCheck className="w-10 h-10 text-primary-600 stroke-[1.5]" />
                 </div>
-                <h4 className="text-xl font-bold text-brand-primary mb-3">Certified Quality</h4>
-                <p className="text-slate text-sm leading-relaxed">Every service involves strict 15-point quality checks and uses only 100% genuine, manufacturer-approved components.</p>
+                <h4 className="text-2xl font-bold text-brand-primary mb-4">Certified Quality</h4>
+                <p className="text-slate text-base leading-relaxed">Every service involves strict 15-point quality checks and uses only 100% genuine, manufacturer-approved components.</p>
               </motion.div>
               
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.2 }}
-                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+                className="bg-white border border-primary-100 rounded-[2rem] p-8 md:p-10 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-300 transition-all duration-300 ease-out flex flex-col items-center text-center group h-full"
               >
-                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Clock className="w-8 h-8 text-primary-600" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-primary-100/50 flex items-center justify-center mb-8 group-hover:scale-105 transition-transform duration-300">
+                  <Clock className="w-10 h-10 text-primary-600 stroke-[1.5]" />
                 </div>
-                <h4 className="text-xl font-bold text-brand-primary mb-3">Rapid Response</h4>
-                <p className="text-slate text-sm leading-relaxed">We respect your time. Get guaranteed same-day emergency visits and precise, on-time scheduled maintenance.</p>
+                <h4 className="text-2xl font-bold text-brand-primary mb-4">Rapid Response</h4>
+                <p className="text-slate text-base leading-relaxed">We respect your time. Get guaranteed same-day emergency visits and precise, on-time scheduled maintenance.</p>
               </motion.div>
               
               <motion.div 
                 initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.3 }}
-                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+                className="bg-white border border-primary-100 rounded-[2rem] p-8 md:p-10 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-300 transition-all duration-300 ease-out flex flex-col items-center text-center group h-full"
               >
-                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Award className="w-8 h-8 text-primary-600" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-primary-100/50 flex items-center justify-center mb-8 group-hover:scale-105 transition-transform duration-300">
+                  <Award className="w-10 h-10 text-primary-600 stroke-[1.5]" />
                 </div>
-                <h4 className="text-xl font-bold text-brand-primary mb-3">Expert Engineers</h4>
-                <p className="text-slate text-sm leading-relaxed">Our technicians aren't just mechanics; they are certified water purification experts trained on all advanced RO technologies.</p>
+                <h4 className="text-2xl font-bold text-brand-primary mb-4">Expert Engineers</h4>
+                <p className="text-slate text-base leading-relaxed">Our technicians aren't just mechanics; they are certified water purification experts trained on all advanced RO technologies.</p>
               </motion.div>
             </div>
           </div>
@@ -405,16 +426,16 @@ export default function Home() {
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
           <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp}>
-              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">Ready for pure water?</h2>
-              <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">Get in touch with our experts today for a free consultation or to schedule a service visit.</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">Need Fast & Reliable RO Service?</h2>
+              <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto">Book an installation, repair, or annual maintenance with our experienced technicians.</p>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-white text-brand-primary font-medium px-8 py-4 rounded-lg hover:bg-surface transition-elegant text-base w-full sm:w-auto">
-                  Book a Service
+                <Link href="/service-booking" className="inline-flex items-center justify-center gap-2 bg-white text-brand-primary font-bold px-8 py-4 rounded-xl hover:bg-surface hover:-translate-y-1 transition-all duration-300 shadow-lg text-base w-full sm:w-auto">
+                  Book Service
                 </Link>
-                <a href={`tel:${contactNumber}`} className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/20 font-medium px-8 py-4 rounded-lg hover:bg-white/5 transition-elegant text-base w-full sm:w-auto">
-                  <Phone className="w-4 h-4" />
-                  {contactNumber}
+                <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/30 font-bold px-8 py-4 rounded-xl hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 text-base w-full sm:w-auto">
+                  <MessageCircle className="w-5 h-5" />
+                  Chat on WhatsApp
                 </a>
               </div>
             </motion.div>
