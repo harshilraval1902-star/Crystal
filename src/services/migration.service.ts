@@ -10,7 +10,7 @@ import olixBlack from "@/assets/IMG_20250520_190437_1775412426686.jpg";
 import olixBrown from "@/assets/IMG_20250520_190513_1775412426687.jpg";
 import { ProductService } from "./product.service";
 import { AmcService } from "./amc.service";
-import { TestimonialService } from "./testimonial.service";
+
 import { GalleryService } from "./gallery.service";
 import { SettingsService } from "./settings.service";
 import { FaqService, SiteServiceService } from "./content.service";
@@ -33,12 +33,7 @@ export async function migrateInitialWebsiteData() {
       AmcService.create({ name: "Premium Care", price: "2999", durationMonths: 12, description: "Priority maintenance for complete peace of mind.", serviceVisits: 4, sparePartsCovered: true, prioritySupport: true, badge: "Best Value", isActive: true, displayOrder: 3 }),
     ]);
 
-  if (!(await TestimonialService.getAll()).length)
-    await Promise.all([
-      TestimonialService.create({ customerName: "Rajesh Kumar", review: "Excellent service! Technician came within 2 hours and fixed my RO. Very professional and affordable.", rating: 5, isActive: true, displayOrder: 1 }),
-      TestimonialService.create({ customerName: "Priya Sharma", review: "Bought a new RO from Crystal Natural Water. Installation was smooth, water quality is amazing!", rating: 5, isActive: true, displayOrder: 2 }),
-      TestimonialService.create({ customerName: "Amit Patel", review: "Annual AMC plan is very cost-effective. No hidden charges, transparent pricing. Will renew again.", rating: 5, isActive: true, displayOrder: 3 }),
-    ]);
+
 
   if (!(await GalleryService.getAll()).length)
     await Promise.all(

@@ -6,10 +6,8 @@ import Products from "./Products";
 import AMCPlans from "./AMCPlans";
 import ServiceRequests from "./ServiceRequests";
 import Inquiries from "./Inquiries";
-import Subscribers from "./Subscribers";
-import Testimonials from "./Testimonials";
+
 import Gallery from "./Gallery";
-import Reviews from "./Reviews";
 import Faqs from "./Faqs";
 import SiteServices from "./SiteServices";
 import Settings from "./Settings";
@@ -49,10 +47,8 @@ export default function AdminLayout() {
         <Route path="/admin/amc" component={AMCPlans} />
         <Route path="/admin/services" component={ServiceRequests} />
         <Route path="/admin/inquiries" component={Inquiries} />
-        <Route path="/admin/subscribers" component={Subscribers} />
-        <Route path="/admin/testimonials" component={Testimonials} />
+
         <Route path="/admin/gallery" component={Gallery} />
-        <Route path="/admin/reviews" component={Reviews} />
         <Route path="/admin/faqs" component={Faqs} />
         <Route path="/admin/site-services" component={SiteServices} />
         <Route path="/admin/settings" component={Settings} />

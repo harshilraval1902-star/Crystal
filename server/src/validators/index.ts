@@ -73,19 +73,6 @@ export const subscriberBulkDeleteSchema = z.object({
   ids: z.array(z.number().int()).min(1, "Subscriber IDs array is required"),
 });
 
-// Testimonial validation schemas
-export const testimonialCreateSchema = z.object({
-  customerName: z.string().min(1, "customerName is required"),
-  review: z.string().min(1, "review is required"),
-  rating: z.number().int().min(1).max(5).optional(),
-  location: z.string().optional().nullable(),
-  designation: z.string().optional().nullable(),
-  photoUrl: z.string().optional().nullable(),
-  isActive: z.boolean().optional(),
-  displayOrder: z.number().int().optional(),
-});
-
-export const testimonialUpdateSchema = testimonialCreateSchema.partial();
 
 // FAQ validation schemas
 export const faqCreateSchema = z.object({

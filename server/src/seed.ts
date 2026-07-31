@@ -76,18 +76,6 @@ async function seed() {
     console.log("✅ AMC plans seeded.");
   }
 
-  // ── Testimonials ──────────────────────────────────────────────────────────
-  const testimonialCount = await prisma.testimonial.count();
-  if (!testimonialCount) {
-    await prisma.testimonial.createMany({
-      data: [
-        { customerName: "Rajesh Kumar",  review: "Excellent service! Technician came within 2 hours and fixed my RO. Very professional and affordable.", rating: 5, isActive: true, displayOrder: 1 },
-        { customerName: "Priya Sharma",  review: "Bought a new RO from Crystal Natural Water. Installation was smooth, water quality is amazing!", rating: 5, isActive: true, displayOrder: 2 },
-        { customerName: "Amit Patel",    review: "Annual AMC plan is very cost-effective. No hidden charges, transparent pricing. Will renew again.", rating: 5, isActive: true, displayOrder: 3 },
-      ],
-    });
-    console.log("✅ Testimonials seeded.");
-  }
 
   // ── Site Services ─────────────────────────────────────────────────────────
   const siteServiceCount = await prisma.siteService.count();

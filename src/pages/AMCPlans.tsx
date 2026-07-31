@@ -503,37 +503,6 @@ export default function AMCPlans() {
           </div>
         </section>
 
-        {/* 6. SOCIAL PROOF (Authentic Testimonials) */}
-        <section className="py-20 z-10 relative bg-white">
-          <div className="max-w-6xl mx-auto px-6 lg:px-8">
-            <div className="text-center mb-16 max-w-2xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight">
-                Trusted by Homes Across Ahmedabad
-              </h2>
-              <div className="flex justify-center gap-1 mt-3">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { name: "Rajesh Patel", text: "Professional service every time. The technician arrived right on schedule, completed filter servicing, and recorded post-water TDS. Very clean work.", rating: 5 },
-                { name: "Pooja Shah", text: "Having an AMC makes support hassle-free. Our water filter had a sudden pump leak and the emergency technician resolved it within 3 hours. No extra charge.", rating: 5 },
-                { name: "Anil Sharma", text: "Transparent pricing and extremely polite crew. There are no surprise costs like other providers. They use 100% genuine spare parts only.", rating: 5 }
-              ].map((t, idx) => (
-                <div key={idx} className="bg-slate-50/50 border border-slate-100 rounded-2xl p-8 shadow-xs flex flex-col justify-between hover:shadow-sm transition-shadow">
-                  <p className="text-slate text-sm font-semibold leading-relaxed mb-6">"{t.text}"</p>
-                  <div>
-                    <h5 className="font-extrabold text-brand-primary text-sm">{t.name}</h5>
-                    <span className="text-[10px] text-slate/60 uppercase tracking-widest font-bold">Verified Customer</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* 7. FAQ SECTION */}
         <section className="py-24 bg-blue-50/40 border-t border-primary-100/50 z-10 relative">

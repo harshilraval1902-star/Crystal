@@ -34,7 +34,6 @@ export function TopBar({ onOpenMobileSidebar }: TopBarProps) {
     data.products?.forEach((p: any) => all.push({ id: `p${p.id}`, text: `New product added: ${p.name}`, time: p.createdAt, icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-100' }));
     data.serviceRequests?.forEach((r: any) => all.push({ id: `s${r.id}`, text: `Service request from ${r.customerName}`, time: r.createdAt, icon: Activity, color: 'text-orange-500', bg: 'bg-orange-100' }));
     data.inquiries?.forEach((i: any) => all.push({ id: `i${i.id}`, text: `Inquiry: ${i.subject || i.name}`, time: i.createdAt, icon: MessageCircle, color: 'text-green-500', bg: 'bg-green-100' }));
-    data.reviews?.forEach((r: any) => all.push({ id: `r${r.id}`, text: `New ${r.rating}-star review from ${r.customerName}`, time: r.createdAt, icon: Star, color: 'text-yellow-500', bg: 'bg-yellow-100' }));
     
     return all.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8);
   }, [data]);

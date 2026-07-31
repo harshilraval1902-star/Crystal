@@ -8,8 +8,6 @@ export const getDashboard = asyncHandler(async (_req: Request, res: Response) =>
     totalAmcPlans,
     totalServiceRequests,
     totalInquiries,
-    totalTestimonials,
-    totalReviews,
     recentServiceRequests,
     recentInquiries,
     statusBreakdown,
@@ -18,8 +16,6 @@ export const getDashboard = asyncHandler(async (_req: Request, res: Response) =>
     prisma.amcPlan.count({ where: { isDeleted: false } }),
     prisma.serviceRequest.count({ where: { isDeleted: false } }),
     prisma.inquiry.count({ where: { isDeleted: false } }),
-    prisma.testimonial.count({ where: { isDeleted: false } }),
-    prisma.review.count({ where: { isDeleted: false } }),
     prisma.serviceRequest.findMany({
       where: { isDeleted: false },
       orderBy: { createdAt: "desc" },
@@ -45,8 +41,6 @@ export const getDashboard = asyncHandler(async (_req: Request, res: Response) =>
       totalAmcPlans,
       totalServiceRequests,
       totalInquiries,
-      totalTestimonials,
-      totalReviews,
     },
     statusBreakdown: statusBreakdown.map((item) => ({
       status: item.status,

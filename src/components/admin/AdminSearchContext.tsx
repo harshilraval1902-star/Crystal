@@ -40,9 +40,6 @@ export function AdminSearchProvider({ children }: { children: ReactNode }) {
     data.inquiries?.filter((i: any) => i.name?.toLowerCase().includes(q) || i.subject?.toLowerCase().includes(q))
       .forEach((i: any) => results.push({ id: `i${i.id}`, title: i.subject || i.name, type: 'Inquiry', icon: MessageSquare, url: `/admin/inquiries` }));
 
-    data.reviews?.filter((r: any) => r.customerName?.toLowerCase().includes(q) || r.comment?.toLowerCase().includes(q))
-      .forEach((r: any) => results.push({ id: `r${r.id}`, title: r.customerName, type: 'Review', icon: Star, url: `/admin/reviews` }));
-
     return results.slice(0, 10);
   }, [data, search]);
 
@@ -67,7 +64,7 @@ export function AdminSearchProvider({ children }: { children: ReactNode }) {
               <input
                 autoFocus
                 className="flex-1 bg-transparent border-0 focus:ring-0 text-lg text-gray-900 placeholder:text-gray-400 outline-none"
-                placeholder="Search products, requests, reviews..."
+                placeholder="Search products, requests..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

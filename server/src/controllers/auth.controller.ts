@@ -10,7 +10,6 @@ import {
 } from "../middleware/auth";
 import { asyncHandler } from "../utils/asyncHandler";
 import { createError } from "../middleware/errorHandler";
-import { logActivity } from "../utils/audit";
 
 const REFRESH_TOKEN_TTL_DAYS = 7;
 
@@ -47,9 +46,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     where: { id: admin.id },
     data: { lastLogin: new Date() },
   });
-
-  // Log activity
-  await logActivity(req, admin.id, "LOGIN", "Admin", admin.id);
 
   res.json({
     accessToken,

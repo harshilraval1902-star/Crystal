@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { ProductService } from "@/services/product.service";
 import { useDataStore } from "@/hooks/useDataStore";
-import { TestimonialService } from "@/services/testimonial.service";
+
 import { SiteServiceService } from "@/services/content.service";
 import { SettingsService } from "@/services/settings.service";
 import { ROFeatureService, ROFeature } from "@/services/roFeature.service";
@@ -46,7 +46,7 @@ const faqs = [
 ];
 
 export default function Home() {
-  const [managedTestimonials, setManagedTestimonials] = useState<{ name: string; rating: number; review: string }[]>([]);
+
   const [siteServices, setSiteServices] = useState<{ title: string; desc: string; href: string; cta: string }[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [settings, setSettings] = useState<Record<string, string>>({});
@@ -95,9 +95,7 @@ export default function Home() {
         }),
     );
 
-    TestimonialService.getAll().then((items) =>
-      setManagedTestimonials(items.filter((item) => item.isActive).map((item) => ({ name: item.customerName, rating: item.rating, review: item.review })))
-    );
+
     SiteServiceService.getAll().then((items) =>
       setSiteServices(items.filter((item) => item.isActive).sort((a, b) => a.displayOrder - b.displayOrder).map((item) => ({ title: item.title, desc: item.description, href: item.href, cta: item.cta })))
     );
@@ -313,52 +311,47 @@ export default function Home() {
           </div>
         </section>
 
-        {/* GOOGLE REVIEW TESTIMONIALS */}
+        {/* WHY CHOOSE CRYSTAL RO CARE */}
         <section className="py-24 lg:py-32 bg-surface overflow-hidden border-b border-primary-100">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <h3 className="text-3xl sm:text-4xl font-bold text-brand-primary tracking-tight">Verified Trust.</h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                <span className="font-semibold text-brand-primary">4.9 / 5.0 on Google</span>
-              </div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={elegantFadeUp} className="mb-16 flex flex-col items-center text-center gap-4">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-primary tracking-tight">Why Choose Crystal RO Care</h3>
+              <p className="text-slate text-lg max-w-2xl">Premium service, guaranteed purity, and unmatched reliability for your home.</p>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {managedTestimonials.slice(0, 3).map((t, i) => (
-                <motion.div 
-                  key={t.name} 
-                  initial="hidden" 
-                  whileInView="visible" 
-                  viewport={{ once: true, margin: "-50px" }} 
-                  variants={elegantFadeUp} 
-                  transition={{ delay: i * 0.1 }} 
-                  className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex gap-1 mb-4">
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <Star key={j} className={`w-4 h-4 ${j < t.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
-                      ))}
-                    </div>
-                    <p className="text-brand-primary text-sm leading-relaxed mb-8">"{t.review}"</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center font-medium text-brand-primary text-sm shrink-0 border border-primary-100">
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-brand-primary tracking-tight text-sm flex items-center gap-1.5">
-                        {t.name}
-                        <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                      </div>
-                      <span className="text-[10px] text-slate uppercase tracking-wider">Verified Purchase</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <motion.div 
+                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.1 }}
+                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="w-8 h-8 text-primary-600" />
+                </div>
+                <h4 className="text-xl font-bold text-brand-primary mb-3">Certified Quality</h4>
+                <p className="text-slate text-sm leading-relaxed">Every service involves strict 15-point quality checks and uses only 100% genuine, manufacturer-approved components.</p>
+              </motion.div>
+              
+              <motion.div 
+                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.2 }}
+                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Clock className="w-8 h-8 text-primary-600" />
+                </div>
+                <h4 className="text-xl font-bold text-brand-primary mb-3">Rapid Response</h4>
+                <p className="text-slate text-sm leading-relaxed">We respect your time. Get guaranteed same-day emergency visits and precise, on-time scheduled maintenance.</p>
+              </motion.div>
+              
+              <motion.div 
+                initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={elegantFadeUp} transition={{ delay: 0.3 }}
+                className="bg-background border border-primary-100 rounded-2xl p-8 hover:border-primary-300 transition-elegant flex flex-col items-center text-center group"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Award className="w-8 h-8 text-primary-600" />
+                </div>
+                <h4 className="text-xl font-bold text-brand-primary mb-3">Expert Engineers</h4>
+                <p className="text-slate text-sm leading-relaxed">Our technicians aren't just mechanics; they are certified water purification experts trained on all advanced RO technologies.</p>
+              </motion.div>
             </div>
           </div>
         </section>

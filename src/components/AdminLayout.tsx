@@ -35,10 +35,6 @@ const getHeaderContent = (path: string) => {
     return { title: "Gallery", subtitle: "Maintain the image gallery and update visuals effortlessly." };
   }
 
-  if (path === "/admin/reviews") {
-    return { title: "Reviews", subtitle: "Moderate customer reviews and keep quality feedback current." };
-  }
-
   if (path === "/admin/faqs") {
     return { title: "FAQs", subtitle: "Manage frequently asked questions and help center content." };
   }

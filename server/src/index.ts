@@ -10,15 +10,13 @@ import path from "path";
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import amcRoutes from "./routes/amc.routes";
-import reviewRoutes from "./routes/review.routes";
-import testimonialRoutes from "./routes/testimonial.routes";
+
 import galleryRoutes from "./routes/gallery.routes";
 import faqRoutes from "./routes/faq.routes";
 import siteServiceRoutes from "./routes/siteService.routes";
 import settingsRoutes from "./routes/settings.routes";
 import serviceRequestRoutes from "./routes/serviceRequest.routes";
 import inquiryRoutes from "./routes/inquiry.routes";
-import subscriberRoutes from "./routes/subscriber.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import uploadRoutes from "./routes/upload.routes";
 import usersRoutes from "./routes/users.routes";
@@ -29,9 +27,6 @@ import { UPLOAD_DIR } from "./middleware/upload";
 import prisma from "./config/db";
 import { env } from "./config/env";
 
-import { auditRequestMiddleware } from "./utils/audit";
-import { metrics } from "./utils/metrics";
-
 import v1Router from "./routes/v1";
 import fs, { promises as fsPromises } from "fs";
 
@@ -41,18 +36,6 @@ const PORT = env.PORT;
 // ── Trust Proxy ──────────────────────────────────────────
 // Trust first proxy (essential for correct IP detection behind Nginx, Heroku, Cloudflare, etc.)
 app.set("trust proxy", 1);
-
-// ── Observability Metrics Middleware ──────────────────────
-app.use((req, res, next) => {
-  metrics.incrementActiveRequests();
-  res.on("finish", () => {
-    metrics.decrementActiveRequests();
-  });
-  next();
-});
-
-// ── Audit Request middleware ──────────────────────────────
-app.use(auditRequestMiddleware);
 
 // ── Security ─────────────────────────────────────────────
 app.use(
@@ -160,36 +143,23 @@ app.get(["/swagger.json", "/api-docs/swagger.json"], (_req, res) => {
 
 // ── API Routes ────────────────────────────────────────────
 app.use("/api/admin/auth", authRoutes);
-app.use("/api/admin/reviews", reviewRoutes);
-app.use("/api/admin/products", productRoutes);
 app.use("/api/admin/users", usersRoutes);
 app.use("/api/admin/dashboard", dashboardRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/amc-plans", amcRoutes);
-app.use("/api/reviews", reviewRoutes);
-app.use("/api/testimonials", testimonialRoutes);
+
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/site-services", siteServiceRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
 app.use("/api/inquiries", inquiryRoutes);
-app.use("/api/subscribers", subscriberRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/hero-slides", heroSlideRoutes);
 app.use("/api/ro-features", roFeatureRoutes);
 
 // ── API Routes (Versioned v1 Router Mount) ────────────────
 app.use("/api/v1", v1Router);
-
-// ── Enterprise Metrics Ingestion ─────────────────────────
-app.get("/api/metrics", (_req, res) => {
-  if (process.env.ENABLE_METRICS !== "true") {
-    res.status(403).json({ error: "Metrics ingestion disabled." });
-    return;
-  }
-  res.json(metrics.getMetrics());
-});
 
 // ── Health Check ──────────────────────────────────────────
 app.get(["/health", "/api/health"], async (req, res) => {
@@ -211,7 +181,6 @@ app.get(["/health", "/api/health"], async (req, res) => {
   }
 
   const isHealthy = dbStatus === "UP" && uploadDirStatus === "UP";
-  const sysMetrics = metrics.getMetrics(dbLatency);
 
   res.status(isHealthy ? 200 : 503).json({
     status: isHealthy ? "healthy" : "unhealthy",
@@ -219,7 +188,7 @@ app.get(["/health", "/api/health"], async (req, res) => {
     env: process.env.NODE_ENV ?? "development",
     version: process.env.npm_package_version ?? "1.0.0",
     nodeVersion: process.version,
-    uptime: sysMetrics.uptime,
+    uptime: process.uptime(),
     checks: {
       database: {
         status: dbStatus,
@@ -229,18 +198,6 @@ app.get(["/health", "/api/health"], async (req, res) => {
         status: uploadDirStatus,
         path: UPLOAD_DIR,
       }
-    },
-    metrics: {
-      memory: {
-        rss: Math.round(sysMetrics.memoryUsage.rss / 1024 / 1024) + "MB",
-        heapTotal: Math.round(sysMetrics.memoryUsage.heapTotal / 1024 / 1024) + "MB",
-        heapUsed: Math.round(sysMetrics.memoryUsage.heapUsed / 1024 / 1024) + "MB",
-      },
-      cpu: sysMetrics.cpuUsage,
-      eventLoopDelayMs: sysMetrics.eventLoopDelayMs,
-      activeRequests: sysMetrics.activeRequests,
-      totalRequests: sysMetrics.totalRequests,
-      errorCount: sysMetrics.errorCount,
     }
   });
 });
@@ -293,18 +250,8 @@ const gracefulShutdown = (signal: string) => {
     }
   });
 
-  const checkInterval = setInterval(() => {
-    const active = metrics.getMetrics().activeRequests;
-    if (active === 0) {
-      console.log("✨ All active requests completed.");
-      clearInterval(checkInterval);
-    } else {
-      console.log(`⏳ Waiting for ${active} active request(s) to complete...`);
-    }
-  }, 500);
-
   setTimeout(() => {
-    console.error("⚠️ Force exit: active connections did not close in time.");
+    console.error("⚠️ Force exit: connections did not close in time.");
     process.exit(1);
   }, 10000).unref();
 };

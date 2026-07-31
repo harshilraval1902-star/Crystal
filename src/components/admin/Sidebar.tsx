@@ -31,7 +31,6 @@ const navGroups = [
     title: "Catalog",
     items: [
       { href: "/admin/products", icon: ShoppingBag, label: "Products" },
-      { href: "/admin/reviews", icon: Star, label: "Reviews" },
       { href: "/admin/gallery", icon: Image, label: "Gallery" },
     ],
   },

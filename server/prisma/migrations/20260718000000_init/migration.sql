@@ -16,7 +16,7 @@ CREATE TABLE `Admin` (
 -- CreateTable
 CREATE TABLE `RefreshToken` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `token` VARCHAR(512) NOT NULL,
+    `token` VARCHAR(191) NOT NULL,
     `adminId` INTEGER NOT NULL,
     `expiresAt` DATETIME(3) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

@@ -2,7 +2,7 @@ import multer, { FileFilterCallback } from "multer";
 import path from "path";
 import fs from "fs";
 import { Request } from "express";
-import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 
 const UPLOAD_DIR = path.resolve(
   process.cwd(),
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   },
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    const uniqueName = `${uuidv4()}${ext}`;
+    const uniqueName = `${crypto.randomUUID()}${ext}`;
     cb(null, uniqueName);
   },
 });

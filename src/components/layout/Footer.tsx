@@ -4,14 +4,11 @@ import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, ArrowRight, ShieldCh
 import logoImg from "@/assets/Logo-png_1775412426687.png";
 import { SettingsService } from "@/services/settings.service";
 import { SiteServiceService } from "@/services/content.service";
-import { SubscriberService } from "@/services/subscriber.service";
 import { useToast } from "@/components/admin/ToastProvider";
 
 export default function Footer() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [services, setServices] = useState<string[]>([]);
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { notify } = useToast();
 
   useEffect(() => {
@@ -23,38 +20,6 @@ export default function Footer() {
     );
   }, []);
 
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) {
-      notify({ title: "Error", description: "Email is required.", variant: "error" });
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      notify({ title: "Error", description: "Please enter a valid email address.", variant: "error" });
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      await SubscriberService.subscribe(email);
-      notify({
-        title: "Subscribed!",
-        description: "Thank you for subscribing to our newsletter.",
-        variant: "success",
-      });
-      setEmail("");
-    } catch (err: any) {
-      notify({
-        title: "Subscription Failed",
-        description: err.message || "Something went wrong. Please try again.",
-        variant: "error",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const contactNumber = settings.contactNumber ?? "6359585515";
   const emailVal = settings.email ?? "crystalnaturalwater@gmail.com";
   const address = settings.address ?? "India | Est. 2019";
@@ -63,33 +28,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-brand-primary text-white border-t border-primary-800">
-      
-      {/* LARGE PRE-FOOTER CTA */}
-      <div className="border-b border-primary-800 py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight mb-2">Subscribe to Purity</h2>
-            <p className="text-primary-300">Join our newsletter for maintenance tips and exclusive offers.</p>
-          </div>
-          <form onSubmit={handleSubscribe} className="flex w-full md:w-auto gap-2">
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address" 
-              className="bg-primary-900 border border-primary-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-white w-full md:w-72 transition-elegant placeholder:text-primary-500"
-              disabled={isSubmitting}
-            />
-            <button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="bg-white text-brand-primary px-6 py-3 rounded-lg font-medium hover:bg-surface transition-elegant whitespace-nowrap disabled:opacity-75"
-            >
-              {isSubmitting ? "Subscribing..." : "Subscribe"}
-            </button>
-          </form>
-        </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-20 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">

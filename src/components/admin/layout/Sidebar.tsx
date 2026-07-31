@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ShoppingBag,
-  Star,
+
   Image as ImageIcon,
   Wrench,
   FileText,
@@ -47,10 +47,8 @@ const navGroups = [
   {
     title: "Engagement",
     items: [
-      { href: "/admin/testimonials", icon: Star, label: "Testimonials" },
-      { href: "/admin/reviews", icon: Star, label: "Reviews" },
+
       { href: "/admin/faqs", icon: HelpCircle, label: "FAQs" },
-      { href: "/admin/subscribers", icon: Mail, label: "Subscribers" },
     ],
   },
   {

@@ -52,7 +52,7 @@ model Product {
   features       String?  @db.Text
   specifications String?  @db.Text
   warranty       String?
-  stockStatus    String   @default(dbgenerated("(in_stock)"))
+  stockStatus    String   @default("in_stock")
   stock          Int?
   featured       Boolean  @default(false)
   mainImageUrl   String?  @db.Text
@@ -81,7 +81,7 @@ model Review {
   customerName String
   rating       Int
   reviewText   String   @db.Text
-  status       String   @default(dbgenerated("(pending)"))
+  status       String   @default("pending")
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -91,30 +91,12 @@ model Review {
   @@map("review")
 }
 
-// ─── Testimonials ─────────────────────────────────────────────────────────────
-model Testimonial {
-  id           Int      @id @default(autoincrement())
-  customerName String
-  review       String   @db.Text
-  rating       Int      @default(5)
-  location     String?
-  designation  String?
-  photoUrl     String?
-  isActive     Boolean  @default(true)
-  isDeleted    Boolean  @default(false)
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("testimonial")
-}
-
 // ─── Gallery ──────────────────────────────────────────────────────────────────
 model GalleryImage {
   id        Int      @id @default(autoincrement())
   title     String
   imageUrl  String   @db.Text
-  category  String   @default(dbgenerated("(General)"))
+  category  String   @default("General")
   isActive  Boolean  @default(true)
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -166,7 +148,7 @@ model Faq {
   id           Int      @id @default(autoincrement())
   question     String
   answer       String   @db.Text
-  category     String   @default(dbgenerated("(General)"))
+  category     String   @default("General")
   isActive     Boolean  @default(true)
   isDeleted    Boolean  @default(false)
   displayOrder Int      @default(0)
@@ -208,7 +190,7 @@ model ServiceRequest {
   address      String?
   serviceType  String?
   message      String?  @db.Text
-  status       String   @default(dbgenerated("(new)"))
+  status       String   @default("new")
   isDeleted    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

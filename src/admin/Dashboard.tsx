@@ -33,7 +33,7 @@ export default function Dashboard() {
   const derived = useMemo(() => {
     if (!rawData) return null;
 
-    const { products = [], amcPlans = [], serviceRequests = [], inquiries = [], testimonials = [] } = rawData as any;
+    const { products = [], amcPlans = [], serviceRequests = [], inquiries = [] } = rawData as any;
 
     const monthMap: Record<string, { requests: number; inquiries: number }> = {};
     const addCount = (dateStr: string, type: "requests" | "inquiries") => {
@@ -61,7 +61,7 @@ export default function Dashboard() {
         totalServiceRequests: serviceRequests.length,
         totalAmcPlans: amcPlans.length,
         totalInquiries: inquiries.length,
-        totalTestimonials: testimonials.length,
+
       },
       monthlyRequests: monthlyRequests.length > 0 ? monthlyRequests : [{ name: "No Data", requests: 0, inquiries: 0 }],
       recentServiceRequests: [...serviceRequests].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),

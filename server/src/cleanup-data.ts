@@ -5,7 +5,7 @@ async function clean() {
   try {
     await prisma.product.deleteMany();
     await prisma.amcPlan.deleteMany();
-    await prisma.testimonial.deleteMany();
+
     await prisma.galleryImage.deleteMany();
     await prisma.siteService.deleteMany();
     await prisma.faq.deleteMany();

@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 
 import multer from "multer";
-import { ErrorTracker } from "../utils/errorTracker";
 
 export interface ApiError extends Error {
   statusCode?: number;
@@ -42,12 +41,9 @@ export function errorHandler(
       ? "Internal server error."
       : apiErr.message ?? "Internal server error.";
 
-  // Log to enterprise error tracking abstraction layer
-  ErrorTracker.captureException(apiErr, {
-    url: _req.originalUrl || _req.url,
-    method: _req.method,
-    statusCode,
-  });
+  if (statusCode >= 500) {
+    console.error(`[Error] ${statusCode} - ${_req.method} ${_req.originalUrl || _req.url}`, apiErr);
+  }
 
   res.status(statusCode).json({ error: message });
 }
