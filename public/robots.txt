@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://crystalwater.in/sitemap.xml
+Sitemap: https://crystalrocare.com/sitemap.xml

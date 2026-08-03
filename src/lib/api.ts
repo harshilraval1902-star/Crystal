@@ -86,11 +86,28 @@ apiClient.interceptors.response.use(
       window.location.href = `${BASE}/admin/login`;
     }
 
-    const message =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      "An unexpected error occurred.";
+    // Log technical errors to the console
+    console.error("[API Error]", error);
+
+    // Standardize user-friendly error messages
+    let message = "Something went wrong. Please try again.";
+
+    if (error.code === 'ERR_NETWORK') {
+      message = "Please check your internet connection.";
+    } else if (error.response) {
+      const status = error.response.status;
+      if (status >= 500) {
+        message = "Server error. We're working on it, please try again later.";
+      } else if (status === 404) {
+        message = "The requested resource could not be found.";
+      } else if (status === 403) {
+        message = "You don't have permission to perform this action.";
+      } else if (status === 400 || status === 422) {
+        // Validation errors or bad requests might be safe to display if provided by backend explicitly for user
+        message = error.response.data?.error || error.response.data?.message || "Invalid request. Please check your input.";
+      }
+    }
+
     return Promise.reject(new Error(message));
   },
 );

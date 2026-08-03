@@ -31,8 +31,9 @@ const queryClient = new QueryClient({
 
 // A premium loading fallback
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
     <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-900 rounded-full animate-spin"></div>
+    <p className="text-primary-600 font-medium animate-pulse">Loading Crystal RO Care...</p>
   </div>
 );
 
