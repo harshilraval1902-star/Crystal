@@ -95,8 +95,8 @@ export function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
             exit={{ opacity: 0 }}
             className="flex flex-col whitespace-nowrap"
           >
-            <span className="text-sm font-extrabold tracking-tight">Crystal Admin</span>
-            <span className="text-[10px] font-medium text-primary-200 uppercase tracking-widest">Workspace</span>
+            <span className="text-sm font-extrabold tracking-tight">Kenzora RO</span>
+            <span className="text-[10px] font-medium text-primary-200 uppercase tracking-widest">Admin</span>
           </motion.div>
         )}
       </div>
