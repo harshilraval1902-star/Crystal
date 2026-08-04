@@ -143,6 +143,21 @@ export default function Footer() {
             <Link href="/about" className="hover:text-white transition-elegant">Terms of Service</Link>
           </div>
         </div>
+
+        {/* DEVELOPER CREDIT */}
+        <div className="mt-8 text-center pb-4">
+          <p className="text-primary-400 text-xs md:text-sm">
+            Designed & Developed by{' '}
+            <a 
+              href="https://mahadevinfo.in" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-white hover:underline transition-colors duration-300 font-medium"
+            >
+              Mahadev Infotech
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
