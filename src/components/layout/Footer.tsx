@@ -152,7 +152,7 @@ export default function Footer() {
               href="https://mahadevinfo.in" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:text-white hover:underline transition-colors duration-300 font-medium"
+              className="text-white font-semibold hover:text-accent-500 hover:underline transition-colors duration-300"
             >
               Mahadev Infotech
             </a>
