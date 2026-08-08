@@ -1,0 +1,396 @@
+﻿src\cleanup-data.ts:6:    await pool.execute("DELETE FROM product");
+src\cleanup-data.ts:7:    await pool.execute("DELETE FROM amcplan");
+src\cleanup-data.ts:9:    await pool.execute("DELETE FROM galleryimage");
+src\cleanup-data.ts:10:    await pool.execute("DELETE FROM siteservice");
+src\cleanup-data.ts:11:    await pool.execute("DELETE FROM faq");
+src\cleanup-data.ts:12:    await pool.execute("DELETE FROM setting");
+src\controllers\amc.controller.ts:6:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\amc.controller.ts:8:const BOOLEAN_FIELDS = ["sparePartsCovered", "prioritySupport", "isActive", "isDeleted"];
+src\controllers\amc.controller.ts:16:    "SELECT * FROM amcplan WHERE isDeleted = ? ORDER BY displayOrder ASC, createdAt DESC",
+src\controllers\amc.controller.ts:24:    "SELECT * FROM amcplan WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\amc.controller.ts:50:  const insertData = {
+src\controllers\amc.controller.ts:61:    isDeleted: false,
+src\controllers\amc.controller.ts:63:    updatedAt: new Date()
+src\controllers\amc.controller.ts:67:    `INSERT INTO amcplan (
+src\controllers\amc.controller.ts:70:      displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\amc.controller.ts:73:      insertData.name, insertData.price, insertData.durationMonths, insertData.description,
+src\controllers\amc.controller.ts:74:      insertData.serviceVisits, insertData.sparePartsCovered, insertData.prioritySupport,
+src\controllers\amc.controller.ts:75:      insertData.badge, insertData.isActive, insertData.displayOrder, insertData.isDeleted,
+src\controllers\amc.controller.ts:76:      insertData.createdAt, insertData.updatedAt
+src\controllers\amc.controller.ts:80:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM amcplan WHERE id = ?", [result.insertId]);
+src\controllers\amc.controller.ts:84:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\amc.controller.ts:86:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM amcplan WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\amc.controller.ts:89:  const updateData = { ...req.body, updatedAt: new Date() };
+src\controllers\amc.controller.ts:90:  const queryParts = buildUpdateQuery("amcplan", updateData);
+src\controllers\amc.controller.ts:94:      `UPDATE amcplan SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\amc.controller.ts:99:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM amcplan WHERE id = ?", [id]);
+src\controllers\amc.controller.ts:100:  res.json(formatAmcPlan(updatedRows[0]));
+src\controllers\amc.controller.ts:105:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM amcplan WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\amc.controller.ts:108:  await pool.execute("UPDATE amcplan SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\auth.controller.ts:26:    "SELECT * FROM admin WHERE email = ? LIMIT 1",
+src\controllers\auth.controller.ts:47:    "INSERT INTO refreshtoken (token, adminId, expiresAt, createdAt) VALUES (?, ?, ?, NOW())",
+src\controllers\auth.controller.ts:51:  // Update lastLogin
+src\controllers\auth.controller.ts:53:    "UPDATE admin SET lastLogin = NOW(), updatedAt = NOW() WHERE id = ?",
+src\controllers\auth.controller.ts:70:      "SELECT * FROM refreshtoken WHERE token = ? LIMIT 1",
+src\controllers\auth.controller.ts:78:          "DELETE FROM refreshtoken WHERE adminId = ?",
+src\controllers\auth.controller.ts:83:          "DELETE FROM refreshtoken WHERE id = ?",
+src\controllers\auth.controller.ts:103:    "SELECT * FROM refreshtoken WHERE token = ? LIMIT 1",
+src\controllers\auth.controller.ts:113:        "DELETE FROM refreshtoken WHERE adminId = ?",
+src\controllers\auth.controller.ts:124:    await pool.execute("DELETE FROM refreshtoken WHERE id = ?", [stored.id]).catch(() => {});
+src\controllers\auth.controller.ts:129:    "SELECT * FROM admin WHERE id = ? LIMIT 1",
+src\controllers\auth.controller.ts:145:  await pool.execute("DELETE FROM refreshtoken WHERE id = ?", [stored.id]).catch(() => {});
+src\controllers\auth.controller.ts:148:    "INSERT INTO refreshtoken (token, adminId, expiresAt, createdAt) VALUES (?, ?, ?, NOW())",
+src\controllers\auth.controller.ts:158:    "SELECT * FROM admin WHERE id = ? LIMIT 1",
+src\controllers\dashboard.controller.ts:16:    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM product WHERE isDeleted = ?", [false]),
+src\controllers\dashboard.controller.ts:17:    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM amcplan WHERE isDeleted = ?", [false]),
+src\controllers\dashboard.controller.ts:18:    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM servicerequest WHERE isDeleted = ?", [false]),
+src\controllers\dashboard.controller.ts:19:    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM inquiry WHERE isDeleted = ?", [false]),
+src\controllers\dashboard.controller.ts:21:      "SELECT id, customerName, phone, status, createdAt FROM servicerequest WHERE isDeleted = ? ORDER BY createdAt DESC LIMIT 5",
+src\controllers\dashboard.controller.ts:25:      "SELECT id, name, email, subject, createdAt FROM inquiry WHERE isDeleted = ? ORDER BY createdAt DESC LIMIT 5",
+src\controllers\dashboard.controller.ts:29:      "SELECT status, COUNT(*) as count FROM servicerequest WHERE isDeleted = ? GROUP BY status",
+src\controllers\faq.controller.ts:6:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\faq.controller.ts:8:const BOOLEAN_FIELDS = ["isActive", "isDeleted"];
+src\controllers\faq.controller.ts:16:    "SELECT * FROM faq WHERE isDeleted = ? ORDER BY displayOrder ASC, createdAt DESC",
+src\controllers\faq.controller.ts:24:    "SELECT * FROM faq WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\faq.controller.ts:45:  const insertData = {
+src\controllers\faq.controller.ts:51:    isDeleted: false,
+src\controllers\faq.controller.ts:53:    updatedAt: new Date()
+src\controllers\faq.controller.ts:57:    `INSERT INTO faq (
+src\controllers\faq.controller.ts:58:      question, answer, category, isActive, displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\faq.controller.ts:61:      insertData.question, insertData.answer, insertData.category,
+src\controllers\faq.controller.ts:62:      insertData.isActive, insertData.displayOrder, insertData.isDeleted,
+src\controllers\faq.controller.ts:63:      insertData.createdAt, insertData.updatedAt
+src\controllers\faq.controller.ts:67:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM faq WHERE id = ?", [result.insertId]);
+src\controllers\faq.controller.ts:71:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\faq.controller.ts:73:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM faq WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\faq.controller.ts:76:  const updateData = { ...req.body, updatedAt: new Date() };
+src\controllers\faq.controller.ts:77:  const queryParts = buildUpdateQuery("faq", updateData);
+src\controllers\faq.controller.ts:81:      `UPDATE faq SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\faq.controller.ts:86:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM faq WHERE id = ?", [id]);
+src\controllers\faq.controller.ts:87:  res.json(formatFaq(updatedRows[0]));
+src\controllers\faq.controller.ts:92:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM faq WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\faq.controller.ts:95:  await pool.execute("UPDATE faq SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\gallery.controller.ts:7:import { deleteUploadedFile } from "../utils/file";
+src\controllers\gallery.controller.ts:8:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\gallery.controller.ts:10:const BOOLEAN_FIELDS = ["isActive", "isDeleted"];
+src\controllers\gallery.controller.ts:18:    "SELECT * FROM galleryimage WHERE isDeleted = ? ORDER BY createdAt DESC",
+src\controllers\gallery.controller.ts:26:    "SELECT * FROM galleryimage WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\gallery.controller.ts:48:  const insertData = {
+src\controllers\gallery.controller.ts:53:    isDeleted: false,
+src\controllers\gallery.controller.ts:55:    updatedAt: new Date()
+src\controllers\gallery.controller.ts:59:    `INSERT INTO galleryimage (
+src\controllers\gallery.controller.ts:60:      title, imageUrl, category, isActive, isDeleted, createdAt, updatedAt
+src\controllers\gallery.controller.ts:63:      insertData.title, insertData.imageUrl, insertData.category,
+src\controllers\gallery.controller.ts:64:      insertData.isActive, insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\gallery.controller.ts:68:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM galleryimage WHERE id = ?", [result.insertId]);
+src\controllers\gallery.controller.ts:72:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\gallery.controller.ts:74:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM galleryimage WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\gallery.controller.ts:84:    // Delete old file if it was a local upload
+src\controllers\gallery.controller.ts:85:    await deleteUploadedFile(existing.imageUrl);
+src\controllers\gallery.controller.ts:89:  let isActiveUpdate = body.isActive;
+src\controllers\gallery.controller.ts:90:  if (typeof isActiveUpdate === "string") {
+src\controllers\gallery.controller.ts:91:    isActiveUpdate = isActiveUpdate === "true";
+src\controllers\gallery.controller.ts:94:  const updateData: Record<string, any> = { updatedAt: new Date() };
+src\controllers\gallery.controller.ts:95:  if (body.title !== undefined) updateData.title = body.title;
+src\controllers\gallery.controller.ts:96:  if (body.category !== undefined) updateData.category = body.category;
+src\controllers\gallery.controller.ts:97:  if (isActiveUpdate !== undefined) updateData.isActive = isActiveUpdate;
+src\controllers\gallery.controller.ts:98:  if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+src\controllers\gallery.controller.ts:100:  const queryParts = buildUpdateQuery("galleryimage", updateData);
+src\controllers\gallery.controller.ts:103:      `UPDATE galleryimage SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\gallery.controller.ts:108:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM galleryimage WHERE id = ?", [id]);
+src\controllers\gallery.controller.ts:109:  res.json(formatGalleryImage(updatedRows[0]));
+src\controllers\gallery.controller.ts:114:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM galleryimage WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\gallery.controller.ts:118:  // Delete physical file if local
+src\controllers\gallery.controller.ts:119:  await deleteUploadedFile(existing.imageUrl);
+src\controllers\gallery.controller.ts:121:  await pool.execute("UPDATE galleryimage SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\heroSlide.controller.ts:4:import { deleteUploadedFile } from '../utils/file';
+src\controllers\heroSlide.controller.ts:5:import { mapBooleans, buildUpdateQuery } from '../utils/dbHelpers';
+src\controllers\heroSlide.controller.ts:7:const BOOLEAN_FIELDS = ["isActive", "isDeleted"];
+src\controllers\heroSlide.controller.ts:18:        "SELECT * FROM heroslide WHERE isActive = ? AND isDeleted = ? ORDER BY displayOrder ASC",
+src\controllers\heroSlide.controller.ts:32:        "SELECT * FROM heroslide WHERE isDeleted = ? ORDER BY displayOrder ASC",
+src\controllers\heroSlide.controller.ts:47:      const insertData = {
+src\controllers\heroSlide.controller.ts:52:        isDeleted: false,
+src\controllers\heroSlide.controller.ts:54:        updatedAt: new Date()
+src\controllers\heroSlide.controller.ts:58:        `INSERT INTO heroslide (
+src\controllers\heroSlide.controller.ts:59:          name, imgUrl, isActive, displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\heroSlide.controller.ts:62:          insertData.name, insertData.imgUrl, insertData.isActive,
+src\controllers\heroSlide.controller.ts:63:          insertData.displayOrder, insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\heroSlide.controller.ts:67:      const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM heroslide WHERE id = ?", [result.insertId]);
+src\controllers\heroSlide.controller.ts:75:  // Update a slide
+src\controllers\heroSlide.controller.ts:76:  static async update(req: Request, res: Response) {
+src\controllers\heroSlide.controller.ts:81:      const updateData: Record<string, any> = { updatedAt: new Date() };
+src\controllers\heroSlide.controller.ts:82:      if (name !== undefined) updateData.name = name;
+src\controllers\heroSlide.controller.ts:83:      if (imgUrl !== undefined) updateData.imgUrl = imgUrl;
+src\controllers\heroSlide.controller.ts:84:      if (isActive !== undefined) updateData.isActive = isActive;
+src\controllers\heroSlide.controller.ts:85:      if (displayOrder !== undefined) updateData.displayOrder = displayOrder;
+src\controllers\heroSlide.controller.ts:87:      const queryParts = buildUpdateQuery("heroslide", updateData);
+src\controllers\heroSlide.controller.ts:90:          `UPDATE heroslide SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\heroSlide.controller.ts:95:      const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM heroslide WHERE id = ?", [id]);
+src\controllers\heroSlide.controller.ts:96:      res.json(formatHeroSlide(updatedRows[0]));
+src\controllers\heroSlide.controller.ts:99:      res.status(500).json({ error: 'Failed to update hero slide' });
+src\controllers\heroSlide.controller.ts:103:  // Soft delete a slide
+src\controllers\heroSlide.controller.ts:104:  static async delete(req: Request, res: Response) {
+src\controllers\heroSlide.controller.ts:107:      const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM heroslide WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\heroSlide.controller.ts:111:        await deleteUploadedFile(existing.imgUrl);
+src\controllers\heroSlide.controller.ts:114:      await pool.execute("UPDATE heroslide SET isDeleted = ?, isActive = ?, updatedAt = NOW() WHERE id = ?", [true, false, id]);
+src\controllers\heroSlide.controller.ts:115:      res.json({ message: 'Slide deleted successfully' });
+src\controllers\heroSlide.controller.ts:118:      res.status(500).json({ error: 'Failed to delete hero slide' });
+src\controllers\inquiry.controller.ts:6:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\inquiry.controller.ts:8:const BOOLEAN_FIELDS = ["isDeleted"];
+src\controllers\inquiry.controller.ts:16:    "SELECT * FROM inquiry WHERE isDeleted = ? ORDER BY createdAt DESC",
+src\controllers\inquiry.controller.ts:24:    "SELECT * FROM inquiry WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\inquiry.controller.ts:45:  const insertData = {
+src\controllers\inquiry.controller.ts:51:    isDeleted: false,
+src\controllers\inquiry.controller.ts:53:    updatedAt: new Date()
+src\controllers\inquiry.controller.ts:57:    `INSERT INTO inquiry (
+src\controllers\inquiry.controller.ts:58:      name, phone, email, subject, message, isDeleted, createdAt, updatedAt
+src\controllers\inquiry.controller.ts:61:      insertData.name, insertData.phone, insertData.email, insertData.subject,
+src\controllers\inquiry.controller.ts:62:      insertData.message, insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\inquiry.controller.ts:66:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM inquiry WHERE id = ?", [result.insertId]);
+src\controllers\inquiry.controller.ts:70:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\inquiry.controller.ts:72:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM inquiry WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\inquiry.controller.ts:75:  const updateData = { ...req.body, updatedAt: new Date() };
+src\controllers\inquiry.controller.ts:76:  const queryParts = buildUpdateQuery("inquiry", updateData);
+src\controllers\inquiry.controller.ts:80:      `UPDATE inquiry SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\inquiry.controller.ts:85:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM inquiry WHERE id = ?", [id]);
+src\controllers\inquiry.controller.ts:86:  res.json(formatInquiry(updatedRows[0]));
+src\controllers\inquiry.controller.ts:91:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM inquiry WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\inquiry.controller.ts:94:  await pool.execute("UPDATE inquiry SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\product.controller.ts:6:import { deleteUploadedFile } from "../utils/file";
+src\controllers\product.controller.ts:7:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\product.controller.ts:9:const BOOLEAN_FIELDS = ["featured", "isActive", "isDeleted"];
+src\controllers\product.controller.ts:35:    "SELECT * FROM product WHERE isDeleted = ? ORDER BY displayOrder ASC, createdAt DESC",
+src\controllers\product.controller.ts:45:    "SELECT * FROM product WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\product.controller.ts:89:  const [existing] = await pool.query<RowDataPacket[]>("SELECT id FROM product WHERE slug = ? LIMIT 1", [data.slug]);
+src\controllers\product.controller.ts:92:  const insertData = {
+src\controllers\product.controller.ts:118:    isDeleted: false,
+src\controllers\product.controller.ts:120:    updatedAt: new Date()
+src\controllers\product.controller.ts:124:    `INSERT INTO product (
+src\controllers\product.controller.ts:128:      seoTitle, seoDescription, isActive, displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\product.controller.ts:131:      insertData.name, insertData.slug, insertData.price, insertData.brand,
+src\controllers\product.controller.ts:132:      insertData.model, insertData.category, insertData.discountPrice, insertData.description,
+src\controllers\product.controller.ts:133:      insertData.features, insertData.specifications, insertData.warranty, insertData.stockStatus,
+src\controllers\product.controller.ts:134:      insertData.stock, insertData.featured, insertData.mainImageUrl, insertData.thumbnail,
+src\controllers\product.controller.ts:135:      insertData.image, insertData.images, insertData.variants, insertData.tags, insertData.badge,
+src\controllers\product.controller.ts:136:      insertData.seoTitle, insertData.seoDescription, insertData.isActive, insertData.displayOrder,
+src\controllers\product.controller.ts:137:      insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\product.controller.ts:141:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM product WHERE id = ?", [result.insertId]);
+src\controllers\product.controller.ts:146:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\product.controller.ts:148:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM product WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\product.controller.ts:183:      "SELECT id FROM product WHERE slug = ? AND id != ? AND isDeleted = ? LIMIT 1",
+src\controllers\product.controller.ts:189:  const updateData: Record<string, any> = { updatedAt: new Date() };
+src\controllers\product.controller.ts:190:  if (data.name !== undefined) updateData.name = data.name;
+src\controllers\product.controller.ts:191:  if (data.slug !== undefined) updateData.slug = data.slug;
+src\controllers\product.controller.ts:192:  if (data.price !== undefined) updateData.price = data.price;
+src\controllers\product.controller.ts:193:  if (data.brand !== undefined) updateData.brand = data.brand;
+src\controllers\product.controller.ts:194:  if (data.model !== undefined) updateData.model = data.model;
+src\controllers\product.controller.ts:195:  if (data.category !== undefined) updateData.category = data.category;
+src\controllers\product.controller.ts:196:  if (data.discountPrice !== undefined) updateData.discountPrice = data.discountPrice;
+src\controllers\product.controller.ts:197:  if (data.description !== undefined) updateData.description = data.description;
+src\controllers\product.controller.ts:198:  if (data.features !== undefined) updateData.features = JSON.stringify(data.features);
+src\controllers\product.controller.ts:199:  if (data.specifications !== undefined) updateData.specifications = data.specifications;
+src\controllers\product.controller.ts:200:  if (data.warranty !== undefined) updateData.warranty = data.warranty;
+src\controllers\product.controller.ts:201:  if (data.stockStatus !== undefined) updateData.stockStatus = data.stockStatus;
+src\controllers\product.controller.ts:202:  if (data.stock !== undefined) updateData.stock = data.stock;
+src\controllers\product.controller.ts:203:  if (data.featured !== undefined) updateData.featured = data.featured;
+src\controllers\product.controller.ts:204:  if (data.mainImageUrl !== undefined) updateData.mainImageUrl = data.mainImageUrl;
+src\controllers\product.controller.ts:205:  if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail;
+src\controllers\product.controller.ts:206:  if (data.image !== undefined) updateData.image = data.image;
+src\controllers\product.controller.ts:207:  if (data.images !== undefined) updateData.images = JSON.stringify(data.images);
+src\controllers\product.controller.ts:208:  if (data.variants !== undefined) updateData.variants = JSON.stringify(data.variants);
+src\controllers\product.controller.ts:209:  if (data.tags !== undefined) updateData.tags = JSON.stringify(data.tags);
+src\controllers\product.controller.ts:210:  if (data.badge !== undefined) updateData.badge = data.badge;
+src\controllers\product.controller.ts:211:  if (data.seoTitle !== undefined) updateData.seoTitle = data.seoTitle;
+src\controllers\product.controller.ts:212:  if (data.seoDescription !== undefined) updateData.seoDescription = data.seoDescription;
+src\controllers\product.controller.ts:213:  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+src\controllers\product.controller.ts:214:  if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder;
+src\controllers\product.controller.ts:216:  const queryParts = buildUpdateQuery("product", updateData);
+src\controllers\product.controller.ts:219:      `UPDATE product SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\product.controller.ts:224:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM product WHERE id = ?", [id]);
+src\controllers\product.controller.ts:225:  res.json(parseProduct(updatedRows[0]));
+src\controllers\product.controller.ts:228:// DELETE /api/products/:id
+src\controllers\product.controller.ts:231:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM product WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\product.controller.ts:235:  // Safely delete uploaded files
+src\controllers\product.controller.ts:236:  await deleteUploadedFile(existing.mainImageUrl);
+src\controllers\product.controller.ts:237:  await deleteUploadedFile(existing.thumbnail);
+src\controllers\product.controller.ts:238:  await deleteUploadedFile(existing.image);
+src\controllers\product.controller.ts:244:        await Promise.all(parsedImages.map(img => deleteUploadedFile(img)));
+src\controllers\product.controller.ts:251:  await pool.execute("UPDATE product SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\roFeature.controller.ts:4:import { mapBooleans, buildUpdateQuery } from '../utils/dbHelpers';
+src\controllers\roFeature.controller.ts:6:const BOOLEAN_FIELDS = ["isActive", "isDeleted"];
+src\controllers\roFeature.controller.ts:16:        "SELECT * FROM rofeature WHERE isActive = ? AND isDeleted = ? ORDER BY displayOrder ASC",
+src\controllers\roFeature.controller.ts:29:        "SELECT * FROM rofeature WHERE isDeleted = ? ORDER BY displayOrder ASC",
+src\controllers\roFeature.controller.ts:43:      const insertData = {
+src\controllers\roFeature.controller.ts:49:        isDeleted: false,
+src\controllers\roFeature.controller.ts:51:        updatedAt: new Date()
+src\controllers\roFeature.controller.ts:55:        `INSERT INTO rofeature (
+src\controllers\roFeature.controller.ts:56:          title, description, iconName, isActive, displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\roFeature.controller.ts:59:          insertData.title, insertData.description, insertData.iconName, insertData.isActive,
+src\controllers\roFeature.controller.ts:60:          insertData.displayOrder, insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\roFeature.controller.ts:64:      const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM rofeature WHERE id = ?", [result.insertId]);
+src\controllers\roFeature.controller.ts:72:  static async update(req: Request, res: Response) {
+src\controllers\roFeature.controller.ts:77:      const updateData: Record<string, any> = { updatedAt: new Date() };
+src\controllers\roFeature.controller.ts:78:      if (title !== undefined) updateData.title = title;
+src\controllers\roFeature.controller.ts:79:      if (description !== undefined) updateData.description = description;
+src\controllers\roFeature.controller.ts:80:      if (iconName !== undefined) updateData.iconName = iconName;
+src\controllers\roFeature.controller.ts:81:      if (isActive !== undefined) updateData.isActive = isActive;
+src\controllers\roFeature.controller.ts:82:      if (displayOrder !== undefined) updateData.displayOrder = displayOrder;
+src\controllers\roFeature.controller.ts:84:      const queryParts = buildUpdateQuery("rofeature", updateData);
+src\controllers\roFeature.controller.ts:87:          `UPDATE rofeature SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\roFeature.controller.ts:92:      const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM rofeature WHERE id = ?", [id]);
+src\controllers\roFeature.controller.ts:93:      res.json(formatROFeature(updatedRows[0]));
+src\controllers\roFeature.controller.ts:96:      res.status(500).json({ error: 'Failed to update RO feature' });
+src\controllers\roFeature.controller.ts:100:  static async delete(req: Request, res: Response) {
+src\controllers\roFeature.controller.ts:103:      await pool.execute("UPDATE rofeature SET isDeleted = ?, isActive = ?, updatedAt = NOW() WHERE id = ?", [true, false, id]);
+src\controllers\roFeature.controller.ts:104:      res.json({ message: 'RO Feature deleted successfully' });
+src\controllers\roFeature.controller.ts:107:      res.status(500).json({ error: 'Failed to delete RO feature' });
+src\controllers\serviceRequest.controller.ts:6:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\serviceRequest.controller.ts:8:const BOOLEAN_FIELDS = ["isDeleted"];
+src\controllers\serviceRequest.controller.ts:16:    "SELECT * FROM servicerequest WHERE isDeleted = ? ORDER BY createdAt DESC",
+src\controllers\serviceRequest.controller.ts:24:    "SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\serviceRequest.controller.ts:47:  const insertData = {
+src\controllers\serviceRequest.controller.ts:55:    isDeleted: false,
+src\controllers\serviceRequest.controller.ts:57:    updatedAt: new Date()
+src\controllers\serviceRequest.controller.ts:61:    `INSERT INTO servicerequest (
+src\controllers\serviceRequest.controller.ts:62:      customerName, phone, email, address, serviceType, message, status, isDeleted, createdAt, updatedAt
+src\controllers\serviceRequest.controller.ts:65:      insertData.customerName, insertData.phone, insertData.email, insertData.address,
+src\controllers\serviceRequest.controller.ts:66:      insertData.serviceType, insertData.message, insertData.status, insertData.isDeleted,
+src\controllers\serviceRequest.controller.ts:67:      insertData.createdAt, insertData.updatedAt
+src\controllers\serviceRequest.controller.ts:71:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ?", [result.insertId]);
+src\controllers\serviceRequest.controller.ts:75:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\serviceRequest.controller.ts:77:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\serviceRequest.controller.ts:80:  const updateData = { ...req.body, updatedAt: new Date() };
+src\controllers\serviceRequest.controller.ts:81:  const queryParts = buildUpdateQuery("servicerequest", updateData);
+src\controllers\serviceRequest.controller.ts:85:      `UPDATE servicerequest SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\serviceRequest.controller.ts:90:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ?", [id]);
+src\controllers\serviceRequest.controller.ts:91:  res.json(formatServiceRequest(updatedRows[0]));
+src\controllers\serviceRequest.controller.ts:96:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\serviceRequest.controller.ts:99:  await pool.execute("UPDATE servicerequest SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\settings.controller.ts:8:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM setting");
+src\controllers\settings.controller.ts:17:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\settings.controller.ts:26:        `INSERT INTO setting (\`key\`, value, createdAt, updatedAt) 
+src\controllers\settings.controller.ts:28:         ON DUPLICATE KEY UPDATE value = ?, updatedAt = NOW()`,
+src\controllers\settings.controller.ts:41:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM setting");
+src\controllers\settings.controller.ts:50:// POST /api/settings ΓÇö alias for update
+src\controllers\settings.controller.ts:51:export const create = update;
+src\controllers\siteService.controller.ts:6:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\siteService.controller.ts:8:const BOOLEAN_FIELDS = ["isActive", "isDeleted"];
+src\controllers\siteService.controller.ts:16:    "SELECT * FROM siteservice WHERE isDeleted = ? ORDER BY displayOrder ASC, createdAt DESC",
+src\controllers\siteService.controller.ts:24:    "SELECT * FROM siteservice WHERE id = ? AND isDeleted = ? LIMIT 1",
+src\controllers\siteService.controller.ts:48:  const insertData = {
+src\controllers\siteService.controller.ts:57:    isDeleted: false,
+src\controllers\siteService.controller.ts:59:    updatedAt: new Date()
+src\controllers\siteService.controller.ts:63:    `INSERT INTO siteservice (
+src\controllers\siteService.controller.ts:64:      title, description, href, cta, icon, accent, isActive, displayOrder, isDeleted, createdAt, updatedAt
+src\controllers\siteService.controller.ts:67:      insertData.title, insertData.description, insertData.href, insertData.cta,
+src\controllers\siteService.controller.ts:68:      insertData.icon, insertData.accent, insertData.isActive, insertData.displayOrder,
+src\controllers\siteService.controller.ts:69:      insertData.isDeleted, insertData.createdAt, insertData.updatedAt
+src\controllers\siteService.controller.ts:73:  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM siteservice WHERE id = ?", [result.insertId]);
+src\controllers\siteService.controller.ts:77:export const update = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\siteService.controller.ts:79:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM siteservice WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\siteService.controller.ts:82:  const updateData = { ...req.body, updatedAt: new Date() };
+src\controllers\siteService.controller.ts:83:  const queryParts = buildUpdateQuery("siteservice", updateData);
+src\controllers\siteService.controller.ts:87:      `UPDATE siteservice SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\siteService.controller.ts:92:  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM siteservice WHERE id = ?", [id]);
+src\controllers\siteService.controller.ts:93:  res.json(formatSiteService(updatedRows[0]));
+src\controllers\siteService.controller.ts:98:  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM siteservice WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+src\controllers\siteService.controller.ts:101:  await pool.execute("UPDATE siteservice SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
+src\controllers\users.controller.ts:7:import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+src\controllers\users.controller.ts:18:    "SELECT id, name, email, role, status, isActive, lastLogin, createdAt FROM admin ORDER BY createdAt DESC"
+src\controllers\users.controller.ts:30:  const [existing] = await pool.query<RowDataPacket[]>("SELECT id FROM admin WHERE email = ? LIMIT 1", [email]);
+src\controllers\users.controller.ts:37:  const insertData = {
+src\controllers\users.controller.ts:45:    updatedAt: new Date()
+src\controllers\users.controller.ts:49:    `INSERT INTO admin (
+src\controllers\users.controller.ts:50:      name, email, password, role, status, isActive, createdAt, updatedAt
+src\controllers\users.controller.ts:53:      insertData.name, insertData.email, insertData.password, insertData.role,
+src\controllers\users.controller.ts:54:      insertData.status, insertData.isActive, insertData.createdAt, insertData.updatedAt
+src\controllers\users.controller.ts:59:    "SELECT id, name, email, role, status, isActive, lastLogin, createdAt FROM admin WHERE id = ?",
+src\controllers\users.controller.ts:60:    [result.insertId]
+src\controllers\users.controller.ts:66:export const updateUser = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\users.controller.ts:70:  const [userRows] = await pool.query<RowDataPacket[]>("SELECT * FROM admin WHERE id = ? LIMIT 1", [id]);
+src\controllers\users.controller.ts:76:  const updateData: Record<string, any> = { updatedAt: new Date() };
+src\controllers\users.controller.ts:77:  if (name !== undefined) updateData.name = name;
+src\controllers\users.controller.ts:78:  if (email !== undefined) updateData.email = email;
+src\controllers\users.controller.ts:79:  if (role !== undefined) updateData.role = role;
+src\controllers\users.controller.ts:81:    updateData.status = status;
+src\controllers\users.controller.ts:82:    updateData.isActive = status === "suspended" ? false : true;
+src\controllers\users.controller.ts:85:  const queryParts = buildUpdateQuery("admin", updateData);
+src\controllers\users.controller.ts:88:      `UPDATE admin SET ${queryParts.setClause} WHERE id = ?`,
+src\controllers\users.controller.ts:93:  const [updatedRows] = await pool.query<RowDataPacket[]>(
+src\controllers\users.controller.ts:94:    "SELECT id, name, email, role, status, isActive, lastLogin, createdAt FROM admin WHERE id = ?",
+src\controllers\users.controller.ts:97:  res.json(formatUser(updatedRows[0]));
+src\controllers\users.controller.ts:100:// DELETE /api/admin/users/:id
+src\controllers\users.controller.ts:101:export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+src\controllers\users.controller.ts:104:  const [userRows] = await pool.query<RowDataPacket[]>("SELECT * FROM admin WHERE id = ? LIMIT 1", [id]);
+src\controllers\users.controller.ts:112:      "SELECT COUNT(*) as count FROM admin WHERE role = 'Super Admin'"
+src\controllers\users.controller.ts:116:      throw createError("Cannot delete the last Super Admin", 400);
+src\controllers\users.controller.ts:121:  await pool.execute("DELETE FROM refreshtoken WHERE adminId = ?", [id]).catch(() => {});
+src\controllers\users.controller.ts:122:  await pool.execute("UPDATE activitylog SET adminId = NULL WHERE adminId = ?", [id]).catch(() => {});
+src\controllers\users.controller.ts:123:  await pool.execute("DELETE FROM admin WHERE id = ?", [id]);
+src\controllers\users.controller.ts:125:  res.json({ message: "User deleted successfully" });
+src\index.ts:102:    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+src\index.ts:170:    await pool.query("SELECT 1");
+src\index.ts:214:    await pool.query("SELECT 1");
+src\middleware\auth.ts:71:    const [tokens] = await pool.query<RowDataPacket[]>("SELECT * FROM refreshtoken WHERE token = ? LIMIT 1", [token]);
+src\routes\amc.routes.ts:5:import { amcPlanCreateSchema, amcPlanUpdateSchema } from "../validators";
+src\routes\amc.routes.ts:12:router.put("/:id", authenticate, validateBody(amcPlanUpdateSchema), ctrl.update);
+src\routes\amc.routes.ts:13:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\faq.routes.ts:5:import { faqCreateSchema, faqUpdateSchema } from "../validators";
+src\routes\faq.routes.ts:12:router.put("/:id", authenticate, validateBody(faqUpdateSchema), ctrl.update);
+src\routes\faq.routes.ts:13:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\gallery.routes.ts:6:import { galleryCreateSchema, galleryUpdateSchema } from "../validators";
+src\routes\gallery.routes.ts:13:router.put("/:id", authenticate, upload.single("image"), optimizeImage, validateBody(galleryUpdateSchema), ctrl.update);
+src\routes\gallery.routes.ts:14:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\heroSlide.routes.ts:5:import { heroSlideCreateSchema, heroSlideUpdateSchema } from "../validators";
+src\routes\heroSlide.routes.ts:15:router.put('/:id', authenticate, validateBody(heroSlideUpdateSchema), HeroSlideController.update);
+src\routes\heroSlide.routes.ts:16:router.delete('/:id', authenticate, HeroSlideController.delete);
+src\routes\inquiry.routes.ts:5:import { inquiryCreateSchema, inquiryUpdateSchema } from "../validators";
+src\routes\inquiry.routes.ts:14:router.put("/:id", authenticate, validateBody(inquiryUpdateSchema), ctrl.update);
+src\routes\inquiry.routes.ts:15:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\product.routes.ts:5:import { productCreateSchema, productUpdateSchema } from "../validators";
+src\routes\product.routes.ts:12:router.put("/:id", authenticate, validateBody(productUpdateSchema), ctrl.update);
+src\routes\product.routes.ts:13:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\roFeature.routes.ts:13:router.put('/:id', authenticate, ROFeatureController.update);
+src\routes\roFeature.routes.ts:14:router.delete('/:id', authenticate, ROFeatureController.delete);
+src\routes\serviceRequest.routes.ts:5:import { bookingCreateSchema, bookingUpdateSchema } from "../validators";
+src\routes\serviceRequest.routes.ts:14:router.put("/:id", authenticate, validateBody(bookingUpdateSchema), ctrl.update);
+src\routes\serviceRequest.routes.ts:15:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\settings.routes.ts:5:import { siteSettingsUpdateSchema } from "../validators";
+src\routes\settings.routes.ts:10:router.post("/", authenticate, validateBody(siteSettingsUpdateSchema), ctrl.create);
+src\routes\settings.routes.ts:11:router.put("/", authenticate, validateBody(siteSettingsUpdateSchema), ctrl.update);
+src\routes\siteService.routes.ts:5:import { siteServiceCreateSchema, siteServiceUpdateSchema } from "../validators";
+src\routes\siteService.routes.ts:12:router.put("/:id", authenticate, validateBody(siteServiceUpdateSchema), ctrl.update);
+src\routes\siteService.routes.ts:13:router.delete("/:id", authenticate, ctrl.remove);
+src\routes\users.routes.ts:12:router.put("/:id", users.updateUser);
+src\routes\users.routes.ts:13:router.delete("/:id", users.deleteUser);
+src\seed.ts:10:  const [existingAdmin] = await pool.query<RowDataPacket[]>("SELECT id FROM admin WHERE email = ?", ["admin@crystalwater.in"]);
+src\seed.ts:15:      "INSERT INTO admin (email, password, name, role, status, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+src\seed.ts:24:  const [settingsCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM setting");
+src\seed.ts:39:      { key: "missionText",       value: "To make safe drinking water accessible by delivering thoughtfully selected RO systems, expert service, and honest guidance for every customer." },
+src\seed.ts:50:      { key: "aboutPartnerText",  value: "We provide complete RO solutions from purifier selection to installation, scheduled maintenance, and emergency service. Our trained technicians use genuine parts and follow strict quality checks on every visit." },
+src\seed.ts:60:      await pool.execute("INSERT INTO setting (`key`, value, createdAt, updatedAt) VALUES (?, ?, NOW(), NOW())", [item.key, item.value]);
+src\seed.ts:66:  const [amcCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM amcplan");
+src\seed.ts:77:        "INSERT INTO amcplan (name, price, durationMonths, description, serviceVisits, sparePartsCovered, prioritySupport, badge, isActive, displayOrder, isDeleted, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+src\seed.ts:86:  const [siteServiceCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM siteservice");
+src\seed.ts:97:        "INSERT INTO siteservice (title, description, href, cta, icon, accent, isActive, displayOrder, isDeleted, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+src\seed.ts:105:  const [faqCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM faq");
+src\seed.ts:119:        "INSERT INTO faq (question, answer, category, isActive, displayOrder, isDeleted, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+src\seed.ts:127:  const [productCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM product");
+src\seed.ts:163:        `INSERT INTO product (
+src\seed.ts:164:          name, slug, brand, model, category, price, discountPrice, description, features, warranty, stockStatus, badge, isActive, featured, displayOrder, isDeleted, createdAt, updatedAt
+src\seed.ts:173:  const [roFeatureCountResult] = await pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM rofeature");
+src\seed.ts:187:        "INSERT INTO rofeature (title, description, iconName, isActive, displayOrder, isDeleted, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+src\utils\dbHelpers.ts:11:export function buildUpdateQuery(tableName: string, data: Record<string, any>) {
+src\utils\file.ts:6: * Safely deletes an uploaded file from disk using its URL or path.
+src\utils\file.ts:7: * If the file is not a local upload, doesn't exist, or cannot be deleted,
+src\utils\file.ts:10:export async function deleteUploadedFile(urlOrPath: string | null | undefined): Promise<void> {
+src\validators\index.ts:32:export const productUpdateSchema = productCreateSchema.partial();
+src\validators\index.ts:42:export const heroSlideUpdateSchema = heroSlideCreateSchema.partial();
+src\validators\index.ts:52:export const galleryUpdateSchema = galleryCreateSchema.partial();
+src\validators\index.ts:65:export const bookingUpdateSchema = bookingCreateSchema.partial();
+src\validators\index.ts:72:export const subscriberBulkDeleteSchema = z.object({
+src\validators\index.ts:86:export const faqUpdateSchema = faqCreateSchema.partial();
+src\validators\index.ts:102:export const amcPlanUpdateSchema = amcPlanCreateSchema.partial();
+src\validators\index.ts:116:export const siteServiceUpdateSchema = siteServiceCreateSchema.partial();
+src\validators\index.ts:119:export const siteSettingsUpdateSchema = z.record(z.any());
+src\validators\index.ts:130:export const inquiryUpdateSchema = inquiryCreateSchema.partial();

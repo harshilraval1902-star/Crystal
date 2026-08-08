@@ -112,6 +112,18 @@ apiClient.interceptors.response.use(
   },
 );
 
+// Add another interceptor to catch HTML responses (which happens when backend is missing and frontend router catches the API request)
+apiClient.interceptors.response.use(
+  (response) => {
+    // If we receive an HTML page instead of JSON, it means the API endpoint doesn't exist
+    // and the fallback router (.htaccess) returned index.html. We must reject it!
+    if (typeof response.data === 'string' && response.data.toLowerCase().includes('<!doctype html>')) {
+      return Promise.reject(new Error("API returned HTML instead of JSON. Backend might be unreachable."));
+    }
+    return response;
+  }
+);
+
 export async function apiJson<T>(path: string, options: { method?: string; data?: unknown } = {}): Promise<T> {
   const response = await apiClient.request<T>({
     url: path,

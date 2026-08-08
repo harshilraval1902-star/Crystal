@@ -1,39 +1,40 @@
 import { Request, Response } from "express";
-import prisma from "../config/db";
+import pool from "../config/db";
+import { RowDataPacket } from "mysql2/promise";
 import { asyncHandler } from "../utils/asyncHandler";
 
 export const getDashboard = asyncHandler(async (_req: Request, res: Response) => {
   const [
-    totalProducts,
-    totalAmcPlans,
-    totalServiceRequests,
-    totalInquiries,
-    recentServiceRequests,
-    recentInquiries,
-    statusBreakdown,
+    totalProductsRows,
+    totalAmcPlansRows,
+    totalServiceRequestsRows,
+    totalInquiriesRows,
+    recentServiceRequestsRows,
+    recentInquiriesRows,
+    statusBreakdownRows,
   ] = await Promise.all([
-    prisma.product.count({ where: { isDeleted: false } }),
-    prisma.amcPlan.count({ where: { isDeleted: false } }),
-    prisma.serviceRequest.count({ where: { isDeleted: false } }),
-    prisma.inquiry.count({ where: { isDeleted: false } }),
-    prisma.serviceRequest.findMany({
-      where: { isDeleted: false },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { id: true, customerName: true, phone: true, status: true, createdAt: true },
-    }),
-    prisma.inquiry.findMany({
-      where: { isDeleted: false },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { id: true, name: true, email: true, subject: true, createdAt: true },
-    }),
-    prisma.serviceRequest.groupBy({
-      by: ["status"],
-      where: { isDeleted: false },
-      _count: { status: true },
-    }),
+    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM product WHERE isDeleted = ?", [false]),
+    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM amcplan WHERE isDeleted = ?", [false]),
+    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM servicerequest WHERE isDeleted = ?", [false]),
+    pool.query<RowDataPacket[]>("SELECT COUNT(*) as count FROM inquiry WHERE isDeleted = ?", [false]),
+    pool.query<RowDataPacket[]>(
+      "SELECT id, customerName, phone, status, createdAt FROM servicerequest WHERE isDeleted = ? ORDER BY createdAt DESC LIMIT 5",
+      [false]
+    ),
+    pool.query<RowDataPacket[]>(
+      "SELECT id, name, email, subject, createdAt FROM inquiry WHERE isDeleted = ? ORDER BY createdAt DESC LIMIT 5",
+      [false]
+    ),
+    pool.query<RowDataPacket[]>(
+      "SELECT status, COUNT(*) as count FROM servicerequest WHERE isDeleted = ? GROUP BY status",
+      [false]
+    ),
   ]);
+
+  const totalProducts = totalProductsRows[0][0].count;
+  const totalAmcPlans = totalAmcPlansRows[0][0].count;
+  const totalServiceRequests = totalServiceRequestsRows[0][0].count;
+  const totalInquiries = totalInquiriesRows[0][0].count;
 
   res.json({
     stats: {
@@ -42,12 +43,12 @@ export const getDashboard = asyncHandler(async (_req: Request, res: Response) =>
       totalServiceRequests,
       totalInquiries,
     },
-    statusBreakdown: statusBreakdown.map((item) => ({
+    statusBreakdown: statusBreakdownRows[0].map((item: any) => ({
       status: item.status,
-      count: item._count.status,
+      count: item.count,
     })),
-    recentServiceRequests,
-    recentInquiries,
+    recentServiceRequests: recentServiceRequestsRows[0],
+    recentInquiries: recentInquiriesRows[0],
     monthlyRequests: [],
   });
 });

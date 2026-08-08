@@ -39,24 +39,7 @@ async function verify() {
     });
   }
 
-  // 2. Prisma validation & DB connection test
-  try {
-    console.log("Checking Prisma Schema & Connection...");
-    execSync("npx prisma validate", { stdio: "ignore", cwd: path.resolve(__dirname, "../../") });
-    results.push({
-      name: "Prisma Validate Check",
-      passed: true,
-      message: "Prisma schema is completely valid.",
-    });
-  } catch (err: any) {
-    results.push({
-      name: "Prisma Validate Check",
-      passed: false,
-      message: "Prisma schema validation failed. Run 'npx prisma validate'.",
-    });
-  }
-
-  // 3. TypeScript validation (Backend compilation test)
+  // 2. TypeScript validation (Backend compilation test)
   try {
     console.log("Checking Backend TS compilation...");
     execSync("npx tsc --noEmit", { stdio: "ignore", cwd: path.resolve(__dirname, "../../") });

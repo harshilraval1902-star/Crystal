@@ -24,7 +24,7 @@ import heroSlideRoutes from "./routes/heroSlide.routes";
 import roFeatureRoutes from "./routes/roFeature.routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { UPLOAD_DIR } from "./middleware/upload";
-import prisma from "./config/db";
+import pool from "./config/db";
 import { env } from "./config/env";
 
 import v1Router from "./routes/v1";
@@ -167,7 +167,7 @@ app.get(["/health", "/api/health"], async (req, res) => {
   let dbStatus = "UP";
   let dbLatency = 0;
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await pool.query("SELECT 1");
     dbLatency = Date.now() - startDb;
   } catch (err) {
     dbStatus = "DOWN";
@@ -211,7 +211,7 @@ let server: any;
 // ── Start ─────────────────────────────────────────────────
 async function main() {
   try {
-    await prisma.$connect();
+    await pool.query("SELECT 1");
     console.log("✅ Database connected.");
 
 
@@ -223,7 +223,7 @@ async function main() {
     });
   } catch (err) {
     console.error("❌ Failed to start server:", err);
-    await prisma.$disconnect();
+    await pool.end();
     process.exit(1);
   }
 }
@@ -241,11 +241,11 @@ const gracefulShutdown = (signal: string) => {
   server.close(async () => {
     console.log("🛑 HTTP server closed.");
     try {
-      await prisma.$disconnect();
-      console.log("💾 Prisma client disconnected.");
+      await pool.end();
+      console.log("💾 MySQL pool disconnected.");
       process.exit(0);
     } catch (err) {
-      console.error("❌ Error during Prisma disconnect:", err);
+      console.error("❌ Error during MySQL pool disconnect:", err);
       process.exit(1);
     }
   });

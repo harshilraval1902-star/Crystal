@@ -1,22 +1,32 @@
 import { Request, Response } from "express";
-import prisma from "../config/db";
+import pool from "../config/db";
+import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { asyncHandler } from "../utils/asyncHandler";
 import { createError } from "../middleware/errorHandler";
+import { mapBooleans, buildUpdateQuery } from "../utils/dbHelpers";
+
+const BOOLEAN_FIELDS = ["isDeleted"];
+
+function formatServiceRequest(request: any) {
+  return mapBooleans(request, BOOLEAN_FIELDS);
+}
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
-  const requests = await prisma.serviceRequest.findMany({
-    where: { isDeleted: false },
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(requests);
+  const [requests] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM servicerequest WHERE isDeleted = ? ORDER BY createdAt DESC",
+    [false]
+  );
+  res.json(requests.map(formatServiceRequest));
 });
 
 export const getById = asyncHandler(async (req: Request, res: Response) => {
-  const request = await prisma.serviceRequest.findFirst({
-    where: { id: Number(req.params.id), isDeleted: false },
-  });
+  const [requests] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1",
+    [Number(req.params.id), false]
+  );
+  const request = requests[0];
   if (!request) throw createError("Service request not found.", 404);
-  res.json(request);
+  res.json(formatServiceRequest(request));
 });
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
@@ -34,35 +44,58 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     throw createError("customerName and phone are required.", 400);
   }
 
-  const request = await prisma.serviceRequest.create({
-    data: {
-      customerName: data.customerName,
-      phone: data.phone,
-      email: data.email,
-      address: data.address,
-      serviceType: data.serviceType,
-      message: data.message,
-      status: data.status ?? "new",
-    },
-  });
+  const insertData = {
+    customerName: data.customerName,
+    phone: data.phone,
+    email: data.email ?? null,
+    address: data.address ?? null,
+    serviceType: data.serviceType ?? null,
+    message: data.message ?? null,
+    status: data.status ?? "new",
+    isDeleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
 
-  res.status(201).json(request);
+  const [result] = await pool.execute<ResultSetHeader>(
+    `INSERT INTO servicerequest (
+      customerName, phone, email, address, serviceType, message, status, isDeleted, createdAt, updatedAt
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      insertData.customerName, insertData.phone, insertData.email, insertData.address,
+      insertData.serviceType, insertData.message, insertData.status, insertData.isDeleted,
+      insertData.createdAt, insertData.updatedAt
+    ]
+  );
+
+  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ?", [result.insertId]);
+  res.status(201).json(formatServiceRequest(rows[0]));
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const existing = await prisma.serviceRequest.findFirst({ where: { id, isDeleted: false } });
-  if (!existing) throw createError("Service request not found.", 404);
+  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+  if (!existingRows[0]) throw createError("Service request not found.", 404);
 
-  const updated = await prisma.serviceRequest.update({ where: { id }, data: req.body });
-  res.json(updated);
+  const updateData = { ...req.body, updatedAt: new Date() };
+  const queryParts = buildUpdateQuery("servicerequest", updateData);
+  
+  if (queryParts) {
+    await pool.execute(
+      `UPDATE servicerequest SET ${queryParts.setClause} WHERE id = ?`,
+      [...queryParts.values, id]
+    );
+  }
+
+  const [updatedRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ?", [id]);
+  res.json(formatServiceRequest(updatedRows[0]));
 });
 
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const existing = await prisma.serviceRequest.findFirst({ where: { id, isDeleted: false } });
-  if (!existing) throw createError("Service request not found.", 404);
+  const [existingRows] = await pool.query<RowDataPacket[]>("SELECT * FROM servicerequest WHERE id = ? AND isDeleted = ? LIMIT 1", [id, false]);
+  if (!existingRows[0]) throw createError("Service request not found.", 404);
 
-  await prisma.serviceRequest.update({ where: { id }, data: { isDeleted: true } });
+  await pool.execute("UPDATE servicerequest SET isDeleted = ?, updatedAt = NOW() WHERE id = ?", [true, id]);
   res.status(204).send();
 });

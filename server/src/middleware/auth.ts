@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../config/db";
+import pool from "../config/db";
+import { RowDataPacket } from "mysql2/promise";
 
 export interface AuthRequest extends Request {
   adminId?: number;
@@ -67,8 +68,9 @@ export async function verifyRefreshToken(
     };
 
     // Also verify it exists in the DB and is not expired
-    const stored = await prisma.refreshToken.findUnique({ where: { token } });
-    if (!stored || stored.expiresAt < new Date()) {
+    const [tokens] = await pool.query<RowDataPacket[]>("SELECT * FROM refreshtoken WHERE token = ? LIMIT 1", [token]);
+    const stored = tokens[0];
+    if (!stored || new Date(stored.expiresAt) < new Date()) {
       return null;
     }
 

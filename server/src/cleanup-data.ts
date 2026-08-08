@@ -1,20 +1,20 @@
-import prisma from "./config/db";
+import pool from "./config/db";
 
 async function clean() {
   console.log("Cleaning up content tables so frontend migration can re-seed with correct image assets...");
   try {
-    await prisma.product.deleteMany();
-    await prisma.amcPlan.deleteMany();
+    await pool.execute("DELETE FROM product");
+    await pool.execute("DELETE FROM amcplan");
 
-    await prisma.galleryImage.deleteMany();
-    await prisma.siteService.deleteMany();
-    await prisma.faq.deleteMany();
-    await prisma.setting.deleteMany();
+    await pool.execute("DELETE FROM galleryimage");
+    await pool.execute("DELETE FROM siteservice");
+    await pool.execute("DELETE FROM faq");
+    await pool.execute("DELETE FROM setting");
     console.log("✅ Cleanup done! Refresh your browser to let the frontend auto-seed with correct image paths.");
   } catch (err) {
     console.error("❌ Cleanup failed:", err);
   } finally {
-    await prisma.$disconnect();
+    await pool.end();
   }
 }
 

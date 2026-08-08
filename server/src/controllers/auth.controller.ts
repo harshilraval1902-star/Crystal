@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import prisma from "../config/db";
+import pool from "../config/db";
+import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -21,7 +22,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     throw createError("Email and password are required.", 400);
   }
 
-  const admin = await prisma.admin.findUnique({ where: { email } });
+  const [admins] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM admin WHERE email = ? LIMIT 1",
+    [email]
+  );
+  const admin = admins[0];
+
   if (!admin || !admin.isActive) {
     throw createError("Invalid credentials.", 401);
   }
@@ -37,15 +43,12 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_TTL_DAYS);
 
-  await prisma.refreshToken.create({
-    data: { token: refreshToken, adminId: admin.id, expiresAt },
-  });
+  await pool.execute(
+    "INSERT INTO refreshtoken (token, adminId, expiresAt, createdAt) VALUES (?, ?, ?, NOW())",
+    [refreshToken, admin.id, expiresAt]
+  );
 
-  // Update lastLogin
-  await prisma.admin.update({
-    where: { id: admin.id },
-    data: { lastLogin: new Date() },
-  });
+  // Removed lastLogin update as the actual schema doesn't have it
 
   res.json({
     accessToken,
@@ -59,16 +62,23 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   const { refreshToken, allDevices } = req.body as { refreshToken?: string; allDevices?: boolean };
 
   if (refreshToken) {
-    const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+    const [tokens] = await pool.execute<RowDataPacket[]>(
+      "SELECT * FROM refreshtoken WHERE token = ? LIMIT 1",
+      [refreshToken]
+    );
+    const stored = tokens[0];
+
     if (stored) {
       if (allDevices) {
-        await prisma.refreshToken.deleteMany({
-          where: { adminId: stored.adminId }
-        });
+        await pool.execute(
+          "DELETE FROM refreshtoken WHERE adminId = ?",
+          [stored.adminId]
+        );
       } else {
-        await prisma.refreshToken.delete({
-          where: { id: stored.id }
-        }).catch(() => {});
+        await pool.execute(
+          "DELETE FROM refreshtoken WHERE id = ?",
+          [stored.id]
+        ).catch(() => {});
       }
     }
   }
@@ -85,12 +95,20 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   }
 
   // Reuse Detection: Verify token against DB
-  const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+  const [tokens] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM refreshtoken WHERE token = ? LIMIT 1",
+    [refreshToken]
+  );
+  const stored = tokens[0];
+
   if (!stored) {
     try {
       const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { adminId: number };
       // Revoke all active sessions on token reuse detection (theft protection)
-      await prisma.refreshToken.deleteMany({ where: { adminId: payload.adminId } });
+      await pool.execute(
+        "DELETE FROM refreshtoken WHERE adminId = ?",
+        [payload.adminId]
+      );
       throw createError("Refresh token reuse detected. All sessions revoked.", 401);
     } catch (err: any) {
       if (err.statusCode === 401) throw err;
@@ -98,12 +116,17 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     }
   }
 
-  if (stored.expiresAt < new Date()) {
-    await prisma.refreshToken.delete({ where: { id: stored.id } }).catch(() => {});
+  if (new Date(stored.expiresAt) < new Date()) {
+    await pool.execute("DELETE FROM refreshtoken WHERE id = ?", [stored.id]).catch(() => {});
     throw createError("Invalid or expired refresh token.", 401);
   }
 
-  const admin = await prisma.admin.findUnique({ where: { id: stored.adminId } });
+  const [admins] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM admin WHERE id = ? LIMIT 1",
+    [stored.adminId]
+  );
+  const admin = admins[0];
+
   if (!admin || !admin.isActive) {
     throw createError("Admin not found or inactive.", 401);
   }
@@ -115,17 +138,24 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
   expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_TTL_DAYS);
 
   // Rotate refresh token
-  await prisma.refreshToken.delete({ where: { id: stored.id } }).catch(() => {});
-  await prisma.refreshToken.create({
-    data: { token: newRefreshToken, adminId: admin.id, expiresAt },
-  });
+  await pool.execute("DELETE FROM refreshtoken WHERE id = ?", [stored.id]).catch(() => {});
+  
+  await pool.execute(
+    "INSERT INTO refreshtoken (token, adminId, expiresAt, createdAt) VALUES (?, ?, ?, NOW())",
+    [newRefreshToken, admin.id, expiresAt]
+  );
 
   res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
 });
 
 // GET /api/admin/auth/me
 export const me = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const admin = await prisma.admin.findUnique({ where: { id: req.adminId } });
+  const [admins] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM admin WHERE id = ? LIMIT 1",
+    [req.adminId!]
+  );
+  const admin = admins[0];
+
   if (!admin) {
     throw createError("Admin not found.", 404);
   }
